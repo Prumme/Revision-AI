@@ -1,0 +1,11 @@
+services: 
+  frontend:
+    image: node
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - ./entrypoint.sh:/app/entrypoint.sh
+    working_dir: /app
+    entrypoint: ["/app/entrypoint.sh"]
+    
