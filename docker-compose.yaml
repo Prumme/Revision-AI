@@ -1,0 +1,17 @@
+services: 
+  frontend:
+    image: node:18
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend
+      - ./entrypoint.sh:/app/entrypoint.sh
+    working_dir: /app/frontend
+    entrypoint: ["/app/entrypoint.sh"]
+    
+
+    # TODO: créer un service pour lancer le backend 
+    # backend:
+
+    # TODO: créer un service pour lancer la base de données
+    # database:
