@@ -1,1 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Expanded:wght@100;200;300;400;500;600;700;800;900');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+
 @import "tailwindcss";
+
+
+@theme {
+  --color-background: #F5F5F5;
+  --color-foreground: #000000;
+  
+  --color-background-alt: #FFFFFF;
+  --color-foreground-alt: #00000099;
+
+  --color-primary: #FFEC9E;
+  
+
+  --font-encode: "Encode Sans Semi Expanded", sans-serif; 
+  --font-outfit: "Outfit", sans-serif; 
+
+  --inset-shadow-md: inset 0 4px 6px rgba(0, 0, 0, 0.3); 
+  }
+
