@@ -1,3 +1,5 @@
+<script lang="ts" setup></script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Header -->
@@ -14,5 +16,3 @@
     <!-- <footer class="text-center p-4 text-sm text-gray-600"></footer> -->
   </div>
 </template>
-
-<script lang="ts" setup></script>
