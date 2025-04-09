@@ -1,5 +1,8 @@
+import LoginPage from '@/views/authentication/LoginPage.vue'
+import RegisterPage from '@/views/authentication/RegisterPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import ForgotPassword from '@/views/authentication/ForgotPassword.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +20,21 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage,
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,  
+    }
   ],
 })
 
