@@ -1,3 +1,21 @@
+<script setup lang="ts">
+import Button from "@/components/buttons/ButtonComponent.vue";
+import Card from "@/components/cards/CardComponent.vue";
+import Input from "@/components/inputs/InputComponent.vue";
+import AppLayout from "@/components/layouts/AppLayout.vue";
+import { ref } from "vue";
+
+// Form props
+const username = ref("");
+const email = ref("");
+const password = ref("");
+const passwordConfirmation = ref("");
+
+const handleRegister = () => {
+  console.log("Register");
+};
+</script>
+
 <template>
   <AppLayout>
     <!-- Layout Simple -->
@@ -97,21 +115,3 @@
     </div>
   </AppLayout>
 </template>
-
-<script setup lang="ts">
-import Button from "@/components/buttons/ButtonComponent.vue";
-import Card from "@/components/cards/CardComponent.vue";
-import Input from "@/components/inputs/InputComponent.vue";
-import AppLayout from "@/components/layouts/AppLayout.vue";
-import { ref } from "vue";
-
-// Form props
-const username = ref("");
-const email = ref("");
-const password = ref("");
-const passwordConfirmation = ref("");
-
-const handleRegister = () => {
-  console.log("Register");
-};
-</script>
