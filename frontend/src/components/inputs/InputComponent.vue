@@ -77,6 +77,7 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
           :placeholder="placeholder"
           :autocomplete="autocomplete"
         />
+
         <button
           type="button"
           @click="togglePasswordVisibility"
@@ -89,7 +90,7 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
 
       <!-- Password criterias -->
       <div
-        v-if="type === 'password' && showCriteria === true"
+        v-if="type === 'password' && showCriteria"
         class="mt-1 grid grid-cols-2 gap-2 text-[10px]"
       >
         <div class="flex items-center gap-2">

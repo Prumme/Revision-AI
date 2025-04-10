@@ -7,9 +7,7 @@
 
       // Sizes (Responsive with Tailwind classes)
       // Default size (larger on bigger screens)
-      'px-6 py-2.5 text-sm': size == 'default',
-      'px-4 py-2 text-base': size == 'default' && windowWidth >= 768 && windowWidth < 1024,
-      'px-3 py-1.5 text-sm': size == 'default' && windowWidth < 768,
+      'px-3 py-1.5 text-sm md:px-4 md:py-2 md:text-base lg:px-6 lg:py-2.5 lg:text-base': size == 'default',
 
       // Icon size
       'px-1.5 py-1.5 w-min': size == 'icon',
