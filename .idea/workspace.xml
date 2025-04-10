@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="Action frontend test">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/frontend-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/frontend-test.yml" afterDir="false" />
-    </list>
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="Action frontend test" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -102,7 +100,15 @@
       <option name="project" value="LOCAL" />
       <updated>1744278652412</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Action frontend test">
+      <option name="closed" value="true" />
+      <created>1744278771390</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1744278771390</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
