@@ -1,3 +1,6 @@
+import LoginPage from '@/views/authentication/LoginPage.vue'
+import RegisterPage from '@/views/authentication/RegisterPage.vue'
+import ForgotPassword from '@/views/authentication/ForgotPassword.vue'
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import UserSidenav from "@/components/UserSidenav.vue";
@@ -22,6 +25,21 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginPage,
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage,
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+    }
   ],
 });
 
