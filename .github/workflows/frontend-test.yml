@@ -2,8 +2,7 @@ name: Test Vue Frontend
 
 on:
   pull_request:
-    paths:
-      - 'frontend/**'
+    types: [ opened, synchronize, reopened ]
 
 jobs:
   test:
