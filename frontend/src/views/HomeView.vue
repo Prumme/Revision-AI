@@ -1,5 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
 <template>
-  <div class="container"></div>
+  <main>
+    Pages
+  </main>
 </template>
