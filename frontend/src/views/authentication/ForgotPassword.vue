@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import Button from "@/components/buttons/ButtonComponent.vue";
 import Card from "@/components/cards/CardComponent.vue";

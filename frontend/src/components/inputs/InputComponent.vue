@@ -136,4 +136,3 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
     />
   </div>
 </template>
-
