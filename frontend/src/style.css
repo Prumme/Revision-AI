@@ -14,11 +14,17 @@
   --color-primary-dark: #e9d275;
 
   --color-error: #ef2d56;
-
+  --color-error-dark: #c72a4d;
+  --color-success-light: #62ef9f;
   --color-success: #0cce6b;
+
+  --color-blue-light: #f0faff;
+  --color-blue: #9ee0ff;
 
   --color-gray-extralight: #d9d9d9;
   --color-gray-light: #5a5a5a;
+
+  --color-black-transparent: rgba(0, 0, 0, 0.58);
   --color-black: #28262c;
 
   --font-encode: "Encode Sans Semi Expanded", sans-serif;
