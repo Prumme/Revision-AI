@@ -20,7 +20,7 @@ const handleLogin = () => {
       <!-- Illustration -->
       <div class="relative w-full h-screen">
         <img
-          src="../../assets/backgrounds/background_illustration.webp"
+          src="@/assets/backgrounds/background_illustration.webp"
           alt="background_illustration"
           class="w-full h-full object-cover"
         />
