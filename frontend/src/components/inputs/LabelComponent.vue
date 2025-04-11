@@ -12,3 +12,4 @@ defineProps({
     <slot />
   </label>
 </template>
+  

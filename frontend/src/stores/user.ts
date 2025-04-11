@@ -4,13 +4,15 @@ import { ref } from "vue";
 
 export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
-<<<<<<< Updated upstream
 
   const getFullName = () => {
+
+    if (!user.value) {
+      return "John Doe";
+    }
+
     return user?.value?.firstname + " " + user?.value?.lastname;
   };
-=======
->>>>>>> Stashed changes
 
   function setUser(newUser: User) {
     user.value = newUser;
@@ -24,9 +26,6 @@ export const useUserStore = defineStore("user", () => {
     user,
     setUser,
     clearUser,
-<<<<<<< Updated upstream
     getFullName,
-=======
->>>>>>> Stashed changes
   };
 });

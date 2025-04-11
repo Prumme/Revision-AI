@@ -57,20 +57,3 @@ defineProps({
     </transition>
   </div>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  @apply transition-opacity transition-transform duration-300 ease-in-out;
-}
-
-.fade-enter,
-.fade-leave-to {
-  @apply opacity-0 scale-95;
-}
-
-.fade-enter-to,
-.fade-leave {
-  @apply opacity-100 scale-100;
-}
-</style>

@@ -59,24 +59,26 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div
-    :class="[
-      'flex items-center gap-4 p-4 rounded-lg shadow-md w-full whitespace-nowrap',
-      colorClass,
-      'transition-opacity duration-500 ease-in-out',
-    ]"
-    class="font-outfit"
-    role="alert"
-  >
-    <component :is="Icon" class="w-5 h-5 text-xl" />
-    <span class="font-medium">{{ message }}</span>
-
-    <button
-      @click="closeToast"
-      class="ml-4 p-1 text-sm focus:outline-none"
-      :class="iconColor[props.type || 'info']"
+  <div class="bg-white">
+    <div
+      :class="[
+        'flex items-center gap-4 lg:p-4 rounded-lg shadow-md w-full whitespace-nowrap',
+        colorClass,
+        'transition-opacity duration-500 ease-in-out',
+      ]"
+      class="font-outfit"
+      role="alert"
     >
-      <XIcon class="w-5 h-5" />
-    </button>
+      <component :is="Icon" class="w-5 h-5 text-xl" />
+      <span class="font-medium">{{ message }}</span>
+
+      <button
+        @click="closeToast"
+        class="lg:ml-4 p-1 text-sm focus:outline-none"
+        :class="iconColor[props.type || 'info']"
+      >
+        <XIcon class="w-5 h-5" />
+      </button>
+    </div>
   </div>
 </template>

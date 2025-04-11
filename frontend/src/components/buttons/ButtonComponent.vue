@@ -19,10 +19,6 @@ const { type = "button", variant = "primary", size = "default", disabled = false
       'w-full inline-flex items-center justify-center font-outfit font-medium transition-all duration-75 ease-in-out border-2 border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed': true,
 
       // Sizes (Responsive with Tailwind classes)
-<<<<<<< Updated upstream
-      // Default size (larger on bigger screens)
-=======
->>>>>>> Stashed changes
       'px-3 py-1.5 text-sm md:px-4 md:py-2 md:text-base lg:px-6 lg:py-2.5 lg:text-base':
         size == 'default',
 
@@ -38,8 +34,8 @@ const { type = "button", variant = "primary", size = "default", disabled = false
         variant === 'rounded-full',
 
       // Icon position
-      'flex flex-row-reverse gap-2': positionIcon === 'right',
-      'flex flex-row gap-2': positionIcon === 'left',
+      'flex items-center flex-row-reverse gap-2.5': positionIcon === 'right',
+      'flex items-center flex-row gap-2.5': positionIcon === 'left',
     }"
   >
     <span v-if="positionIcon === 'left'">

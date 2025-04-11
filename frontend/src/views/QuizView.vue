@@ -73,7 +73,7 @@ const questions = ref([
     <ToastComponent type="error" message="Ceci est un message d'erreur" class="mb-5" />
   </div>
 
-  <section class="flex flex-col gap-5 p-4 w-full">
+  <section class="flex flex-col gap-5 w-full">
     <FormHeader title="Titre de votre quiz" description="Créez votre quiz" />
 
     <!-- Grille des questions -->

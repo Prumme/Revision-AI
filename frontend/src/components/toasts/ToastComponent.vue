@@ -15,13 +15,11 @@ const closeToast = () => {
 </script>
 
 <template>
-  <div class="relative font-oufit">
-    <transition name="fade">
-      <div v-if="showToast" class="fixed top-0 right-5 m-4 z-50">
-        <ToastMessage :type="type" :message="message" @close="closeToast" />
-      </div>
-    </transition>
-  </div>
+  <transition name="fade">
+    <div v-if="showToast" class="fixed lg:top-0 right-2.5 lg:right-5 lg:m-4 z-50">
+      <ToastMessage :type="type" :message="message" @close="closeToast" />
+    </div>
+  </transition>
 </template>
 
 <style scoped>

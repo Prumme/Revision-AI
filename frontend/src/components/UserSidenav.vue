@@ -1,44 +1,17 @@
 <script setup lang="ts">
-<<<<<<< Updated upstream
-import { useRoute } from "vue-router";
-import NavLink from "@/components/buttons/NavLink.vue";
-
-const route = useRoute();
-</script>
-
-<template>
-  <main class="w-screen h-screen flex">
-    <nav class="w-86 h-full bg-background-alt text-foreground-alt">
-      <div class="px-7 pt-14 font-outfit flex flex-col gap-3">
-        <NavLink
-          to="/dashboard"
-          icon="House"
-          text="Accueil"
-          :active="route.fullPath === '/dashboard'"
-        />
-        <NavLink to="/exams" icon="FileQuestion" text="Quiz" :active="route.fullPath === '/quiz'" />
-        <NavLink
-          to="/documents"
-          icon="File"
-          text="Documents"
-          :active="route.fullPath === '/documents'"
-        />
-      </div>
-    </nav>
-
-    <div class="w-full h-full overflow-scroll bg-background text-foreground pt-10 pl-20">
-=======
 import NavLink from "@/components/buttons/NavLink.vue";
 import Dropdown from "@/components/dropdowns/DropdownInput.vue";
 import ProfileComponent from "@/components/profile/ProfileComponent.vue";
 import { ChevronsRightIcon, LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
 import { ref } from "vue";
 
-const isSidebarOpen = ref(false); // La sidebar est fermée par défaut
+const isSidebarOpen = ref(false);
+const isSidebarCollapsed = ref(false);
 
 // Toggle Sidebar
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
 };
 </script>
 
@@ -48,18 +21,19 @@ const toggleSidebar = () => {
     <nav
       class="hidden md:block relative p-5"
       :class="[
-        'bg-white text-foreground-alt',
+        'bg-white text-foreground-alt border border-l border-gray-extralight',
         'h-full',
         'transition-all duration-500 ease-in-out',
         'shadow-lg',
         isSidebarOpen ? 'lg:w-92' : 'lg:w-24',
         'w-24',
         isSidebarOpen && 'md:w-32',
+        isSidebarOpen && 'lg:shadow-lg',
       ]"
     >
       <div class="flex flex-col justify-between h-full">
         <!-- Menus -->
-        <div class="font-outfit flex flex-col gap-4 mt-5 text-black">
+        <div class="font-outfit flex flex-col gap-2.5 mt-5 text-black">
           <div class="flex items-center justify-center">
             <h1
               class="text-xl truncate font-medium text-black font-outfit grow text-left pl-3"
@@ -74,7 +48,7 @@ const toggleSidebar = () => {
             />
           </div>
           <NavLink
-            to="/home"
+            to="/dashboard"
             icon="Home"
             :text="isSidebarOpen ? 'Accueil' : ''"
             :active="true"
@@ -106,16 +80,23 @@ const toggleSidebar = () => {
             <template #menus>
               <ProfileComponent
                 :isSidebarOpen="isSidebarOpen"
+                :isSidebarCollapsed="isSidebarCollapsed"
                 :icon="false"
                 class="block px-4 py-4"
               />
-              <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Mon profil</a>
-              <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
-              <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
-              <a href="#" class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100">
+              <RouterLink to="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                >Mon profil</RouterLink
+              >
+              <RouterLink to="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                >Boutique</RouterLink
+              >
+              <RouterLink to="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                >Paramètres</RouterLink
+              >
+              <RouterLink to="#" class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100">
                 <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
                 Se déconnecter
-              </a>
+              </RouterLink>
             </template>
           </Dropdown>
         </div>
@@ -162,7 +143,9 @@ const toggleSidebar = () => {
               :icon="false"
               class="block px-4 py-4"
             />
-            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Mon profil</a>
+            <a href="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              >Mon profil</a
+            >
             <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
             <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
             <a href="#" class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100">
@@ -174,8 +157,7 @@ const toggleSidebar = () => {
       </div>
     </div>
 
-    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-4">
->>>>>>> Stashed changes
+    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8">
       <router-view></router-view>
     </div>
   </main>
