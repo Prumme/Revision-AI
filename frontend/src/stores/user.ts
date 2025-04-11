@@ -6,6 +6,11 @@ export const useUserStore = defineStore("user", () => {
   const user = ref<User | null>(null);
 
   const getFullName = () => {
+
+    if (!user.value) {
+      return "John Doe";
+    }
+
     return user?.value?.firstname + " " + user?.value?.lastname;
   };
 

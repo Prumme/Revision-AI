@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from "lucide-vue-next";
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
-import LabelComponent from "./LabelComponent.vue";
+import Label from "@/components/inputs/LabelComponent.vue";
 
 const props = defineProps({
-  modelValue: { type: String, required: true },
+  modelValue: { type: [String, Number], required: true },
   label: { type: String, required: false },
   placeholder: { type: String, required: false },
   type: { type: String, default: "text" },
@@ -31,7 +31,7 @@ const togglePasswordVisibility = () => {
 };
 
 const onInput = (event: Event) => {
-  const target = event.target as HTMLInputElement;
+  const target = event.target as HTMLInputElement | HTMLTextAreaElement;
   emit("update:modelValue", target.value);
 };
 
@@ -53,10 +53,9 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
 
 <template>
   <div class="relative">
-    <LabelComponent v-if="label" :for-id="id" class="block text-sm font-medium text-gray-700">
+    <Label v-if="label" :for-id="id" class="block text-sm font-medium text-gray-700">
       {{ label }}
-    </LabelComponent>
-
+    </Label>
     <!-- Password input -->
     <div class="flex flex-col gap-2">
       <div
@@ -73,7 +72,7 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
           @input="onInput"
           @focus="isFocused = true"
           @blur="isFocused = false"
-          class="p-2 w-full flex-1 outline-none bg-transparent text-sm text-black"
+          class="placeholder:font-outfit p-2 w-full flex-1 outline-none bg-transparent text-sm text-black"
           :placeholder="placeholder"
           :autocomplete="autocomplete"
         />
@@ -119,20 +118,39 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
     </div>
 
     <!-- Basic input (non-password) -->
-    <input
-      v-if="type !== 'password'"
-      :id="id"
-      :type="type"
-      :value="modelValue"
-      @input="onInput"
-      @focus="isFocused = true"
-      @blur="isFocused = false"
-      :class="[
-        'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
-        isFocused ? 'border-primary' : 'border-gray-300',
-      ]"
-      :placeholder="placeholder"
-      :autocomplete="autocomplete"
-    />
+    <template v-if="type !== 'password'">
+      <input
+        v-if="type !== 'textarea'"
+        :id="id"
+        :type="type"
+        :value="modelValue"
+        @input="onInput"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+        class="placeholder:font-outfit placeholder:text-gray-extralight"
+        :class="[
+          'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
+          isFocused ? 'border-primary' : 'border-gray-300',
+        ]"
+        :placeholder="placeholder"
+        :autocomplete="autocomplete"
+      />
+
+      <textarea
+        v-else
+        :id="id"
+        :value="modelValue"
+        @input="onInput"
+        @focus="isFocused = true"
+        @blur="isFocused = false"
+        :placeholder="placeholder"
+        class="placeholder:font-outfit placeholder:text-gray-extralight mt-2 p-2 w-full border rounded-md outline-none text-sm text-black"
+        :class="[
+          'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
+          isFocused ? 'border-primary' : 'border-gray-300',
+        ]"
+        :rows="4"
+      />
+    </template>
   </div>
 </template>
