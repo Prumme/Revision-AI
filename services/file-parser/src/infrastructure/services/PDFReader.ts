@@ -52,41 +52,41 @@ export class PDFReader implements FileReader<PDFContent>{
         const randomStringFile = Math.random().toString(36).substring(2, 15)
         const dirName = path.join("/tmp", "pdf-reader", randomStringFile)
         fs.mkdirSync(dirName, { recursive: true })
+        try{
+            for(let i = 0; i < pageCount; i++){
+                const prefix = path.join("/tmp", "pdf-reader", randomStringFile, `page-${i + 1}`)
+                const content = await this.poppler.pdfToText(this.filePath, undefined,{
+                    firstPageToConvert: i + 1,
+                    lastPageToConvert: i + 1,
+                })
 
-        for(let i = 0; i < pageCount; i++){
-            const prefix = path.join("/tmp", "pdf-reader", randomStringFile, `page-${i + 1}`)
-            const content = await this.poppler.pdfToText(this.filePath, undefined,{
-                firstPageToConvert: i + 1,
-                lastPageToConvert: i + 1,
-            })
+                await this.poppler.pdfImages(this.filePath, prefix, {
+                    allFiles: true,
+                    firstPageToConvert: i + 1,
+                    lastPageToConvert: i + 1,
+                })
 
-            await this.poppler.pdfImages(this.filePath, prefix, {
-                allFiles: true,
-                firstPageToConvert: i + 1,
-                lastPageToConvert: i + 1,
-            })
-
-            const files = fs.readdirSync(dirName)
-            const images : Promise<ImageContent|FileReadException>[] = []
-            for(const file of files){
-                if(file.startsWith(`page-${i + 1}`)){
-                    const imageReader = new ImageReader()
-                    images.push(imageReader.read(path.join(dirName, file)))
+                const files = fs.readdirSync(dirName)
+                const images : Promise<ImageContent|FileReadException>[] = []
+                for(const file of files){
+                    if(file.startsWith(`page-${i + 1}`)){
+                        const imageReader = new ImageReader()
+                        images.push(imageReader.read(path.join(dirName, file)))
+                    }
                 }
-            }
 
-            const imageContents = await Promise.all(images)
-            const page : PDFPage = {
-                number: i + 1,
-                content,
-                images: imageContents.filter(image => !(image instanceof FileReadException) && Boolean(image.content)) as ImageContent[]
-            }
+                const imageContents = await Promise.all(images)
+                const page : PDFPage = {
+                    number: i + 1,
+                    content,
+                    images: imageContents.filter(image => !(image instanceof FileReadException) && Boolean(image.content)) as ImageContent[]
+                }
 
-            pages.push(page)
+                pages.push(page)
+            }
+        } finally {
+            fs.rmSync(dirName, { recursive: true, force: true })
         }
-
-        fs.rmSync(dirName, { recursive: true, force: true })
-
         return pages
 
     }
