@@ -6,12 +6,14 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint .",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.24.0",
+    "@types/amqplib": "^0.10.7",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
@@ -26,7 +28,9 @@
     "typescript-eslint": "^8.29.1"
   },
   "dependencies": {
+    "amqplib": "^0.10.7",
     "node-poppler": "^7.2.4",
-    "node-tesseract-ocr": "^2.2.1"
+    "node-tesseract-ocr": "^2.2.1",
+    "zod": "^3.24.2"
   }
 }

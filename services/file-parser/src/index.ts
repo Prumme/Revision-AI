@@ -1,15 +1,10 @@
-import { PDFReader } from "./infrastructure/services/PDFReader";
-import * as fs from "node:fs";
+import { cliEntrypoint } from "./infrastructure/cli/cliEntrypoint";
+import { mqConsumer } from "./infrastructure/broker/mqConsumer";
 
-async function main(){
-    const pdfReader = new PDFReader()
-     pdfReader.read("test.pdf").then(result=>{
-        if(result instanceof Error){
-            console.error(result)
-            return
-        }
-        fs.writeFileSync("result.json", JSON.stringify(result, null, 2))
-     })
+const mode = process.env.MODE || "cli"
+
+if(mode === "cli"){
+  cliEntrypoint().then()
+}else if(mode === "mq"){
+  mqConsumer().then()
 }
-
-main()
