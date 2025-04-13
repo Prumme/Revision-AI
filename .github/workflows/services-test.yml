@@ -1,0 +1,20 @@
+name: services-test.yml
+on:
+    pull_request:
+        types: [ opened, synchronize, reopened ]
+
+jobs:
+  test:
+    name: Run backend tests
+    runs-on: node:22-bullseye-slim
+
+    defaults:
+      run:
+        working-directory: services
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name : run test
+        run : sh scripts/tests.sh

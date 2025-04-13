@@ -1,12 +1,12 @@
 export type Result<T> = Success<T> | Failure;
 
-class Failure {
+export class Failure {
   readonly type = "failure";
   readonly success = false;
   constructor(public readonly error: Error) {}
 }
 
-class Success<T> {
+export class Success<T> {
   readonly type = "success";
   readonly success = true;
   constructor(public readonly value: T) {}

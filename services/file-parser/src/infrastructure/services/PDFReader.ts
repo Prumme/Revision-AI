@@ -1,21 +1,27 @@
 import { FileReader } from "../../app/services/FileReader";
 import { PDFContent, PDFInfo, PDFPage } from "../../app/value-objects/PDFContent";
-import {Poppler} from "node-poppler"
+import {Poppler as popplerLib} from "node-poppler"
 import { FileReadException } from "../../app/exceptions/FileReadException";
-import path from "node:path";
-import * as fs from "node:fs";
+import pathLib from "node:path";
+import * as fsLib from "node:fs";
 import { ImageReader } from "./ImageReader";
 import { ImageContent } from "../../app/value-objects/ImageContent";
-export class PDFReader implements FileReader<PDFContent>{
-    private readonly poppler : Poppler
-    private filePath : string
 
-    constructor() {
-        this.poppler = new Poppler()
-        this.filePath = ""
+export type FileSystem = Pick<typeof fsLib, "existsSync" | "mkdirSync" | "readdirSync" | "rmSync">;
+export type PopplerUtils = Pick<popplerLib, "pdfToText" | "pdfInfo" | "pdfImages">
+export type PathType = Pick<typeof pathLib, "join" | "basename">
+export class PDFReader implements FileReader<PDFContent>{
+    private filePath : string = ""
+
+    constructor(
+      private readonly path: PathType = pathLib,
+      private readonly fs : FileSystem = fsLib,
+      private readonly poppler: PopplerUtils = new popplerLib(),
+      private readonly imageReaderClass = ImageReader
+    ){
     }
     async read(filePath: string): Promise<PDFContent|FileReadException> {
-        if (!filePath || !fs.existsSync(filePath)) return FileReadException.fileNotFound(filePath)
+        if (!filePath || !this.fs.existsSync(filePath)) return FileReadException.fileNotFound(filePath)
         this.filePath = filePath
         try{
             return {
@@ -50,11 +56,11 @@ export class PDFReader implements FileReader<PDFContent>{
 
         //create a temp dir /tmp
         const randomStringFile = Math.random().toString(36).substring(2, 15)
-        const dirName = path.join("/tmp", "pdf-reader", randomStringFile)
-        fs.mkdirSync(dirName, { recursive: true })
+        const dirName = this.path.join("/tmp", "pdf-reader", randomStringFile)
+        this.fs.mkdirSync(dirName, { recursive: true })
         try{
             for(let i = 0; i < pageCount; i++){
-                const prefix = path.join("/tmp", "pdf-reader", randomStringFile, `page-${i + 1}`)
+                const prefix = this.path.join("/tmp", "pdf-reader", randomStringFile, `page-${i + 1}`)
                 const content = await this.poppler.pdfToText(this.filePath, undefined,{
                     firstPageToConvert: i + 1,
                     lastPageToConvert: i + 1,
@@ -66,12 +72,12 @@ export class PDFReader implements FileReader<PDFContent>{
                     lastPageToConvert: i + 1,
                 })
 
-                const files = fs.readdirSync(dirName)
+                const files = this.fs.readdirSync(dirName)
                 const images : Promise<ImageContent|FileReadException>[] = []
                 for(const file of files){
                     if(file.startsWith(`page-${i + 1}`)){
-                        const imageReader = new ImageReader()
-                        images.push(imageReader.read(path.join(dirName, file)))
+                        const imageReader = new this.imageReaderClass()
+                        images.push(imageReader.read(this.path.join(dirName, file)))
                     }
                 }
 
@@ -85,7 +91,7 @@ export class PDFReader implements FileReader<PDFContent>{
                 pages.push(page)
             }
         } finally {
-            fs.rmSync(dirName, { recursive: true, force: true })
+            this.fs.rmSync(dirName, { recursive: true, force: true })
         }
         return pages
 
