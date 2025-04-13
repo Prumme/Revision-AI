@@ -6,7 +6,7 @@ on:
 jobs:
   test:
     name: Run backend tests
-    runs-on: node:22-bullseye-slim
+    runs-on: ubuntu-latest
 
     defaults:
       run:
@@ -15,6 +15,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: 22
 
       - name : run test
         run : sh scripts/tests.sh
