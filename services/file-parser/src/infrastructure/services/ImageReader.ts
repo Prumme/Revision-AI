@@ -1,4 +1,4 @@
-import { FileReader } from "../../app/services/FileReader";
+import { IFileReader } from "../../app/services/IFileReader";
 import { ImageContent } from "../../app/value-objects/ImageContent";
 import tesseractLib from "node-tesseract-ocr"
 import { FileReadException } from "../../app/exceptions/FileReadException";
@@ -10,7 +10,7 @@ export interface OCR {
     recognize(filePath: string, config: object): Promise<string>;
 }
 
-export class ImageReader implements FileReader<ImageContent> {
+export class ImageReader implements IFileReader<ImageContent> {
     private fs: FileSystem;
     private tesseract: OCR;
     constructor(fs: FileSystem = fsLib, tesseract: OCR = tesseractLib) {

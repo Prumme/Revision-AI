@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "amqplib": "^0.10.7",
+    "mime": "^4.0.7",
     "node-poppler": "^7.2.4",
     "node-tesseract-ocr": "^2.2.1",
     "zod": "^3.24.2"

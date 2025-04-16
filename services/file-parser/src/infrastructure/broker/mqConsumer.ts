@@ -1,17 +1,17 @@
 import amqp from 'amqplib';
 import { fileUploadedEvent } from "./messages/fileUploadedEvent";
-import { PDFReader } from "../services/PDFReader";
 import { handleFileUploadedUseCaseFactory } from "../../app/usecases/HandleFileUploadedUseCase";
 import { HTTPFileDownloader } from "../services/HTTPFileDownloader";
+import { FileReaderResolver } from "../services/FileReaderResolver";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const QUEUE_NAME = process.env.QUEUE_NAME || 'file-uploaded';
 
 const fileDownloader = new HTTPFileDownloader()
-const fileReader = new PDFReader()
-const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReader)
+const fileReaderResolver = new FileReaderResolver()
+const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReaderResolver)
 export const mqConsumer = async () => {
-  async function onMessage(msg : any){
+  async function onMessage(msg : amqp.Message|null){
     if(!msg) return;
     const content = msg.content.toString();
     const parsedContent = JSON.parse(content);

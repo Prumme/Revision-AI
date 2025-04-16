@@ -1,4 +1,4 @@
-import { FileReader } from "../../app/services/FileReader";
+import { IFileReader } from "../../app/services/IFileReader";
 import { PDFContent, PDFInfo, PDFPage } from "../../app/value-objects/PDFContent";
 import {Poppler as popplerLib} from "node-poppler"
 import { FileReadException } from "../../app/exceptions/FileReadException";
@@ -10,7 +10,7 @@ import { ImageContent } from "../../app/value-objects/ImageContent";
 export type FileSystem = Pick<typeof fsLib, "existsSync" | "mkdirSync" | "readdirSync" | "rmSync">;
 export type PopplerUtils = Pick<popplerLib, "pdfToText" | "pdfInfo" | "pdfImages">
 export type PathType = Pick<typeof pathLib, "join" | "basename">
-export class PDFReader implements FileReader<PDFContent>{
+export class PDFReader implements IFileReader<PDFContent>{
     private filePath : string = ""
 
     constructor(

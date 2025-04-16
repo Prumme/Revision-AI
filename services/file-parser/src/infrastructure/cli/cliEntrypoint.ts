@@ -1,17 +1,26 @@
 import { handleFileUploadedUseCaseFactory } from "../../app/usecases/HandleFileUploadedUseCase";
 import { FileSystemFileDownloader } from "../services/FileSystemFileDownloader";
-import { PDFReader } from "../services/PDFReader";
+import mimeLib from "mime"
+import { FileReaderResolver } from "../services/FileReaderResolver";
 
 const fileDownloader = new FileSystemFileDownloader()
-const fileReader = new PDFReader()
-const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReader)
+const fileReaderResolver = new FileReaderResolver()
+const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReaderResolver)
 
 export const cliEntrypoint = async () => {
   const filePath = process.argv[2];
+
   if(!filePath) {
     console.error("Please provide a file path as an argument.");
     process.exit(1);
   }
+
+  //get file mime type
+  const mimeType = mimeLib.getType(filePath)
+  if(!mimeType){
+    console.error("Cannot determine the mime type of the given file.")
+  }
+
   const result = await handleFileUploadedUseCase({
     path: filePath
   })
