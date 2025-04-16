@@ -1,0 +1,6 @@
+# File parser service
+
+Service qui permet de parser des fichiers media (pdf, audio, video, image) et de les convertir en json.
+
+Out -> Event file.parsed Queue RabbitMQ
+In -> Event file.uploaded Queue RabbitMQ
