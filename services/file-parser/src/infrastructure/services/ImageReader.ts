@@ -4,6 +4,7 @@ import tesseractLib from "node-tesseract-ocr"
 import { FileReadException } from "../../app/exceptions/FileReadException";
 import * as fsLib from "node:fs";
 import fs from "node:fs";
+import { localPath } from "../../app/entities/FileDownloaded";
 
 export type FileSystem = Pick<typeof fs, "existsSync">;
 export interface OCR {
@@ -17,8 +18,8 @@ export class ImageReader implements IFileReader<ImageContent> {
         this.fs = fs;
         this.tesseract = tesseract;
     }
-    async read(filePath: string): Promise<ImageContent|FileReadException> {
-        if (!filePath || !this.fs.existsSync(filePath)) return FileReadException.fileNotFound(filePath)
+    async read(localPath: localPath): Promise<ImageContent|FileReadException> {
+        if (!localPath || !this.fs.existsSync(localPath)) return FileReadException.fileNotFound(localPath)
         const config = {
          lang:"fra",
           oem: 1,
@@ -26,15 +27,15 @@ export class ImageReader implements IFileReader<ImageContent> {
         }
 
         try{
-            const content = await this.tesseract.recognize(filePath, config)
+            const content = await this.tesseract.recognize(localPath, config)
             const trimmedContent = content.trim()
             return {
-                fileName: filePath,
+                fileName: localPath,
                 content:trimmedContent
             }
         }catch (e : unknown){
             console.error(e);
-            return FileReadException.readError(filePath)
+            return FileReadException.readError(localPath)
         }
     }
 }

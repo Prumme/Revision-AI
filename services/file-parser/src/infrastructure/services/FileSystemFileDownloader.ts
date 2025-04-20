@@ -8,6 +8,14 @@ export type FileSystemFileDownloaderArgs = {
 }
 
 export type MimeResolver = Pick<typeof mimeLib,"getType">
+
+/**
+ * FileSystemFileDownloader class
+ * This class is responsible for "downloading" files from the local file system.
+ * It use for testing purposes.
+ * It uses the mime library to resolve the mime type of the file.
+ * It does not actually download the file, but simulates the download process.
+ */
 export class FileSystemFileDownloader implements IFileDownloader<FileSystemFileDownloaderArgs> {
   constructor(private readonly mimeResolver : MimeResolver = mimeLib) {
   }

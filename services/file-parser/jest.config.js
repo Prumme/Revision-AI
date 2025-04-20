@@ -8,4 +8,8 @@ module.exports = {
       tsconfig: 'tsconfig.json',
     },
   },
+  transform: {
+    '^.+\\.js?$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['/node_modules/(?!mime)'],
 };

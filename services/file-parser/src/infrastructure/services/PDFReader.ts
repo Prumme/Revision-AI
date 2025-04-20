@@ -6,10 +6,20 @@ import pathLib from "node:path";
 import * as fsLib from "node:fs";
 import { ImageReader } from "./ImageReader";
 import { ImageContent } from "../../app/value-objects/ImageContent";
+import { localPath } from "../../app/entities/FileDownloaded";
 
 export type FileSystem = Pick<typeof fsLib, "existsSync" | "mkdirSync" | "readdirSync" | "rmSync">;
 export type PopplerUtils = Pick<popplerLib, "pdfToText" | "pdfInfo" | "pdfImages">
 export type PathType = Pick<typeof pathLib, "join" | "basename">
+
+/**
+ * PDFReader class
+ * This class is responsible for reading PDF files and extracting text and images from them.
+ * It uses the node-poppler library to interact with PDF files and the ImageReader class to read images.
+ * It also uses the fs module to interact with the file system.
+ * It is used to read PDF files and extract text and images from them.
+ * It is not responsible for downloading or uploading files.
+ */
 export class PDFReader implements IFileReader<PDFContent>{
     private filePath : string = ""
 
@@ -20,18 +30,18 @@ export class PDFReader implements IFileReader<PDFContent>{
       private readonly imageReaderClass = ImageReader
     ){
     }
-    async read(filePath: string): Promise<PDFContent|FileReadException> {
-        if (!filePath || !this.fs.existsSync(filePath)) return FileReadException.fileNotFound(filePath)
-        this.filePath = filePath
+    async read(localPath: localPath): Promise<PDFContent|FileReadException> {
+        if (!localPath || !this.fs.existsSync(localPath)) return FileReadException.fileNotFound(localPath)
+        this.filePath = localPath
         try{
             return {
-                fileName: filePath,
+                fileName: localPath,
                 pages: await this.getPages()
             }
         }catch (e : unknown){
             if(e instanceof FileReadException) return e
             console.error(e);
-            return FileReadException.readError(filePath)
+            return FileReadException.readError(localPath)
         }
     }
 
