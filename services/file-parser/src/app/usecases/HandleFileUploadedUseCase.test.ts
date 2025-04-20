@@ -77,7 +77,7 @@ describe("HandleFileUploadedUseCase", () => {
     expect(mockFileReader.read).toHaveBeenCalledWith(mockFilePath);
   });
 
-  it('should return failure wile reader resolver fails', async () => {
+  it('should return failure when reader resolver fails', async () => {
     const mockInput = "valid-input";
     const mockFilePath = "/path/to/file";
     const mockedFileDownloaded = new FileDownloaded("fake","afke","fake",0,"fake",new Date());
