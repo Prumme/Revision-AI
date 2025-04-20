@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:mqProvider" : "ts-node-dev --respawn --transpile-only src/infrastructure/broker/mqProvider.ts",
     "lint": "eslint .",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc"

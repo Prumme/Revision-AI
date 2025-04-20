@@ -8,7 +8,32 @@ services:
       - ./entrypoint.sh:/app/entrypoint.sh
     working_dir: /app/frontend
     entrypoint: ["/app/entrypoint.sh"]
-    
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672" # dashboard
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  file-parser:
+    build:
+      context: ./services/file-parser
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./services/file-parser:/app
+    environment:
+      - MODE=mq
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
 
     # TODO: créer un service pour lancer le backend 
     # backend:

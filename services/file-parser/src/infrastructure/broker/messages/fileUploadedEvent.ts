@@ -7,5 +7,8 @@ export const fileUploadedEvent = z.object({
   fileSize: z.number(),
   fileType: z.string(),
   userId: z.string(),
-  uploadDate: z.date(),
+  uploadDate: z.preprocess((arg) => {
+    const date = new Date(arg as string);
+    return isNaN(date.getTime()) ? undefined : date;
+  }, z.date()),
 })
