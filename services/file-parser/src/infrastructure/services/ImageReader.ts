@@ -28,7 +28,7 @@ export class ImageReader implements IFileReader<ImageContent> {
 
         try{
             const content = await this.tesseract.recognize(localPath, config)
-            const trimmedContent = content.trim()
+            const trimmedContent = content.trim().replace(/\s+/g, ' ')
             return {
                 fileName: localPath,
                 content:trimmedContent

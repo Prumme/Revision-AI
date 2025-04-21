@@ -11,6 +11,7 @@ export type S3FileDownloaderArgs = {
   bucketName: string;
   objectKey: string;
   downloadPath: string;
+  fileId : string;
 }
 
 type FileSystem = Pick<typeof fsLib, "createWriteStream" | "statSync">
@@ -22,7 +23,14 @@ type S3Client = Pick<AWS.S3, "getObject">
  */
 export class S3FileDownloader implements IFileDownloader<S3FileDownloaderArgs> {
   constructor(
-    private readonly s3Client: S3Client = new AWS.S3(), // Client S3 injectable
+    private readonly s3Client: S3Client = new AWS.S3({
+      accessKeyId: process.env.SCALEWAY_ACCESS_KEY_ID,
+      secretAccessKey: process.env.SCALEWAY_ACCESS_KEY,
+      endpoint: process.env.SCALEWAY_BUCKET_URL , // ex: 'https://s3.fr-par.scw.cloud'
+      region: process.env.SCALEWAY_REGION,
+      signatureVersion: 'v4',
+      s3ForcePathStyle: true
+    }), // Client S3 injectable
     private readonly mimeResolver: MimeResolver = mimeLib, // Mime resolver injectable
     private readonly fileSystem: FileSystem = fsLib // File system injectable
   ) {}
@@ -42,27 +50,31 @@ export class S3FileDownloader implements IFileDownloader<S3FileDownloaderArgs> {
         fileStream.pipe(writeStream);
 
         return new Promise<FileDownloaded|FileDownloadException>((resolve)=>{
-          writeStream.on('finish', () => {
+            fileStream.on('error', (error) => {
+              console.error("Error reading from S3 stream:", error);
+              resolve(new FileDownloadException(`Error reading from S3 stream: ${error.message}`));
+            });
 
-            const mime = this.mimeResolver.getType(downloadPath);
-            if (!mime) return resolve(new FileDownloadException("Cannot resolve the mime type of the downloaded file"));
+            writeStream.on('finish', () => {
+              const mime = this.mimeResolver.getType(downloadPath);
+              if (!mime) return resolve(new FileDownloadException("Cannot resolve the mime type of the downloaded file"));
 
-            const fileName = objectKey.split('/').pop() || 'unknown';
-            const fileSize = this.fileSystem.statSync(downloadPath).size;
+              const fileName = objectKey.split('/').pop() || 'unknown';
+              const fileSize = this.fileSystem.statSync(downloadPath).size;
 
-            resolve(new FileDownloaded(
-              '1', // Placeholder for actual ID
-              fileName,
-              downloadPath,
-              fileSize,
-              mime,
-              new Date(),
-            ));
-          });
+              resolve(new FileDownloaded(
+                args.fileId, // Placeholder for actual ID
+                fileName,
+                downloadPath,
+                fileSize,
+                mime,
+                new Date(),
+              ));
+            });
 
-          writeStream.on('error', (error) => {
-            resolve(new FileDownloadException(`Error writing file to disk: ${error.message}`));
-          });
+            writeStream.on('error', (error) => {
+              resolve(new FileDownloadException(`Error writing file to disk: ${error.message}`));
+            });
         })
       }catch (error : unknown) {
         if(error instanceof Error) {
