@@ -35,10 +35,11 @@ describe('S3FileDownloader', () => {
       bucketName: 'mon-bucket',
       objectKey: 'chemin/vers/fichier.txt',
       downloadPath: './fichier.txt',
+      fileId: '12345',
     };
 
     // Mock des méthodes S3, MIME et FS
-    const fileStream = { pipe: jest.fn() };
+    const fileStream = { pipe: jest.fn(), on: jest.fn() };
     fakeS3.getObject.mockReturnValueOnce({ createReadStream: () => fileStream });
     fakeMime.getType.mockReturnValue('text/plain');
     fakeFs.createWriteStream.mockReturnValueOnce({
@@ -62,6 +63,7 @@ describe('S3FileDownloader', () => {
       bucketName: '',
       objectKey: 'chemin/vers/fichier.txt',
       downloadPath: './fichier.txt',
+      fileId: '12345',
     };
 
     const result = await s3FileDownloader.download(downloadArgs) as FileDownloadException;
@@ -76,10 +78,11 @@ describe('S3FileDownloader', () => {
       bucketName: 'mon-bucket',
       objectKey: 'chemin/vers/fichier.txt',
       downloadPath: './fichier.txt',
+      fileId: '12345',
     };
 
     // Mock des méthodes S3 et FS
-    const fileStream = { pipe: jest.fn() };
+    const fileStream = { pipe: jest.fn(), on: jest.fn() };
     fakeS3.getObject.mockReturnValueOnce({ createReadStream: () => fileStream });
     fakeMime.getType.mockReturnValueOnce(null);
     fakeFs.createWriteStream.mockReturnValueOnce({
@@ -100,6 +103,7 @@ describe('S3FileDownloader', () => {
       bucketName: 'mon-bucket',
       objectKey: 'chemin/vers/fichier.txt',
       downloadPath: './fichier.txt',
+      fileId: '12345',
     };
 
     const error = new Error("Erreur S3");
@@ -110,5 +114,25 @@ describe('S3FileDownloader', () => {
     // Vérifications
     expect(result).toBeInstanceOf(FileDownloadException);
     expect(result.message).toBe("Error downloading file from S3: Erreur S3");
+  });
+
+  it('should return error if S3 fileRead failed', async () => {
+    const downloadArgs: S3FileDownloaderArgs = {
+      bucketName: 'mon-bucket',
+      objectKey: 'chemin/vers/fichier.txt',
+      downloadPath: './fichier.txt',
+      fileId: '12345',
+    };
+
+    const fileStream = { pipe: jest.fn(), on: (event : string,callback : (error:Error) => void) => {
+      if (event === 'error') callback(new Error("Erreur de lecture"));
+    }};
+    fakeS3.getObject.mockReturnValueOnce({ createReadStream: () => fileStream });
+
+    const result = await s3FileDownloader.download(downloadArgs) as FileDownloadException;
+
+    // Vérifications
+    expect(result).toBeInstanceOf(FileDownloadException);
+    expect(result.message).toBe("Error reading from S3 stream: Erreur de lecture");
   });
 });
