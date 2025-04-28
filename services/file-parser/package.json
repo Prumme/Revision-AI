@@ -1,0 +1,46 @@
+{
+  "name": "file-parser",
+  "version": "1.0.0",
+  "description": "Service qui permet de parser des fichiers media (pdf, audio, video, image) et de les convertir en json.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:mqProvider": "ts-node-dev --respawn --transpile-only src/infrastructure/broker/mqProvider.ts",
+    "lint": "eslint .",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.27.0",
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-typescript": "^7.27.0",
+    "@eslint/js": "^9.24.0",
+    "@jest/globals": "^29.7.0",
+    "@types/amqplib": "^0.10.7",
+    "@types/jest": "^29.5.14",
+    "@types/mime": "^4.0.0",
+    "@types/node": "^22.14.1",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "babel-jest": "^29.7.0",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.7",
+    "aws-sdk": "^2.1692.0",
+    "mime": "^4.0.7",
+    "node-poppler": "^7.2.4",
+    "node-tesseract-ocr": "^2.2.1",
+    "zod": "^3.24.2"
+  }
+}
