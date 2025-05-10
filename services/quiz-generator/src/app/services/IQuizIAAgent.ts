@@ -11,4 +11,5 @@ export interface IQuizIAAgent{
   generateQuiz(fileContent: FileContent): Promise<Quiz | QuizGenerationError>;
   safetyContentCheck(quiz: Quiz) : Promise<QuizGenerationError | QuizSafetyCheckResult>;
   getMaxTry(): number;
+  updateQuiz(quiz: Quiz, fileContent: FileContent) : Promise<Quiz | QuizGenerationError>
 }

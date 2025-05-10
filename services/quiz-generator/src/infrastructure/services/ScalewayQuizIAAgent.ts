@@ -3,8 +3,9 @@ import { FileContent } from "../../app/value-objects/FileContent";
 import { QuizGenerationError, SafetyCheckError } from "../../app/exceptions/QuizGenerationError";
 import OpenAI from "openai";
 import { Quiz } from "../../app/value-objects/Quiz";
-import { z } from "zod";
 import { QuizSafetyCheckResult } from "../../app/value-objects/QuizSafetyCheckResult";
+import { QuizSchema } from "../schemas/QuizSchema";
+import { QuizSafetyCheckResultSchema } from "../schemas/QuizSafetyCheckResultSchema";
 
 const defaultClient = new OpenAI({
   baseURL: process.env.SCALEWAY_IA_API_URL || "",
@@ -15,7 +16,7 @@ const defaultClient = new OpenAI({
 const model = process.env.SCALEWAY_MODEL || "deepseek-r1-distill-llama-70b";
 
 const maxTokenOutput = Number(process.env.SCALEWAY_MAX_TOKEN) || 1000;
-const maxTokenInput = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 2000;
+const maxTokenInput = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 5000;
 
 const quizGeneratePrompt = `
 Generate a quiz from the "content" key of a JSON file.  
@@ -24,7 +25,7 @@ Return **only** this JSON format (no text, no markdown):
 { "t": "Quiz title", 
   "questions": [{ "q": "Question?", "answers": [{ "a": "Answer 1", "c": true }, { "a": "Answer 2", "c": false }]}]
 }
-Each question must have 2–5 answers, at least one marked "c": true. Cover key ideas from the content.
+Each question must have 2–5 answers, at least one and max 2 marked "c": true,  Cover key ideas from the content.
 `;
 
 const quizEvaluatePrompt = `
@@ -39,22 +40,6 @@ Return **only** this JSON format in this strict format (no text, no markdown):
   "educationalScore": 0
 }
 `;
-
-export const QuizSchema = z.object({
-  t: z.string(),
-  questions: z.array(z.object({
-    q: z.string(),
-    answers: z.array(z.object({
-      a: z.string(),
-      c: z.boolean(),
-    })),
-  })),
-});
-
-export const QuizSafetyCheckResultSchema = z.object({
-  isOffensive: z.boolean(),
-  educationalScore: z.number(),
-})
 
 export class ScalewayQuizIAAgent implements IQuizIAAgent {
   constructor(
@@ -125,5 +110,9 @@ export class ScalewayQuizIAAgent implements IQuizIAAgent {
       console.error(data)
       return new SafetyCheckError("Failed to parse AI response");
     }
+  }
+
+  updateQuiz(quiz: Quiz, fileContent: FileContent): Promise<Quiz | QuizGenerationError> {
+    return Promise.resolve(undefined);
   }
 }

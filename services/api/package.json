@@ -5,7 +5,7 @@
   "main": "tempServer.js",
   "scripts": {
     "serve": "node tempServer.js",
-    "dev": "node tempServer.js",
+    "dev": "node tempServer.js"
   },
   "keywords": [],
   "author": "",
