@@ -1,0 +1,12 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 3
+  rabbitmq:
+    additionalConfig: |
+      loopback_users.guest = false
+      auth_mechanisms.1 = PLAIN
+      auth_mechanisms.2 = AMQPLAIN
+      auth_mechanisms.3 = ANONYMOUS
