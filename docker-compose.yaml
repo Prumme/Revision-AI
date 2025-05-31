@@ -1,4 +1,4 @@
-services: 
+services:
   frontend:
     image: node:18
     ports:
@@ -8,7 +8,6 @@ services:
       - ./entrypoint.sh:/app/entrypoint.sh
     working_dir: /app/frontend
     entrypoint: ["/app/entrypoint.sh"]
-
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -34,9 +33,31 @@ services:
       rabbitmq:
         condition: service_healthy
 
+  api:
+    container_name: api
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
+    env_file: "./services/api/.env"
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./services/api:/app
+    depends_on:
+      database:
+        condition: service_started
 
-    # TODO: créer un service pour lancer le backend 
-    # backend:
+  database:
+    container_name: database
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=api
 
-    # TODO: créer un service pour lancer la base de données
-    # database:
+volumes:
+  mongo-data:
