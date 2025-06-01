@@ -5,7 +5,7 @@ metadata:
     app: file-parser-deploy
   name: file-parser-deploy
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: file-parser-deploy

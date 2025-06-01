@@ -48,5 +48,31 @@ env:
 kubectl port-forward service/api-service 8080:8080
 ```
 
+11. installer helm macos
+```bash
+brew install helm
+```
 
+12. Installer prometheus pour obtenir les metrics business mais aussi les metrics des pods pour définir les ressources necessaire
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus prometheus-community/kube-prometheus-stack
+```
 
+13. Obtenir les credential de connexion graphana dans le secret créer par le chart helm  et se connecter a graphana (se rendre sur http://localhost:8080)
+```bash
+kubectl get secrets prometheus-grafana -o=yaml
+kubectl port-forward services/prometheus-grafana 8080:80
+```
+
+14. Exporter les metrics de rabitmq, rabbitmq cluster operator vient créer des server rabbitmq avec un exporter prometheus déjà configurer sur le port 15692/TCP il est déjà exposer dans le service/rabbitmq créer par l'operateur. Il faut créer un `ServiceMonitor` (CRD de prometheus-operator) pour spéicifé a prometheus ou scrapper les informations.
+
+15. Afficher dans graphana les metrics de rabbitmq avec l'id du dashboard graphana `10991`
+
+16. Créer un le service `quiz-generator` pour exposer le serveur metrics prometheus en clusterIP, puis créer un  `ServiceMonitor` pour créer une target prometheus sur le serveur metrics exposé par le service  `quiz-generator`, Créer un dashboard grapahana pour voir les infos
+
+17. Pour logger les pod business il faut ajouter un label a chaque deployement template avec le label debug=true et tapper la commande
+```bash
+kubectl logs -l debug=true --all-containers=true -f --max-log-requests=20
+```
