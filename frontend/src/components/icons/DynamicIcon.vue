@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue';
 import * as icons from "lucide-vue-next";
 
 const props = defineProps({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   size: Number,
   color: String,
   strokeWidth: Number,
-  defaultClass: String,
-});
+  defaultClass: String
+})
 
 const icon = computed(() => icons[props.name]);
 </script>
@@ -21,7 +21,7 @@ const icon = computed(() => icons[props.name]);
     :is="icon"
     :size="size"
     :color="color"
-    :stroke-width="strokeWidth || 2"
+    :stroke-width="strokeWidth || 2" 
     :default-class="defaultClass"
   />
 </template>

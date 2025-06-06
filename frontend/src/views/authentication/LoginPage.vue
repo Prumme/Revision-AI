@@ -6,8 +6,8 @@ import AppLayout from "@/components/layouts/AppLayout.vue";
 import { ref } from "vue";
 
 // Form props
-const email = ref("");
-const password = ref("");
+const email = ref<string>("");
+const password = ref<string>("");
 
 const handleLogin = () => {
   console.log("Login");
