@@ -1,9 +1,24 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Public } from '@common/decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { User } from '@entities/user.entity';
 
 @ApiTags('Authentification')
 @Controller('auth')
@@ -32,5 +47,22 @@ export class AuthController {
   })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Get('me')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: "Récupérer les informations de l'utilisateur connecté",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Retourne les informations de l'utilisateur connecté",
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  async getCurrentUser(@Req() req: Request) {
+    return this.authService.getCurrentUser(req.user);
   }
 }

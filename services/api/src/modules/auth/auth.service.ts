@@ -3,6 +3,8 @@ import { UserService } from '@modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
+import { User } from '@entities/user.entity';
+import { ReqUser } from '@common/types/request';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +13,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+  async signIn(
+    email: string,
+    pass: string,
+  ): Promise<{ access_token: string; user: User }> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
@@ -25,10 +30,22 @@ export class AuthService {
     const payload = { sub: user.id, username: user.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
+      user: user,
     };
   }
 
   async register(registerDto: RegisterDto) {
     return this.usersService.create(registerDto);
+  }
+
+  async getCurrentUser(reqUser: ReqUser) {
+    const user = await this.usersService.findById(reqUser.sub);
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
+    };
   }
 }

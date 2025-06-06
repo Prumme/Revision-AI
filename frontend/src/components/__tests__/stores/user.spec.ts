@@ -17,8 +17,7 @@ describe("User Store", () => {
     const store = useUserStore();
     const mockUser: User = {
       id: "id-1",
-      firstname: "John",
-      lastname: "Smith",
+      username: "alice",
       email: "alice@example.com",
     };
 
@@ -30,8 +29,7 @@ describe("User Store", () => {
     const store = useUserStore();
     const mockUser: User = {
       id: "id-2",
-      firstname: "Bob",
-      lastname: "Brown",
+      username: "bob",
       email: "bob@example.com",
     };
 

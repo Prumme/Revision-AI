@@ -6,6 +6,7 @@ import UserSidenav from "@/components/UserSidenav.vue";
 import AboutView from "@/views/AboutView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
+import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,6 +14,7 @@ const router = createRouter({
     {
       path: "/",
       component: UserSidenav,
+      meta: { requiresAuth: true },
       children: [
         {
           path: "/",
@@ -40,16 +42,19 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: LoginPage,
+      meta: { requiresGuest: true },
     },
     {
       path: "/register",
       name: "register",
       component: RegisterPage,
+      meta: { requiresGuest: true },
     },
     {
       path: "/forgot-password",
       name: "forgot-password",
       component: ForgotPassword,
+      meta: { requiresGuest: true },
     },
     {
       path: "/:pathMatch(.*)*",
@@ -57,6 +62,45 @@ const router = createRouter({
       component: NotFound,
     },
   ],
+});
+
+// Navigation guard
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
+  const token = localStorage.getItem("token");
+
+  // Si la route nécessite une authentification
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    // Si pas de token, redirection vers login
+    if (!token) {
+      next({ name: "login" });
+      return;
+    }
+
+    try {
+      // On essaie de récupérer les informations de l'utilisateur
+      if (!userStore.user) {
+        await userStore.fetchCurrentUser();
+      }
+      next();
+    } catch {
+      // En cas d'erreur (token invalide par exemple)
+      next({ name: "login" });
+    }
+  }
+  // Si la route est pour les invités uniquement (login, register, etc.)
+  else if (to.matched.some((record) => record.meta.requiresGuest)) {
+    if (token) {
+      // Si l'utilisateur est déjà connecté, on le redirige vers la page d'accueil
+      next({ name: "Dashboard" });
+      return;
+    }
+    next();
+  }
+  // Pour toutes les autres routes
+  else {
+    next();
+  }
 });
 
 export default router;

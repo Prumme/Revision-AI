@@ -32,8 +32,7 @@ export class MongoUserRepository implements UserRepository {
     return {
       id: document._id.toString(),
       email: document.email,
-      firstname: document.firstname,
-      lastname: document.lastname,
+      username: document.username,
       password: document.password,
       lastUpdatedPassword: document.lastUpdatedPassword,
       emailVerified: document.emailVerified,

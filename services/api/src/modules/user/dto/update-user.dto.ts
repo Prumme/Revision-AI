@@ -12,20 +12,11 @@ export class UpdateUserDto {
   email?: string;
 
   @ApiProperty({
-    description: "Prénom de l'utilisateur",
+    description: "Nom d'utilisateur de l'utilisateur",
     example: 'John',
     required: false,
   })
   @IsString()
   @IsOptional()
-  firstname?: string;
-
-  @ApiProperty({
-    description: "Nom de l'utilisateur",
-    example: 'Doe',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  lastname?: string;
+  username?: string;
 }

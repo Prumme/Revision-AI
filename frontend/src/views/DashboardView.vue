@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import type { User } from "@/types/user.ts";
 
-const { setUser, getFullName } = useUserStore();
-
-const user: User = {
-  id: "1212",
-  firstname: "John",
-  lastname: "Smith",
-  email: "john.smith@mail.fr",
-};
-
-setUser(user);
+const { getFullName } = useUserStore();
 </script>
 
 <template>

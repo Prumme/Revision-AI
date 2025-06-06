@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-interface ReqUser {
+export interface ReqUser {
   sub: string;
 }
 

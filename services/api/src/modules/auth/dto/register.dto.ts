@@ -21,18 +21,10 @@ export class RegisterDto {
   password: string;
 
   @ApiProperty({
-    description: "Le prénom de l'utilisateur",
+    description: "Le nom d'utilisateur de l'utilisateur",
     example: 'Jean',
   })
   @IsString()
   @IsNotEmpty()
-  firstname: string;
-
-  @ApiProperty({
-    description: "Le nom de l'utilisateur",
-    example: 'Dupont',
-  })
-  @IsString()
-  @IsNotEmpty()
-  lastname: string;
+  username: string;
 }
