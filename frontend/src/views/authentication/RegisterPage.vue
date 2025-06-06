@@ -30,6 +30,7 @@ const handleRegister = async () => {
       password: password.value,
     });
 
+
     // Redirection vers la page d'accueil
     router.push("/login");
   } catch (e) {

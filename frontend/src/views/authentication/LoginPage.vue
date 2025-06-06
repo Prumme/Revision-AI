@@ -11,6 +11,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 // Form props
+
 const email = ref("");
 const password = ref("");
 const error = ref("");
@@ -21,6 +22,7 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     });
+
 
     // Redirection vers la page d'accueil
     router.push("/");

@@ -1,11 +1,33 @@
 <script setup lang="ts">
+import Button from "@/components/buttons/ButtonComponent.vue";
 import { useUserStore } from "@/stores/user";
 
 const { getFullName } = useUserStore();
+
 </script>
 
 <template>
-  <div>
-    <h1 class="font-encode text-4xl font-black">Bienvenue {{ getFullName() }}</h1>
-  </div>
+  <section class="flex flex-col gap-1.5 w-full">
+    <p class="font-outfit text-lg text-black-transparent">Suivez votre parcours</p>
+    <h1 class="font-outfit text-4xl font-extrabold text-black">
+      Bienvenue <span class="text-primary"> {{ getFullName() }}</span> !
+    </h1>
+    <div class="flex justify-end w-full gap-4 mt-4">
+      <Button variant="primary" position-icon="right" class="group w-min whitespace-nowrap">
+        <template #icon>
+          <PlusIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
+        </template>
+        Créez un quiz
+      </Button>
+
+      <Button variant="primary" class="group w-min whitespace-nowrap" position-icon="right">
+        <template #icon>
+          <SearchIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
+        </template>
+        Trouvez un quiz
+      </Button>
+    </div>
+
+    <div class="grid grid-cols-6 gap-4 mt-8"></div>
+  </section>
 </template>

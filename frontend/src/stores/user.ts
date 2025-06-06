@@ -16,6 +16,7 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string | null>(localStorage.getItem("token"));
 
   const getFullName = () => {
+
     return user?.value?.username;
   };
 
