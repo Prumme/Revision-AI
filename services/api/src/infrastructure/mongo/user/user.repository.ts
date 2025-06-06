@@ -28,19 +28,6 @@ export class MongoUserRepository implements UserRepository {
     return documents.map(this.documentToUser);
   }
 
-  private documentToUser(document: UserDocument): User {
-    return {
-      id: document._id.toString(),
-      email: document.email,
-      username: document.username,
-      password: document.password,
-      lastUpdatedPassword: document.lastUpdatedPassword,
-      emailVerified: document.emailVerified,
-      createdAt: document.createdAt,
-      updatedAt: document.updatedAt,
-    };
-  }
-
   async create(user: User): Promise<User> {
     const document = await this.userModel.create(user);
     return this.documentToUser(document);
@@ -73,5 +60,18 @@ export class MongoUserRepository implements UserRepository {
       console.error('Error deleting user:', error);
       return false;
     }
+  }
+
+  private documentToUser(document: UserDocument): User {
+    return {
+      id: document._id.toString(),
+      email: document.email,
+      username: document.username,
+      password: document.password,
+      lastUpdatedPassword: document.lastUpdatedPassword,
+      emailVerified: document.emailVerified,
+      createdAt: document.createdAt,
+      updatedAt: document.updatedAt,
+    };
   }
 }
