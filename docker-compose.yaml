@@ -1,6 +1,8 @@
 services:
   frontend:
     image: node:18
+    env_file:
+      - .env.frontend
     ports:
       - "5173:5173"
     volumes:
@@ -39,7 +41,8 @@ services:
       context: ./services/api
       dockerfile: Dockerfile
       target: ${NODE_ENV:-development}
-    env_file: "./services/api/.env"
+    env_file:
+      - .env.services.api
     ports:
       - "3000:3000"
       - "3001:3001"
