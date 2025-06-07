@@ -10,6 +10,34 @@ services:
       - ./entrypoint.sh:/app/entrypoint.sh
     working_dir: /app/frontend
     entrypoint: ["/app/entrypoint.sh"]
+    
+  api:
+    container_name: api
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./services/api:/app
+    depends_on:
+      database:
+        condition: service_started
+
+  database:
+    container_name: database
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=api
+
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -65,34 +93,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
-
-  api:
-    container_name: api
-    build:
-      context: ./services/api
-      dockerfile: Dockerfile
-      target: ${NODE_ENV:-development}
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-      - "3001:3001"
-    volumes:
-      - ./services/api:/app
-    depends_on:
-      database:
-        condition: service_started
-
-  database:
-    container_name: database
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=api
-
+      
 volumes:
   grafana-storage:
   mongo-data:
+
