@@ -26,12 +26,7 @@ export const mqConsumer = async () => {
          return;
       }
       const fileParsed = safeContentResult.data;
-
-      const payload =  {
-         fileContent : fileParsed.fileContent
-      }
-
-      const fileContentResult = await generateQuizUseCase(payload)
+      const fileContentResult = await generateQuizUseCase(fileParsed)
 
       if(!fileContentResult.success) {
          console.error("Error generating the quiz:", fileContentResult.error.message);

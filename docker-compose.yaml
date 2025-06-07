@@ -44,6 +44,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    ports:
+      - "9090:9090"
 
   prometheus:
     image: prom/prometheus
