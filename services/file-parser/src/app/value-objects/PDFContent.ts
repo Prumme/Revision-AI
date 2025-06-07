@@ -5,6 +5,12 @@ export interface PDFContent extends FileContent{
   pages : PDFPage[]
 }
 
+export interface PDFPage {
+  number: number
+  content : string,
+  images : ImageContent[]
+}
+
 export interface PDFInfo {
   title: string;
   author: string;
@@ -26,8 +32,3 @@ export interface PDFInfo {
   pdfVersion: string;
 }
 
-export interface PDFPage {
-  number: number
-  content : string,
-  images : ImageContent[]
-}

@@ -30,6 +30,6 @@ export const cliEntrypoint = async () => {
   }
 
   const fileContent = result.value;
-  console.log(fileContent);
+  console.log(JSON.stringify(fileContent, null, 2));
   process.exit(0);
 }

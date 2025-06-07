@@ -4,32 +4,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="Action frontend test">
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/DashboardView.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/errors/NotFound.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/prettier.xml" afterDir="false" />
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix copilot">
+      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/api/public/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/api/tempServer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/metrics/prometheus.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/README" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/babel.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/eslint.config.mjs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/jest.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/exceptions/QuizGenerationError.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IMetricsExporter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IQuizIAAgent.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/FileContent.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/Quiz.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/QuizSafetyCheckResult.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/messages/fileParsedEvent.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/cli/cliEntrypoint.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/monitoring/PrometheusMetricsExporter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/IUseCase.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/Result.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/Timer.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/quiz-generator/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/.eslintrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/.eslintrc.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/eslint.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/eslint.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/assets/base.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/assets/base.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/UserSidenav.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/UserSidenav.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/__tests__/stores/user.spec.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/__tests__/stores/user.spec.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/buttons/ButtonComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/buttons/ButtonComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/buttons/NavLink.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/buttons/NavLink.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/icons/DynamicIcon.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/icons/DynamicIcon.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/inputs/InputComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/inputs/InputComponent.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/stores/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/stores/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/types/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/types/user.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/HomeView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/HomeView.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/authentication/ForgotPassword.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/authentication/ForgotPassword.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/authentication/LoginPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/authentication/LoginPage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vite.config.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/vitest.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/vitest.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/README" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/README" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/usecases/HandleFileUploadedUseCase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/app/usecases/HandleFileUploadedUseCase.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/usecases/IUseCase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/shared/IUseCase.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/value-objects/PDFContent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/app/value-objects/PDFContent.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/messages/fileUploadedEvent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/messages/fileUploadedEvent.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqConsumer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqProvider.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqProvider.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/cli/cliEntrypoint.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/cli/cliEntrypoint.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/ImageReader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/ImageReader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/file-parser/test.pdf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +66,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Vue Composition API Component" />
+        <option value="workflow" />
+        <option value="TypeScript File" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -61,7 +88,15 @@
     &quot;accountId&quot;: &quot;2dae477e-9822-4f7b-b8d4-b18f17127006&quot;
   }
 }</component>
-  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/bin/php" />
+  <component name="JiraServerManager">
+    <selected>-1</selected>
+    <servers />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/services/file-parser/package.json" />
+  </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.7_2/bin/php" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -76,18 +111,22 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Docker.docker-compose.yaml: Compose Deployment.executor": "Run",
+    "Jest.S3FileDownloader.executor": "Run",
+    "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "test/action-frontend",
-    "last_opened_file_path": "/home/ilyam/dev/Revision-AI",
+    "git-widget-placeholder": "16-service-file-parser-migration-de-python-vers-node",
+    "last_opened_file_path": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest",
     "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/aurelien/Documents/ESGI/5IW/Projet-Annuel/Revision-AI/frontend/node_modules/prettier",
+    "prettierjs.PrettierConfiguration.Package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/frontend/node_modules/prettier",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/aurelien/Documents/ESGI/5IW/Projet-Annuel/Revision-AI/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -96,11 +135,75 @@
     ]
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/services/api" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator/src/shared" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services/quiz-generator" />
+      <recent name="$PROJECT_DIR$/services/file-parser" />
+      <recent name="$PROJECT_DIR$/services/file-parser/src/shared" />
+      <recent name="$PROJECT_DIR$/services" />
+      <recent name="$PROJECT_DIR$/services/file-parser/src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Jest.S3FileDownloader.should download the file and return a valid file downloaded">
+    <configuration name="S3FileDownloader" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/services/file-parser/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/services/file-parser" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.test.ts" />
+      <test-names>
+        <test-name value="S3FileDownloader" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="S3FileDownloader.should download the file and return a valid file downloaded" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/services/file-parser/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/services/file-parser" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.test.ts" />
+      <test-names>
+        <test-name value="S3FileDownloader" />
+        <test-name value="should download the file and return a valid file downloaded" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yaml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Jest.S3FileDownloader.should download the file and return a valid file downloaded" />
+        <item itemvalue="Jest.S3FileDownloader" />
+        <item itemvalue="Docker.docker-compose.yaml: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-PS-243.24978.50" />
-        <option value="bundled-php-predefined-a98d8de5180a-fbeb0b58ac0f-com.jetbrains.php.sharedIndexes-PS-243.24978.50" />
+        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PS-241.18034.69" />
+        <option value="bundled-php-predefined-ba97393d7c68-48a1a656d44e-com.jetbrains.php.sharedIndexes-PS-241.18034.69" />
       </set>
     </attachedChunks>
   </component>
@@ -113,6 +216,14 @@
       <option name="presentableId" value="Default" />
       <updated>1741863115901</updated>
       <workItem from="1741863117099" duration="226000" />
+      <workItem from="1744552468733" duration="9473000" />
+      <workItem from="1744575317670" duration="2647000" />
+      <workItem from="1745166023523" duration="334000" />
+      <workItem from="1745166377506" duration="5783000" />
+      <workItem from="1745172185764" duration="720000" />
+      <workItem from="1745172990479" duration="20000" />
+      <workItem from="1745175009908" duration="110000" />
+      <workItem from="1745235121620" duration="23062000" />
     </task>
     <task id="LOCAL-00001" summary="🔨 upgrade some lines">
       <option name="closed" value="true" />
@@ -154,7 +265,79 @@
       <option name="project" value="LOCAL" />
       <updated>1744278791637</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="create file-parser-service&#10;&#10;create ts app&#10;create the pdf reader and the image reader using poppler for pdf and tesseract OCR for images">
+      <option name="closed" value="true" />
+      <created>1744555898718</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1744555898718</updated>
+    </task>
+    <task id="LOCAL-00007" summary="improve file-service&#10;&#10;introduce FileDownloader.ts interface and its implementation&#10;create use case parse file&#10;add the infrastructure logic&#10;cli entrypoint and brocker entrypoint">
+      <option name="closed" value="true" />
+      <created>1744575026512</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1744575026512</updated>
+    </task>
+    <task id="LOCAL-00008" summary="apply copilot sugestion">
+      <option name="closed" value="true" />
+      <created>1744575176388</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1744575176388</updated>
+    </task>
+    <task id="LOCAL-00009" summary="add tests">
+      <option name="closed" value="true" />
+      <created>1744577659508</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577659508</updated>
+    </task>
+    <task id="LOCAL-00010" summary="add tests">
+      <option name="closed" value="true" />
+      <created>1744577664214</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577664214</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fix workflow">
+      <option name="closed" value="true" />
+      <created>1744577888765</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577888765</updated>
+    </task>
+    <task id="LOCAL-00012" summary="setup premiere version rabit mq">
+      <option name="closed" value="true" />
+      <created>1745168749521</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1745168749521</updated>
+    </task>
+    <task id="LOCAL-00013" summary="add S3 File downloader and add tests">
+      <option name="closed" value="true" />
+      <created>1745172128650</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1745172128650</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fix copilot">
+      <option name="closed" value="true" />
+      <created>1745172361728</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1745172361728</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -163,6 +346,18 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value=" upgrade some lines" />
     <MESSAGE value="Action frontend test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Action frontend test" />
+    <MESSAGE value="create file-parser-service&#10;&#10;create ts app&#10;create the pdf reader and the image reader using poppler for pdf and tesseract OCR for images" />
+    <MESSAGE value="improve file-service&#10;&#10;introduce FileDownloader.ts interface and its implementation&#10;create use case parse file&#10;add the infrastructure logic&#10;cli entrypoint and brocker entrypoint" />
+    <MESSAGE value="apply copilot sugestion" />
+    <MESSAGE value="add tests" />
+    <MESSAGE value="fix workflow" />
+    <MESSAGE value="setup premiere version rabit mq" />
+    <MESSAGE value="add S3 File downloader and add tests" />
+    <MESSAGE value="fix copilot" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix copilot" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

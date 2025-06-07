@@ -2,13 +2,15 @@ import amqp from 'amqplib';
 import { fileUploadedEvent } from "./messages/fileUploadedEvent";
 import { handleFileUploadedUseCaseFactory } from "../../app/usecases/HandleFileUploadedUseCase";
 import { FileReaderResolver } from "../services/FileReaderResolver";
-import { FileSystemFileDownloader } from "../services/FileSystemFileDownloader";
+import { mqProvide } from "./mqProvider";
+import { S3FileDownloader, S3FileDownloaderArgs } from "../services/S3FileDownloader";
+import fs from "node:fs";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
-const QUEUE_NAME = process.env.QUEUE_NAME || 'file-uploaded';
+const QUEUE_NAME = process.env.INPUT_QUEUE_NAME || 'file-uploaded';
 
-//const fileDownloader = new HTTPFileDownloader()
-const fileDownloader = new FileSystemFileDownloader()
+
+const fileDownloader = new S3FileDownloader()
 const fileReaderResolver = new FileReaderResolver()
 const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReaderResolver)
 export const mqConsumer = async () => {
@@ -24,32 +26,37 @@ export const mqConsumer = async () => {
       return;
     }
     const fileUploaded = safeContentResult.data;
-    console.log("Received message:", fileUploaded);
-
-    const payload =  {
-      path: fileUploaded.fileUrl,
+    const payload: S3FileDownloaderArgs =  {
+      fileId: fileUploaded.objectKey, // Placeholder for actual ID
+      objectKey: fileUploaded.objectKey,
+      bucketName: fileUploaded.bucketName,
+      downloadPath: "/var/tmp/" + fileUploaded.objectKey.split('/').pop(),
     }
-    // {
-    //     url: fileUploaded.fileUrl,
-    //     fileId: fileUploaded.fileId,
-    //   }
-
     const fileContentResult = await handleFileUploadedUseCase(payload)
 
     if(!fileContentResult.success) {
       console.error("Error processing file:", fileContentResult.error.message);
-      channel.nack(msg);
+      channel.nack(msg, false,false);
       return;
     }
 
     const fileContent = fileContentResult.value;
     console.log("File content:", fileContent);
 
-    //@TODO save it to a database or do something with it + send it to another queue
+    //@TODO save it to a database
     channel.ack(msg);
+
+    await mqProvide({fileContent}).catch(console.error)
+
+    try {
+      fs.unlinkSync(payload.downloadPath);
+      console.log(`File ${payload.downloadPath} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    }
+
   }
 
-  console.log(`Connecting to RabbitMQ at ${RABBITMQ_URL}...`);
   const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
   await channel.assertQueue(QUEUE_NAME, { durable: true });
