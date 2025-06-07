@@ -4,10 +4,11 @@ import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
-import { useUserStore } from "@/stores/user";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
 import { createRouter, createWebHistory } from "vue-router";
+
+import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,7 +42,7 @@ const router = createRouter({
           path: "/profile",
           name: "profile",
           component: ProfilePage,
-        }
+        },
       ],
     },
     // Authentication routes
