@@ -1,11 +1,15 @@
 {
   "name": "api",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Api principal en TS",
+  "main": "tempServer.js",
+  "keywords": [],
   "author": "",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "serve": "node tempServer.js",
+    "dev": "node tempServer.js",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
