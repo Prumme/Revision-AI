@@ -14,8 +14,6 @@ const userStore = useUserStore();
 
 const email = ref<string>("");
 const password = ref<string>("");
-const email = ref("");
-const password = ref("");
 const error = ref("");
 
 const handleLogin = async () => {
