@@ -1,0 +1,8 @@
+# Quiz generato service
+
+Service qui permet de généré en quiz depuis un fichier parsé en json a l'aide de intelligence artificiel.
+
+In -> Event file.parsed Queue RabbitMQ
+Out -> Event quiz.generated Queue RabbitMQ
+
+

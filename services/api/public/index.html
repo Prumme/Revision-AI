@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Fichier</title>
+</head>
+<body>
+<h1>Uploader un fichier</h1>
+<form id="uploadForm" enctype="multipart/form-data">
+  <input type="file" name="file" />
+  <button type="submit">Envoyer</button>
+</form>
+<p id="result"></p>
+
+<script>
+  const form = document.getElementById('uploadForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData
+    });
+    const text = await response.text();
+    document.getElementById('result').textContent = text;
+  });
+</script>
+</body>
+</html>

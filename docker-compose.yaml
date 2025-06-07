@@ -28,12 +28,41 @@ services:
       target: dev
     volumes:
       - ./services/file-parser:/app
-    environment:
-      - MODE=mq
-      - RABBITMQ_URL=amqp://rabbitmq:5672
+    env_file: ".env"
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+  quiz-generator:
+    build:
+      context: ./services/quiz-generator
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./services/quiz-generator:/app
+    env_file: ".env"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./services/metrics/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090" # localhost:9091 -> prometheus web UI
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
 
   api:
     container_name: api
@@ -63,4 +92,5 @@ services:
       - MONGO_INITDB_DATABASE=api
 
 volumes:
+  grafana-storage:
   mongo-data:
