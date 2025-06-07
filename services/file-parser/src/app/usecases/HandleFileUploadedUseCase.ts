@@ -1,4 +1,3 @@
-import { IUseCase } from "./IUseCase";
 import { FileContent } from "../value-objects/FileContent";
 import { IFileDownloader } from "../services/IFileDownloader";
 import { FileDownloadException } from "../exceptions/FileDownloadException";
@@ -6,6 +5,7 @@ import { FileReadException } from "../exceptions/FileReadException";
 import { Result } from "../../shared/Result";
 import { IFileReaderResolver } from "../services/IFileReaderResolver";
 import { ResolveFileReaderException } from "../exceptions/ResolveFileReaderException";
+import { IUseCase } from "../../shared/IUseCase";
 
 export type HandleFileUploadedUseCase<DL> = IUseCase<DL,Result<FileContent>>
 export const handleFileUploadedUseCaseFactory = <DL>(downloader : IFileDownloader<DL>, fileReaderResolver: IFileReaderResolver) : HandleFileUploadedUseCase<DL> => {

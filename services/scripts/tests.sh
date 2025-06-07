@@ -11,7 +11,7 @@ for dir in */; do
   if [ -f "$dir/package.json" ]; then
     if grep -q '"test":' "$dir/package.json"; then
       npm install --prefix "$dir" --silent
-      if npm run --prefix "$dir" test --silent; then
+      if npm run --prefix "$dir" test -- --silent; then
         echo ""
       else
         echo "Tests failed in $dir"

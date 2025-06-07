@@ -4,3 +4,16 @@ Service qui permet de parser des fichiers media (pdf, audio, video, image) et de
 
 Out -> Event file.parsed Queue RabbitMQ
 In -> Event file.uploaded Queue RabbitMQ
+
+
+## Develop
+
+Build image
+```bash
+docker build -t quiz-generator .
+```
+
+Entrér dans le conteneur
+```
+docker run -it -v ./:/app file-parser-service
+```

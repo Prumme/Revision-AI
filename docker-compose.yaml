@@ -11,30 +11,6 @@ services:
     working_dir: /app/frontend
     entrypoint: ["/app/entrypoint.sh"]
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "15672:15672" # dashboard
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-
-  file-parser:
-    build:
-      context: ./services/file-parser
-      dockerfile: Dockerfile
-      target: dev
-    volumes:
-      - ./services/file-parser:/app
-    environment:
-      - MODE=mq
-      - RABBITMQ_URL=amqp://rabbitmq:5672
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-
   api:
     container_name: api
     build:
@@ -52,6 +28,60 @@ services:
       database:
         condition: service_started
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672" # dashboard
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  file-parser:
+    build:
+      context: ./services/file-parser
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./services/file-parser:/app
+    env_file: ".env"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  quiz-generator:
+    build:
+      context: ./services/quiz-generator
+      dockerfile: Dockerfile
+      target: dev
+    volumes:
+      - ./services/quiz-generator:/app
+    env_file: ".env"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "9090:9090"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./services/metrics/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090" # localhost:9091 -> prometheus web UI
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
   database:
     container_name: database
     image: mongo
@@ -64,3 +94,4 @@ services:
 
 volumes:
   mongo-data:
+  grafana-storage:
