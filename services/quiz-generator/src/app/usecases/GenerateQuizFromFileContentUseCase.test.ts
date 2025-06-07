@@ -37,6 +37,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     getMaxTry: jest.fn(() => maxTry),
     generateQuiz: jest.fn().mockResolvedValue(generateQuizReturn),
     safetyContentCheck: jest.fn().mockResolvedValue(safetyCheckReturn),
+    updateQuiz : jest.fn(),
   });
 
   it("should return a successful result when quiz generation and safety check pass", async () => {
@@ -89,6 +90,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     const agent = getMockIAAgent({
       generateQuizReturn: mockQuiz,
       safetyCheckReturn: { isOffensive: true, educationalScore: 20 },
+    
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);

@@ -113,6 +113,6 @@ export class ScalewayQuizIAAgent implements IQuizIAAgent {
   }
 
   updateQuiz(quiz: Quiz, fileContent: FileContent): Promise<Quiz | QuizGenerationError> {
-    return Promise.resolve(undefined);
+    throw new Error("Method not implemented.");
   }
 }
