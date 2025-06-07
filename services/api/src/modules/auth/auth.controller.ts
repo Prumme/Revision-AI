@@ -17,8 +17,7 @@ import {
 import { Public } from '@common/decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { User } from '@entities/user.entity';
+import { Request } from 'express';
 
 @ApiTags('Authentification')
 @Controller('auth')
