@@ -5,12 +5,14 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@entities/user.entity';
 import { ReqUser } from '@common/types/request';
+import { MailService } from '@infrastructure/resend/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async signIn(
@@ -27,6 +29,10 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Email not verified');
+    }
+
     const payload = { sub: user.id, username: user.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
@@ -35,7 +41,30 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    return this.usersService.create(registerDto);
+    const user = await this.usersService.create(registerDto);
+
+    // Génération du token de vérification (à implémenter selon votre logique)
+    const verifyToken = await this.jwtService.signAsync({ sub: user.id });
+    const verifyLink = `${process.env.FRONTEND_URL}/auth/verify-email?token=${verifyToken}`;
+
+    // Envoi de l'email de vérification
+    console.log(verifyLink);
+    await this.mailService.sendVerifyEmail(user.email, {
+      username: user.username,
+      verifyLink: verifyLink,
+    });
+
+    return user;
+  }
+
+  async verifyEmail(token: string) {
+    const decoded = await this.jwtService.verifyAsync(token);
+    const user = await this.usersService.findById(decoded.sub);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    await this.usersService.verifyEmail(user.id);
+    return { message: 'Email vérifié avec succès' };
   }
 
   async getCurrentUser(reqUser: ReqUser) {

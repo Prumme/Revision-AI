@@ -18,7 +18,8 @@
       "@services/*": ["domain/services/*"],
       "@controllers/*": ["controllers/*"],
       "@config/*": ["config/*"],
-      "@common/*": ["common/*"]
+      "@common/*": ["common/*"],
+      "@infrastructure/*": ["infrastructure/*"]
     },
     "incremental": true,
     "skipLibCheck": true,

@@ -6,6 +6,8 @@ import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
+import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
+import EmailSend from "@/views/authentication/EmailSend.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
@@ -62,6 +64,18 @@ const router = createRouter({
       path: "/forgot-password",
       name: "forgot-password",
       component: ForgotPassword,
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/auth/verify-email",
+      name: "verify-email",
+      component: VerifyEmail,
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/email-send",
+      name: "email-send",
+      component: EmailSend,
       meta: { requiresGuest: true },
     },
     {

@@ -32,7 +32,7 @@ const handleRegister = async () => {
     });
 
     // Redirection vers la page d'accueil
-    router.push("/login");
+    router.push("/email-send");
   } catch (e) {
     error.value = "Une erreur est survenue lors de l'inscription";
     console.error(e);
