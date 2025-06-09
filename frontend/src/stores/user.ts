@@ -96,6 +96,10 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
+        const { message } = await response.json();
+        if (message && message === "Email not verified") {
+          throw new Error("Email not verified, please verify your email");
+        }
         throw new Error("Erreur lors de la connexion");
       }
 

@@ -48,6 +48,14 @@ export class UserService {
     });
   }
 
+  async verifyEmail(id: string): Promise<User> {
+    const existingUser = await this.userRepository.findById(id);
+    if (!existingUser) {
+      throw new Error('Utilisateur non trouvé');
+    }
+    return this.userRepository.update(id, { emailVerified: true });
+  }
+
   async updatePassword(id: string, password: string): Promise<User> {
     const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
