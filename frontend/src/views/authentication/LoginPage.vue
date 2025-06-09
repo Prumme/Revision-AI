@@ -3,14 +3,32 @@ import Button from "@/components/buttons/ButtonComponent.vue";
 import Card from "@/components/cards/CardComponent.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import AppLayout from "@/components/layouts/AppLayout.vue";
+import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const userStore = useUserStore();
 
 // Form props
+
 const email = ref<string>("");
 const password = ref<string>("");
+const error = ref("");
 
-const handleLogin = () => {
-  console.log("Login");
+const handleLogin = async () => {
+  try {
+    await userStore.login({
+      email: email.value,
+      password: password.value,
+    });
+
+    // Redirection vers la page d'accueil
+    router.push("/");
+  } catch (e) {
+    error.value = "Email ou mot de passe incorrect";
+    console.error(e);
+  }
 };
 </script>
 
@@ -42,6 +60,10 @@ const handleLogin = () => {
                 @submit.prevent="handleLogin"
                 class="flex flex-col justify-center w-full px-2 lg:px-12"
               >
+                <div v-if="error" class="mb-4 text-red-500 text-sm text-center">
+                  {{ error }}
+                </div>
+
                 <div class="mb-2">
                   <Input
                     v-model="email"
@@ -50,6 +72,7 @@ const handleLogin = () => {
                     placeholder="john.doe@gmail.com"
                     class="w-full"
                     type="email"
+                    required
                   />
                 </div>
 
@@ -61,6 +84,7 @@ const handleLogin = () => {
                     placeholder="Mot de passe"
                     type="password"
                     :show-criteria="false"
+                    required
                   />
                 </div>
                 <div class="text-right mb-4">
@@ -75,14 +99,14 @@ const handleLogin = () => {
 
             <template #actions>
               <div class="flex flex-col gap-2 w-full px-12">
-                <Button variant="primary"> Se connecter </Button>
+                <Button variant="primary" @click="handleLogin"> Se connecter </Button>
               </div>
             </template>
 
             <template #footer>
               <div class="w-full px-12 font-outfit">
                 <p class="text-center mt-6 text-black text-sm">
-                  Vous n’avez pas de compte ?
+                  Vous n'avez pas de compte ?
                   <RouterLink to="/register">
                     <span class="text-primary font-medium hover:underline"
                       >Inscrivez-vous maintenant !</span

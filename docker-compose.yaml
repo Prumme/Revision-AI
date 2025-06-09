@@ -1,25 +1,41 @@
-
 services:
-#  frontend:
-#    image: node:18
-#    ports:
-#      - "5173:5173"
-#    volumes:
-#      - ./frontend:/app/frontend
-#      - ./entrypoint.sh:/app/entrypoint.sh
-#    working_dir: /app/frontend
-#    entrypoint: ["/app/entrypoint.sh"]
+  frontend:
+    image: node:18
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend
+      - ./entrypoint.sh:/app/entrypoint.sh
+    working_dir: /app/frontend
+    entrypoint: ["/app/entrypoint.sh"]
 
   api:
+    container_name: api
     build:
-        context: ./services/api
-        dockerfile: Dockerfile
-        target: dev
-    volumes:
-        - ./services/api:/app
+      context: ./services/api
+      dockerfile: Dockerfile
+      target: ${NODE_ENV:-development}
+    env_file:
+      - .env
     ports:
-        - "8080:8080"
-    env_file: ".env"
+      - "3001:3000"
+    volumes:
+      - ./services/api:/app
+    depends_on:
+      database:
+        condition: service_started
+
+  database:
+    container_name: database
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=api
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -78,3 +94,4 @@ services:
 
 volumes:
   grafana-storage:
+  mongo-data:
