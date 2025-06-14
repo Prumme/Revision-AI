@@ -7,4 +7,6 @@ export interface User {
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+  avatar?: string; // URL de l'avatar stocké dans MinIO
+  bio?: string; // Biographie de l'utilisateur
 }

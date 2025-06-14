@@ -72,6 +72,8 @@ export class MongoUserRepository implements UserRepository {
       emailVerified: document.emailVerified,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
+      avatar: document.avatar,
+      bio: document.bio,
     };
   }
 }

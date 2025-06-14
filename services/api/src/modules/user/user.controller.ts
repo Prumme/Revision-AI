@@ -9,6 +9,9 @@ import {
   HttpException,
   HttpStatus,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,12 +19,16 @@ import {
   ApiResponse,
   ApiParam,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@entities/user.entity';
 import { Request } from 'express';
+import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
+import { ReqUser } from '@common/types/request';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -58,6 +65,31 @@ export class UserController {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
     return user;
+  }
+
+  @Patch('me')
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: "L'utilisateur a été mis à jour.",
+    type: UpdateUserDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async updateMe(
+    @Body() updateUserDto: UpdateUserDto,
+    @CurrentUser() user: ReqUser,
+  ): Promise<User> {
+    try {
+      return await this.userService.update(user.sub, updateUserDto);
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de la mise à jour de l'utilisateur",
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   @Patch(':id')
@@ -119,5 +151,65 @@ export class UserController {
     if (!deleted) {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
+  }
+
+  @Post('me/avatar')
+  @ApiOperation({ summary: "Mettre à jour l'avatar de l'utilisateur" })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('avatar'))
+  async updateAvatar(
+    @CurrentUser() user: ReqUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException(
+        "Aucun fichier n'a été fourni",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Vérifier le type de fichier
+    const allowedMimeTypes = ['image/jpeg', 'image/png'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new HttpException(
+        'Type de fichier non autorisé. Utilisez JPEG ou PNG',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Vérifier la taille du fichier (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      throw new HttpException(
+        'Le fichier est trop volumineux. Taille maximale : 5MB',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const updatedUser = await this.userService.updateAvatar(user.sub, file);
+    return {
+      message: 'Avatar mis à jour avec succès',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        avatar: updatedUser.avatar,
+      },
+    };
+  }
+
+  @Delete('me/avatar')
+  @ApiOperation({ summary: "Supprimer l'avatar de l'utilisateur" })
+  async deleteAvatar(@CurrentUser() user: ReqUser) {
+    const updatedUser = await this.userService.deleteAvatar(user.sub);
+    return {
+      message: 'Avatar supprimé avec succès',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        avatar: updatedUser.avatar,
+      },
+    };
   }
 }

@@ -4,9 +4,15 @@ import Dropdown from "@/components/dropdowns/DropdownInput.vue";
 import ProfileComponent from "@/components/profile/ProfileComponent.vue";
 import { ChevronsRightIcon, LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
 import { ref } from "vue";
+import ToastContainer from "./toasts/ToastContainer.vue";
 
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
+const dropdownRef = ref();
+
+const closeDropdown = () => {
+  dropdownRef.value?.closeMenu();
+};
 
 // Toggle Sidebar
 const toggleSidebar = () => {
@@ -17,6 +23,7 @@ const toggleSidebar = () => {
 
 <template>
   <main class="flex h-screen w-screen font-outfit">
+    <ToastContainer />
     <!-- Sidebar Desktop -->
     <nav
       class="hidden md:block relative p-5"
@@ -72,7 +79,7 @@ const toggleSidebar = () => {
 
         <!-- Profile Section avec Dropdown -->
         <div class="w-full">
-          <Dropdown>
+          <Dropdown ref="dropdownRef">
             <template #trigger>
               <ProfileComponent :isSidebarOpen="isSidebarOpen" :icon="true" />
             </template>
@@ -84,16 +91,29 @@ const toggleSidebar = () => {
                 :icon="false"
                 class="block px-4 py-4"
               />
-              <RouterLink to="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              <RouterLink
+                to="/profile"
+                class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                @click="closeDropdown"
                 >Mon profil</RouterLink
               >
-              <RouterLink to="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              <RouterLink
+                to="#"
+                class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                @click="closeDropdown"
                 >Boutique</RouterLink
               >
-              <RouterLink to="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              <RouterLink
+                to="#"
+                class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+                @click="closeDropdown"
                 >Paramètres</RouterLink
               >
-              <RouterLink to="#" class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100">
+              <RouterLink
+                to="#"
+                class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
+                @click="closeDropdown"
+              >
                 <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
                 Se déconnecter
               </RouterLink>
