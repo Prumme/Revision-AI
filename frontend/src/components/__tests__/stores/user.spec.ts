@@ -19,6 +19,8 @@ describe("User Store", () => {
       id: "id-1",
       username: "alice",
       email: "alice@example.com",
+      bio: "I'm a test user",
+      profilePicture: "test.jpg",
     };
 
     store.setUser(mockUser);
@@ -31,6 +33,8 @@ describe("User Store", () => {
       id: "id-2",
       username: "bob",
       email: "bob@example.com",
+      bio: "I'm a test user",
+      profilePicture: "test.jpg",
     };
 
     store.setUser(mockUser);
