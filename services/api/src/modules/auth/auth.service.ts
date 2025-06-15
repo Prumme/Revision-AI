@@ -1,14 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '@modules/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@entities/user.entity';
 import { ReqUser } from '@common/types/request';
+import { CustomerRepository } from '@repositories/customer.repository';
+import { CustomerAndUser } from '@entities/customer.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject('CustomerRepository')
+    private readonly customerRepository: CustomerRepository,
     private usersService: UserService,
     private jwtService: JwtService,
   ) {}
@@ -47,5 +51,23 @@ export class AuthService {
         username: user.username,
       },
     };
+  }
+
+  async getCurrentCustomer(
+    reqUser: ReqUser,
+  ): Promise<Omit<CustomerAndUser, 'password' | 'lastUpdatedPassword'>> {
+    const customerAndUser = await this.customerRepository.findByUserId(
+      reqUser.sub,
+    );
+    if (!customerAndUser) {
+      throw new UnauthorizedException('Customer not found');
+    }
+    if (!customerAndUser.customerId) {
+      throw new UnauthorizedException('Customer ID not found');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, lastUpdatedPassword, ...customer } =
+      customerAndUser as CustomerAndUser;
+    return customer;
   }
 }

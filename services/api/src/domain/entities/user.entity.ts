@@ -7,4 +7,5 @@ export interface User {
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+  customerId?: string; // Optional, as not all users may be customers
 }

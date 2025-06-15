@@ -8,6 +8,7 @@ import { useUserStore } from "@/stores/user";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import StripePayementMethodInput from "@/components/inputs/StripePayementMethodInput.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,7 +42,7 @@ const router = createRouter({
           path: "/profile",
           name: "profile",
           component: ProfilePage,
-        }
+        },
       ],
     },
     // Authentication routes
@@ -62,6 +63,10 @@ const router = createRouter({
       name: "forgot-password",
       component: ForgotPassword,
       meta: { requiresGuest: true },
+    },
+    {
+      path: "/test",
+      component: StripePayementMethodInput,
     },
     {
       path: "/:pathMatch(.*)*",

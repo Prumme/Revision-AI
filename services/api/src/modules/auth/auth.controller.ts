@@ -17,8 +17,7 @@ import {
 import { Public } from '@common/decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { User } from '@entities/user.entity';
+import { ReqUser } from '@common/types/request';
 
 @ApiTags('Authentification')
 @Controller('auth')
@@ -62,7 +61,7 @@ export class AuthController {
     status: 401,
     description: 'Non autorisé',
   })
-  async getCurrentUser(@Req() req: Request) {
+  async getCurrentUser(@Req() req: Request & { user: ReqUser }) {
     return this.authService.getCurrentUser(req.user);
   }
 }

@@ -5,6 +5,7 @@ import { AuthGuard } from '@common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '@modules/auth/auth.module';
 import { QuizModule } from '@modules/quiz/quiz.module';
+import { SubscriptionModule } from '@modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -14,8 +15,8 @@ import { QuizModule } from '@modules/quiz/quiz.module';
     UserModule,
     AuthModule,
     QuizModule,
+    SubscriptionModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,
