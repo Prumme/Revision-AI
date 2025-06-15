@@ -80,7 +80,7 @@ export const SubscribeUseCaseFactory: UseCaseFactory<
     );
     if (!response) {
       if (response instanceof SubscriptionError) return response;
-      return new Error('Cannot unsubscribe');
+      return new Error('Cannot subscribe');
     }
     return true;
   };
