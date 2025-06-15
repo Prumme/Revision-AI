@@ -6,19 +6,22 @@ import { AuthController } from './auth.controller';
 import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '@mongo/user/user.schema';
+import { MailModule } from '@infrastructure/resend/mail.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UserModule,
+    MailModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   providers: [AuthService, CustomerRepositoryProvider],
   controllers: [AuthController],
+  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}

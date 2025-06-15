@@ -11,10 +11,11 @@ const router = useRouter();
 const userStore = useUserStore();
 
 // Form props
-const username = ref("");
-const email = ref("");
-const password = ref("");
-const passwordConfirmation = ref("");
+const username = ref<string>("");
+const email = ref<string>("");
+const password = ref<string>("");
+const passwordConfirmation = ref<string>("");
+
 const error = ref("");
 
 const handleRegister = async () => {
@@ -30,9 +31,8 @@ const handleRegister = async () => {
       password: password.value,
     });
 
-
     // Redirection vers la page d'accueil
-    router.push("/login");
+    router.push("/email-send");
   } catch (e) {
     error.value = "Une erreur est survenue lors de l'inscription";
     console.error(e);

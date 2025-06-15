@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -17,6 +18,7 @@ import {
 import { Public } from '@common/decorators/public.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { Request } from 'express';
 import { ReqUser } from '@common/types/request';
 
 @ApiTags('Authentification')
@@ -46,6 +48,18 @@ export class AuthController {
   })
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('verify-email')
+  @ApiOperation({ summary: "Vérifier l'email utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: 'Email vérifié avec succès',
+  })
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
   }
 
   @Get('me')

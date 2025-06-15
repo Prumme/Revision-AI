@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { useUserStore } from "@/stores/user";
+import { PlusIcon, SearchIcon } from "lucide-vue-next";
 
 const { getFullName } = useUserStore();
-
 </script>
 
 <template>

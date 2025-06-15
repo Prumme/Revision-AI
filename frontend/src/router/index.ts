@@ -4,11 +4,14 @@ import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
-import { useUserStore } from "@/stores/user";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
+import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
+import EmailSend from "@/views/authentication/EmailSend.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import StripePayementMethodInput from "@/components/inputs/StripePayementMethodInput.vue";
+
+import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +65,18 @@ const router = createRouter({
       path: "/forgot-password",
       name: "forgot-password",
       component: ForgotPassword,
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/auth/verify-email",
+      name: "verify-email",
+      component: VerifyEmail,
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/email-send",
+      name: "email-send",
+      component: EmailSend,
       meta: { requiresGuest: true },
     },
     {

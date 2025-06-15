@@ -12,8 +12,8 @@ const userStore = useUserStore();
 
 // Form props
 
-const email = ref("");
-const password = ref("");
+const email = ref<string>("");
+const password = ref<string>("");
 const error = ref("");
 
 const handleLogin = async () => {
@@ -23,11 +23,14 @@ const handleLogin = async () => {
       password: password.value,
     });
 
-
     // Redirection vers la page d'accueil
     router.push("/");
   } catch (e) {
-    error.value = "Email ou mot de passe incorrect";
+    if (e instanceof Error && e.message === "Email not verified, please verify your email") {
+      error.value = "Email non vérifié, veuillez vérifier votre email";
+    } else {
+      error.value = "Email ou mot de passe incorrect";
+    }
     console.error(e);
   }
 };

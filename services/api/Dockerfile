@@ -1,4 +1,5 @@
-FROM node:20 AS base
+FROM node:22-bullseye-slim as base
+# Create app directory
 
 # Set the working directory
 WORKDIR /app
@@ -8,19 +9,18 @@ COPY package*.json ./
 COPY tsconfig.build.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm install --legacy-peer-deps
-
-# Copy source code
+## PRODUCTION
+FROM base as production
+# Copy app source code
 COPY . .
-
-# Development target
-FROM base AS development
-EXPOSE 3000
-CMD ["npm", "run", "start:dev"]
-
-# Production target
-FROM base AS production
-EXPOSE 3000
+# Build the app
 RUN npm run build
-CMD ["npm", "run", "start:prod"]
+# Expose the port the app runs on
+EXPOSE 3000
+# Start the app
+CMD ["npm","run","start"]
+
+## DEV
+FROM base as dev
+# need volume to be mounted
+CMD ["npm", "run","dev"]
