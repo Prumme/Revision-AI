@@ -16,7 +16,7 @@ services:
     build:
       context: ./services/api
       dockerfile: Dockerfile
-      target: ${NODE_ENV:-development}
+      target: ${NODE_ENV:-dev}
     env_file:
       - .env
     ports:
@@ -41,7 +41,7 @@ services:
     build:
       context: ./services/file-parser
       dockerfile: Dockerfile
-      target: dev
+      target: ${NODE_ENV:-dev}
     volumes:
       - ./services/file-parser:/app
     env_file: ".env"
@@ -53,7 +53,7 @@ services:
     build:
       context: ./services/quiz-generator
       dockerfile: Dockerfile
-      target: dev
+      target: ${NODE_ENV:-dev}
     volumes:
       - ./services/quiz-generator:/app
     env_file: ".env"
@@ -81,7 +81,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
-      -
+
   database:
     container_name: database
     image: mongo

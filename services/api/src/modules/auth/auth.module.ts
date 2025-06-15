@@ -21,7 +21,6 @@ import { MailModule } from '@infrastructure/resend/mail.module';
   ],
   providers: [AuthService, CustomerRepositoryProvider],
   controllers: [AuthController],
-  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}
