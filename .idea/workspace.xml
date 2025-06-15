@@ -4,40 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="remove secret">
-      <change afterPath="$PROJECT_DIR$/.env.frontend" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.env.services.api" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/inputs/StripePayementMethodInput.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/entities/customer.entity.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/errors/SubscriptionError.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/repositories/customer.repository.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/services/MailerService.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/services/SubscriptionProvider.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/usecases/IUseCase.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/usecases/SubscriptionUsecases.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/domain/value-objects/subscriptionTier.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/infrastructure/brevo/BrevoMailerService.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/user/customer.repository.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/infrastructure/stripe/StripeSubscriptionDict.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/infrastructure/stripe/StripeSubscriptionProvider.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/modules/subscription/dto/customer.dto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/src/modules/subscription/dto/subscribe.dto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/app.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/domain/entities/user.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/domain/entities/user.entity.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/user/user.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/user/user.schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/auth/auth.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/auth/auth.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/auth/auth.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/auth/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/auth/auth.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +103,7 @@
     "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "25-billing-et-abbonement",
+    "git-widget-placeholder": "#56 on 25-billing-et-abbonement",
     "last_opened_file_path": "/Users/axel/Documents/Cours/Revision-AI",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",

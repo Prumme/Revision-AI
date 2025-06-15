@@ -22,4 +22,4 @@ CMD ["npm","run","start"]
 ## DEV
 FROM base as dev
 # need volume to be mounted
-CMD ["npm", "run","dev"]
+CMD ["npm", "run","start:dev"]
