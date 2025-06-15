@@ -11,6 +11,16 @@ export const UserSchema = new Schema({
   avatar: { type: String, required: false },
   bio: { type: String, required: false, default: '' },
   deleted: { type: Boolean, default: false },
+  subscriptionTier: { type: String, required: true, default: 'free' },
+  customerId: { type: String, required: false },
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  address: {
+    street: { type: String, required: false },
+    city: { type: String, required: false },
+    postalCode: { type: String, required: false },
+    country: { type: String, required: false },
+  },
 });
 
 export interface UserDocument extends Document {
@@ -25,4 +35,16 @@ export interface UserDocument extends Document {
   avatar?: string;
   bio?: string;
   deleted?: boolean;
+  subscriptionTier: string;
+  customerId?: string;
+  firstName?: string;
+  lastName?: string;
+  address?: {
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
 }

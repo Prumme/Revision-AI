@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { raw } from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use('/stripe/webhook', raw({ type: 'application/json' }));
 
   app.enableCors({
     origin: '*',
@@ -13,7 +15,11 @@ async function bootstrap() {
   });
 
   // Configuration de la validation globale
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   // Configuration de Swagger
   const config = new DocumentBuilder()

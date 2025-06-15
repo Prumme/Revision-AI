@@ -9,6 +9,7 @@ import QuizView from "@/views/QuizView.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import StripePayementMethodInput from "@/components/inputs/StripePayementMethodInput.vue";
 
 import { useUserStore } from "@/stores/user";
 
@@ -77,6 +78,10 @@ const router = createRouter({
       name: "email-send",
       component: EmailSend,
       meta: { requiresGuest: true },
+    },
+    {
+      path: "/test",
+      component: StripePayementMethodInput,
     },
     {
       path: "/:pathMatch(.*)*",
