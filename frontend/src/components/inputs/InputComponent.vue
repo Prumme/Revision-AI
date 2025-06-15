@@ -10,6 +10,7 @@ const props = defineProps({
   type: { type: String, default: "text" },
   autocomplete: { type: String, required: false },
   showCriteria: { type: Boolean, default: true },
+  showLabel: { type: Boolean, default: true },
   id: {
     type: String,
     required: false,

@@ -4,6 +4,7 @@ import { CreateEmailResponseSuccess, Resend } from 'resend';
 import {
   BlockUserParams,
   CancelSubscriptionParams,
+  DeleteAccountParams,
   NewPasswordNeededParams,
   SucceedBoughtParams,
   VerifyEmailParams,
@@ -12,6 +13,7 @@ import { blockUserTemplate } from './templates/block-user';
 import { succeedBoughtTemplate } from './templates/succeed-bought';
 import { cancelSubscriptionTemplate } from './templates/cancel-subscription';
 import { newPasswordNeededTemplate } from './templates/new-password-needed';
+import { deleteAccountTemplate } from './templates/delete-account';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -86,6 +88,15 @@ export class MailService {
       params.username,
       params.loginUrl,
     );
+    return await this.send(to, subject, template);
+  }
+
+  public async sendDeleteAccountEmail(
+    to: string,
+    params: DeleteAccountParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Ton compte a été supprimé';
+    const template = deleteAccountTemplate(params.username);
     return await this.send(to, subject, template);
   }
 }

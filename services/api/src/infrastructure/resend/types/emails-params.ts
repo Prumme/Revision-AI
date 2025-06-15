@@ -20,3 +20,5 @@ export interface CancelSubscriptionParams extends EmailParams {}
 export interface NewPasswordNeededParams extends EmailParams {
   loginUrl: string;
 }
+
+export interface DeleteAccountParams extends EmailParams {}

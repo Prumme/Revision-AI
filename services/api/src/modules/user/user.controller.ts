@@ -29,6 +29,7 @@ import { User } from '@entities/user.entity';
 import { Request } from 'express';
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { ReqUser } from '@common/types/request';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -129,10 +130,40 @@ export class UserController {
     description: 'Utilisateur non trouvé',
   })
   async updatePassword(
-    @Body() password: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
     @Req() { user }: Request,
   ): Promise<User> {
-    return await this.userService.updatePassword(user.sub, password);
+    return await this.userService.updatePassword(user.sub, updatePasswordDto);
+  }
+
+  @Delete('me')
+  @ApiOperation({ summary: 'Supprimer/anonymiser le compte utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Le compte a été anonymisé avec succès',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async deleteMe(@Req() { user }: Request) {
+    try {
+      const updatedUser = await this.userService.anonymizeAccount(user.sub);
+      return {
+        message: 'Compte anonymisé avec succès',
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          username: updatedUser.username,
+          deleted: updatedUser.deleted,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de l'anonymisation du compte",
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   @Delete(':id')

@@ -2,6 +2,8 @@
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import ProfilePicture from "@/components/profile/ProfilePicture.vue";
+import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
+import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
 import { useUserStore } from "@/stores/user";
 import { useToastStore } from "@/stores/toast";
 import { ref, computed, watch } from "vue";
@@ -89,14 +91,10 @@ const handleSubmit = async () => {
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
       <FormCard>
-        <template #title>
-          <h1 class="font-outfit text-lg text-black-transparent mb-4">
-            Vos informations personnelles
-          </h1>
-        </template>
+        <template #title> Vos informations personnelles </template>
 
         <template #content>
-          <div class="grid grid-cols-2 gap-2 space-y-5">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 space-y-5">
             <div class="flex items-center justify-center">
               <ProfilePicture />
             </div>
@@ -132,6 +130,12 @@ const handleSubmit = async () => {
           </div>
         </template>
       </FormCard>
+
+      <div class="flex flex-col gap-4">
+        <PasswordChangeCard />
+      </div>
+
+      <DeleteAccountCard />
     </div>
   </section>
 </template>

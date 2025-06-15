@@ -23,7 +23,7 @@ const getSizeClasses = (size: string = "md") => {
     case "lg":
       return "w-12 h-12 text-lg rounded-xl";
     case "full":
-      return "w-64 h-64 text-base rounded-full border-5 border-primary ";
+      return "w-32 lg:w-64 h-32 lg:h-64 text-base rounded-full border-5 border-primary ";
     default:
       return "w-10 h-10 text-base rounded-xl";
   }
