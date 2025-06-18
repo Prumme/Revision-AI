@@ -16,11 +16,11 @@ services:
     build:
       context: ./services/api
       dockerfile: Dockerfile
-      target: ${NODE_ENV:-development}
+      target: ${NODE_ENV:-dev}
     env_file:
       - .env
     ports:
-      - "3001:3000"
+      - "3000:3000"
     volumes:
       - ./services/api:/app
     depends_on:
@@ -28,16 +28,6 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-
-  database:
-    container_name: database
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=api
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -53,7 +43,7 @@ services:
     build:
       context: ./services/file-parser
       dockerfile: Dockerfile
-      target: dev
+      target: ${NODE_ENV:-dev}
     volumes:
       - ./services/file-parser:/app
     env_file: ".env"
@@ -65,7 +55,7 @@ services:
     build:
       context: ./services/quiz-generator
       dockerfile: Dockerfile
-      target: dev
+      target: ${NODE_ENV:-dev}
     volumes:
       - ./services/quiz-generator:/app
     env_file: ".env"
@@ -85,7 +75,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3000:3000"
+      - "9092:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
     environment:
@@ -111,6 +101,16 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+
+  database:
+    container_name: database
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=api
 
 volumes:
   grafana-storage:

@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
 import { UserModule } from '@modules/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+import { CustomerRepositoryProvider } from '@repositories/customer.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserSchema } from '@mongo/user/user.schema';
 import { MailModule } from '@infrastructure/resend/mail.module';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     UserModule,
     MailModule,
     JwtModule.register({
@@ -15,8 +19,8 @@ import { MailModule } from '@infrastructure/resend/mail.module';
       signOptions: { expiresIn: '1d' },
     }),
   ],
+  providers: [AuthService, CustomerRepositoryProvider],
   controllers: [AuthController],
-  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}

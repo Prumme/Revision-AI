@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '@modules/auth/auth.module';
 import { QuizModule } from '@modules/quiz/quiz.module';
 import { MinioModule } from './modules/minio/minio.module';
+import { SubscriptionModule } from '@modules/subscription/subscription.module';
 
 @Module({
   imports: [
@@ -20,9 +21,9 @@ import { MinioModule } from './modules/minio/minio.module';
     UserModule,
     AuthModule,
     QuizModule,
+    SubscriptionModule,
     MinioModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,

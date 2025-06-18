@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix copilot" />
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/package-lock.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,58 +22,54 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Vue Composition API Component" />
         <option value="workflow" />
-        <option value="TypeScript File" />
         <option value="JavaScript File" />
         <option value="HTML File" />
+        <option value="TypeScript File" />
+        <option value="Vue Composition API Component" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
-    {
-      "state": "OPEN"
-    }
-  ],
-  "lastFilter": {
-    "state": "OPEN"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Prumme&quot;
   }
-}]]></component>
-  <component name="GitHubPullRequestState"><![CDATA[{
-  "prStates": [
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
     {
-      "id": {
-        "id": "PR_kwDOOHU1h86Yahp0",
-        "number": 49
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOOHU1h86TVCKA&quot;,
+        &quot;number&quot;: 45
       },
-      "lastSeen": 1749295316011
+      &quot;lastSeen&quot;: 1749295346319
     },
     {
-      "id": {
-        "id": "PR_kwDOOHU1h86TVCKA",
-        "number": 45
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOOHU1h86YVJ5G&quot;,
+        &quot;number&quot;: 47
       },
-      "lastSeen": 1749295346319
+      &quot;lastSeen&quot;: 1749295777122
     },
     {
-      "id": {
-        "id": "PR_kwDOOHU1h86YVJ5G",
-        "number": 47
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOOHU1h86Yahp0&quot;,
+        &quot;number&quot;: 49
       },
-      "lastSeen": 1749295542419
+      &quot;lastSeen&quot;: 1749295787678
     }
   ]
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "git@github.com:Prumme/Revision-AI.git",
-    "accountId": "3aff0e21-277d-41d7-9fb5-7997b3ad2e34"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:Prumme/Revision-AI.git&quot;,
+    &quot;accountId&quot;: &quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&quot;
   }
-}]]></component>
+}</component>
   <component name="JiraServerManager">
     <selected>-1</selected>
     <servers />
@@ -77,6 +79,9 @@
   </component>
   <component name="PhpDebugGeneral" listening_started="true" />
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.7_2/bin/php" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -92,21 +97,23 @@
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "DefaultHtmlFileTemplate": "HTML File",
+    "Docker.docker-compose.yaml.frontend: Compose Deployment.executor": "Run",
     "Docker.docker-compose.yaml: Compose Deployment.executor": "Run",
     "Jest.S3FileDownloader.executor": "Run",
     "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#47 on 46-créer-le-debut-du-cluster-kubernetes",
-    "last_opened_file_path": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa",
+    "git-widget-placeholder": "#56 on 25-billing-et-abbonement",
+    "last_opened_file_path": "/Users/axel/Documents/Cours/Revision-AI",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs.jest.jest_package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest",
     "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/frontend/node_modules/prettier",
+    "prettierjs.PrettierConfiguration.Package": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier",
+    "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/axel/Documents/Cours/Revision-AI/services/file-parser/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -124,14 +131,14 @@
       <recent name="$PROJECT_DIR$/services/quiz-generator" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services/api/src/modules/subscription" />
+      <recent name="$PROJECT_DIR$/services/api/src/modules" />
       <recent name="$PROJECT_DIR$/services/quiz-generator" />
       <recent name="$PROJECT_DIR$/services/file-parser" />
       <recent name="$PROJECT_DIR$/services/file-parser/src/shared" />
-      <recent name="$PROJECT_DIR$/services" />
-      <recent name="$PROJECT_DIR$/services/file-parser/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.S3FileDownloader.should download the file and return a valid file downloaded">
+  <component name="RunManager" selected="Docker.docker-compose.yaml.frontend: Compose Deployment">
     <configuration name="S3FileDownloader" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/services/file-parser/node_modules/jest" />
@@ -171,8 +178,22 @@
       </deployment>
       <method v="2" />
     </configuration>
+    <configuration name="docker-compose.yaml.frontend: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="frontend" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.docker-compose.yaml.frontend: Compose Deployment" />
         <item itemvalue="Jest.S3FileDownloader.should download the file and return a valid file downloaded" />
         <item itemvalue="Jest.S3FileDownloader" />
         <item itemvalue="Docker.docker-compose.yaml: Compose Deployment" />
@@ -182,8 +203,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-PS-251.23774.436" />
-        <option value="bundled-php-predefined-a98d8de5180a-aaeaa8632555-com.jetbrains.php.sharedIndexes-PS-251.23774.436" />
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PS-251.26094.133" />
+        <option value="bundled-php-predefined-a98d8de5180a-c5828cf854d9-com.jetbrains.php.sharedIndexes-PS-251.26094.133" />
       </set>
     </attachedChunks>
   </component>
@@ -204,7 +225,9 @@
       <workItem from="1745172990479" duration="20000" />
       <workItem from="1745175009908" duration="110000" />
       <workItem from="1745235121620" duration="23062000" />
-      <workItem from="1749295209946" duration="470000" />
+      <workItem from="1749301609329" duration="246000" />
+      <workItem from="1749301885239" duration="14317000" />
+      <workItem from="1749927095568" duration="11888000" />
     </task>
     <task id="LOCAL-00001" summary="🔨 upgrade some lines">
       <option name="closed" value="true" />
@@ -335,7 +358,8 @@
     <MESSAGE value="setup premiere version rabit mq" />
     <MESSAGE value="add S3 File downloader and add tests" />
     <MESSAGE value="fix copilot" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix copilot" />
+    <MESSAGE value="remove secret" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove secret" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
