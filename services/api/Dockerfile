@@ -1,3 +1,4 @@
+
 FROM node:22-bullseye-slim as base
 # Create app directory
 
@@ -22,4 +23,3 @@ CMD ["npm","run","start"]
 FROM base as dev
 # need volume to be mounted
 CMD ["npm", "run","dev"]
-

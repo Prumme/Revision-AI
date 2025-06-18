@@ -1,21 +1,9 @@
 <script setup lang="ts">
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { useUserStore } from "@/stores/user";
-import type { User } from "@/types/user.ts";
 import { PlusIcon, SearchIcon } from "lucide-vue-next";
 
-const { setUser, getFullName } = useUserStore();
-
-const user: User = {
-  id: "1212",
-  firstname: "John",
-  lastname: "Smith",
-  email: "john.smith@mail.fr",
-  bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-  profilePicture: "../../assets/profile_picture/monkey.jpg",
-};
-
-setUser(user);
+const { getFullName } = useUserStore();
 </script>
 
 <template>
