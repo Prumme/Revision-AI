@@ -1,8 +1,8 @@
-**/.env
-
-# compiled output
-**/dist
 **/node_modules
+.env
+.DS_Store
+k8s/secrets/.gitignore
+
 
 
 # Logs

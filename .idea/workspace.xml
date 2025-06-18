@@ -4,56 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix copilot">
-      <change afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/api/tempServer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/metrics/prometheus.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/README" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/babel.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/eslint.config.mjs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/jest.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/exceptions/QuizGenerationError.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IMetricsExporter.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IQuizIAAgent.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/FileContent.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/Quiz.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects/QuizSafetyCheckResult.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/messages/fileParsedEvent.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/cli/cliEntrypoint.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/monitoring/PrometheusMetricsExporter.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.test.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/IUseCase.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/Result.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/src/shared/Timer.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/quiz-generator/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/README" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/README" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/usecases/HandleFileUploadedUseCase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/app/usecases/HandleFileUploadedUseCase.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/usecases/IUseCase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/shared/IUseCase.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/app/value-objects/PDFContent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/app/value-objects/PDFContent.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/messages/fileUploadedEvent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/messages/fileUploadedEvent.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqConsumer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqProvider.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/broker/mqProvider.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/cli/cliEntrypoint.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/cli/cliEntrypoint.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/ImageReader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/ImageReader.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/file-parser/test.pdf" beforeDir="false" />
-    </list>
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix copilot" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -76,18 +27,47 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Prumme&quot;
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "history": [
+    {
+      "state": "OPEN"
+    }
+  ],
+  "lastFilter": {
+    "state": "OPEN"
   }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Prumme/Revision-AI.git&quot;,
-    &quot;accountId&quot;: &quot;2dae477e-9822-4f7b-b8d4-b18f17127006&quot;
+}]]></component>
+  <component name="GitHubPullRequestState"><![CDATA[{
+  "prStates": [
+    {
+      "id": {
+        "id": "PR_kwDOOHU1h86Yahp0",
+        "number": 49
+      },
+      "lastSeen": 1749295316011
+    },
+    {
+      "id": {
+        "id": "PR_kwDOOHU1h86TVCKA",
+        "number": 45
+      },
+      "lastSeen": 1749295346319
+    },
+    {
+      "id": {
+        "id": "PR_kwDOOHU1h86YVJ5G",
+        "number": 47
+      },
+      "lastSeen": 1749295542419
+    }
+  ]
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:Prumme/Revision-AI.git",
+    "accountId": "3aff0e21-277d-41d7-9fb5-7997b3ad2e34"
   }
-}</component>
+}]]></component>
   <component name="JiraServerManager">
     <selected>-1</selected>
     <servers />
@@ -117,7 +97,7 @@
     "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "16-service-file-parser-migration-de-python-vers-node",
+    "git-widget-placeholder": "#47 on 46-créer-le-debut-du-cluster-kubernetes",
     "last_opened_file_path": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -126,7 +106,7 @@
     "nodejs_package_manager_path": "npm",
     "prettierjs.PrettierConfiguration.Package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/frontend/node_modules/prettier",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/axel/Documents/Cours/Revision-AI/services/file-parser/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -202,8 +182,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-1d06a55b98c1-0b3e54e931b4-JavaScript-PS-241.18034.69" />
-        <option value="bundled-php-predefined-ba97393d7c68-48a1a656d44e-com.jetbrains.php.sharedIndexes-PS-241.18034.69" />
+        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-PS-251.23774.436" />
+        <option value="bundled-php-predefined-a98d8de5180a-aaeaa8632555-com.jetbrains.php.sharedIndexes-PS-251.23774.436" />
       </set>
     </attachedChunks>
   </component>
@@ -224,6 +204,7 @@
       <workItem from="1745172990479" duration="20000" />
       <workItem from="1745175009908" duration="110000" />
       <workItem from="1745235121620" duration="23062000" />
+      <workItem from="1749295209946" duration="470000" />
     </task>
     <task id="LOCAL-00001" summary="🔨 upgrade some lines">
       <option name="closed" value="true" />
