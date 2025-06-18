@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "outline" | "rounded-full";
+  variant?: "primary" | "outline" | "rounded-full" | "secondary" | "secondary-inverted";
   size?: "default" | "icon";
   positionIcon?: "left" | "right";
   withIcon?: boolean;
@@ -32,6 +32,10 @@ const { type = "button", variant = "primary", size = "default", disabled = false
         variant === 'outline',
       'bg-primary/80 text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
         variant === 'rounded-full',
+      'bg-white text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
+        variant === 'secondary',
+      'bg-primary text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
+        variant === 'secondary-inverted',
 
       // Icon position
       'flex items-center flex-row-reverse gap-2.5': positionIcon === 'right',
