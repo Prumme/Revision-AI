@@ -9,6 +9,10 @@
 
 .env.services.api
 .env.frontend
+.env
+.DS_Store
+k8s/secrets/.gitignore
+
 
 
 # Logs

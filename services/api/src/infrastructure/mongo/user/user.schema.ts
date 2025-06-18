@@ -8,6 +8,9 @@ export const UserSchema = new Schema({
   emailVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  avatar: { type: String, required: false },
+  bio: { type: String, required: false, default: '' },
+  deleted: { type: Boolean, default: false },
   subscriptionTier: { type: String, required: true, default: 'free' },
   customerId: { type: String, required: false },
   firstName: { type: String, required: false },
@@ -29,6 +32,9 @@ export interface UserDocument extends Document {
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+  avatar?: string;
+  bio?: string;
+  deleted?: boolean;
   subscriptionTier: string;
   customerId?: string;
   firstName?: string;

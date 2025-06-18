@@ -10,11 +10,13 @@ const props = defineProps({
   type: { type: String, default: "text" },
   autocomplete: { type: String, required: false },
   showCriteria: { type: Boolean, default: true },
+  showLabel: { type: Boolean, default: true },
   id: {
     type: String,
     required: false,
     default: () => `input-${Math.random().toString(36).substring(2, 9)}`,
   },
+  disabled: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -131,9 +133,11 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
         :class="[
           'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
           isFocused ? 'border-primary' : 'border-gray-300',
+          disabled && 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed',
         ]"
         :placeholder="placeholder"
         :autocomplete="autocomplete"
+        :disabled="disabled"
       />
 
       <textarea
