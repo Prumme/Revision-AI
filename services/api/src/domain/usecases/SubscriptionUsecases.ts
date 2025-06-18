@@ -159,7 +159,7 @@ export const ActiveSubscriptionUseCaseFactory: UseCaseFactory<
         tier,
       },
     );
-    if (!sent) return sent;
+    if (sent instanceof Error) return sent;
 
     return true;
   };
@@ -207,7 +207,7 @@ export const InactiveSubscriptionUseCaseFactory: UseCaseFactory<
       {},
     );
 
-    if (!sent) return sent;
+    if (sent instanceof Error) return sent;
 
     return true;
   };
