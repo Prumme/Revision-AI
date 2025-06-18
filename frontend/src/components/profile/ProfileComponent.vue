@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { ArrowRightFromLineIcon } from "lucide-vue-next";
+import AvatarComponent from "./avatar/AvatarComponent.vue";
 // @TODO : Implement user context inside this component
 // import { useUserContext } from "@/context/UserContext";
 
@@ -14,14 +15,10 @@ const { getFullName, user } = useUserStore();
 
 <template>
   <div class="flex justify-between items-center gap-4 w-full">
-    <img
-      src="../../assets/profile_picture/monkey.jpg"
-      alt="Profile Picture"
-      class="w-10 h-10 border border-gray-extralight rounded-xl object-cover"
-    />
+    <AvatarComponent :user="user" />
 
     <div
-      class="flex justify-between items-center text-black w-full"
+      class="flex justify-between items-center text-black grow"
       :class="{
         block: isSidebarOpen || !icon,
         hidden: !isSidebarOpen && icon,
@@ -29,7 +26,7 @@ const { getFullName, user } = useUserStore();
     >
       <div class="flex flex-col">
         <p class="font-medium">{{ getFullName() }}</p>
-        <p class="text-sm text-gray-500">{{ user?.email || "johndoe@gmail.com" }}</p>
+        <p class="text-sm text-gray-500">{{ user.email }}</p>
       </div>
       <ArrowRightFromLineIcon v-if="icon" class="h-4 w-4 text-gray-extralight" />
     </div>

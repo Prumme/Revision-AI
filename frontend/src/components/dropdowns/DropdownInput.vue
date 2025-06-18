@@ -32,6 +32,12 @@ onUnmounted(() => {
 defineProps({
   trigger: Object,
 });
+
+defineExpose({
+  closeMenu: () => {
+    isOpen.value = false;
+  },
+});
 </script>
 
 <template>

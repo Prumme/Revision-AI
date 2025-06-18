@@ -63,6 +63,34 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
+  async function updateUser(userData: Partial<User>) {
+    try {
+      if (!token.value) {
+        throw new Error("Non authentifié");
+      }
+
+      const response = await fetch(`${API_URL}/users/me`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la mise à jour du profil");
+      }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      throw error;
+    }
+  }
+
   async function register(credentials: RegisterCredentials) {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
@@ -128,5 +156,6 @@ export const useUserStore = defineStore("user", () => {
     login,
     logout,
     fetchCurrentUser,
+    updateUser,
   };
 });
