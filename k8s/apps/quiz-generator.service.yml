@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quiz-generator-service
+  labels:
+    app: quiz-generator-deploy
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9090
+      targetPort: 9090
+      name: prometheus
+      protocol: TCP
+  selector:
+    app: quiz-generator-deploy

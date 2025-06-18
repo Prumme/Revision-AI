@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  MODE: mq
+  SCALEWAY_REGION: fr-par
+kind: ConfigMap
+metadata:
+  name: env-config-map
