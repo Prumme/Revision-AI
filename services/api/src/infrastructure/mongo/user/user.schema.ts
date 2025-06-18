@@ -10,6 +10,7 @@ export const UserSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
   avatar: { type: String, required: false },
   bio: { type: String, required: false, default: '' },
+  deleted: { type: Boolean, default: false },
 });
 
 export interface UserDocument extends Document {
@@ -23,4 +24,5 @@ export interface UserDocument extends Document {
   updatedAt: Date;
   avatar?: string;
   bio?: string;
+  deleted?: boolean;
 }

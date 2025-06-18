@@ -5,6 +5,8 @@ import { UserRepository } from '@repositories/user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { MinioService } from '@modules/minio/minio.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { MailService } from '@infrastructure/resend/mail.service';
 
 @Injectable()
 export class UserService {
@@ -12,6 +14,7 @@ export class UserService {
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
     private readonly minioService: MinioService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(createUserDto: RegisterDto): Promise<User> {
@@ -23,6 +26,7 @@ export class UserService {
       emailVerified: false,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deleted: false,
     };
     return this.userRepository.create(user);
   }
@@ -60,13 +64,25 @@ export class UserService {
     return this.userRepository.update(id, { emailVerified: true });
   }
 
-  async updatePassword(id: string, password: string): Promise<User> {
+  async updatePassword(
+    id: string,
+    updatePasswordDto: UpdatePasswordDto,
+  ): Promise<User> {
     const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
       throw new Error('Utilisateur non trouvé');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const isPasswordValid = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      existingUser.password,
+    );
+    if (!isPasswordValid) {
+      throw new Error('Mot de passe incorrect');
+    }
+
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10);
+
     return this.userRepository.update(id, {
       password: hashedPassword,
       lastUpdatedPassword: new Date(),
@@ -113,5 +129,39 @@ export class UserService {
     }
 
     return this.userRepository.update(userId, { avatar: null });
+  }
+
+  async anonymizeAccount(userId: string): Promise<User> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    const email = user.email;
+    const username = user.username;
+
+    // Supprimer l'avatar si présent
+    if (user.avatar) {
+      await this.deleteAvatar(userId);
+    }
+
+    // Générer un email anonyme unique basé sur l'ID de l'utilisateur
+    const anonymizedEmail = `deleted_${userId.slice(0, 8)}@deleted.com`;
+
+    // Mettre à jour l'utilisateur avec les données anonymisées
+    const updatedUser = await this.userRepository.update(userId, {
+      email: anonymizedEmail,
+      username: 'Utilisateur supprimé',
+      bio: null,
+      avatar: null,
+      deleted: true,
+      updatedAt: new Date(),
+    });
+
+    await this.mailService.sendDeleteAccountEmail(email, {
+      username,
+    });
+
+    return updatedUser;
   }
 }

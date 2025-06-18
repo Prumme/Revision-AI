@@ -9,4 +9,5 @@ export interface User {
   updatedAt: Date;
   avatar?: string; // URL de l'avatar stocké dans MinIO
   bio?: string; // Biographie de l'utilisateur
+  deleted?: boolean; // Indique si le compte a été supprimé/anonymisé
 }

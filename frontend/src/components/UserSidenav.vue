@@ -5,10 +5,14 @@ import ProfileComponent from "@/components/profile/ProfileComponent.vue";
 import { ChevronsRightIcon, LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
 import { ref } from "vue";
 import ToastContainer from "./toasts/ToastContainer.vue";
+import { useUserStore } from "@/stores/user";
+import { useRouter } from "vue-router";
 
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
 const dropdownRef = ref();
+const userStore = useUserStore();
+const router = useRouter();
 
 const closeDropdown = () => {
   dropdownRef.value?.closeMenu();
@@ -18,6 +22,11 @@ const closeDropdown = () => {
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
+};
+
+const handleLogout = () => {
+  userStore.logout();
+  router.push("/login");
 };
 </script>
 
@@ -97,26 +106,19 @@ const toggleSidebar = () => {
                 @click="closeDropdown"
                 >Mon profil</RouterLink
               >
-              <RouterLink
-                to="#"
-                class="block px-4 py-2 text-gray-light hover:bg-gray-100"
-                @click="closeDropdown"
+              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="#"
                 >Boutique</RouterLink
               >
-              <RouterLink
-                to="#"
-                class="block px-4 py-2 text-gray-light hover:bg-gray-100"
-                @click="closeDropdown"
+              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="#"
                 >Paramètres</RouterLink
               >
-              <RouterLink
-                to="#"
+              <span
                 class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
-                @click="closeDropdown"
+                @click="handleLogout"
               >
                 <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
                 Se déconnecter
-              </RouterLink>
+              </span>
             </template>
           </Dropdown>
         </div>
@@ -168,10 +170,13 @@ const toggleSidebar = () => {
             >
             <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
             <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
-            <a href="#" class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100">
+            <span
+              class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
+              @click="handleLogout"
+            >
               <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
               Se déconnecter
-            </a>
+            </span>
           </template>
         </Dropdown>
       </div>
