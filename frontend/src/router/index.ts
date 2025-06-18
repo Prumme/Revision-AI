@@ -9,7 +9,7 @@ import QuizView from "@/views/QuizView.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
 import { createRouter, createWebHistory } from "vue-router";
-import StripePayementMethodInput from "@/components/inputs/StripePayementMethodInput.vue";
+import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 
 import { useUserStore } from "@/stores/user";
 
@@ -81,7 +81,7 @@ const router = createRouter({
     },
     {
       path: "/test",
-      component: StripePayementMethodInput,
+      component: StripePaymentMethodInput,
     },
     {
       path: "/:pathMatch(.*)*",
