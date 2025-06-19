@@ -54,7 +54,7 @@ onUnmounted(() => {
       </div>
       <div class="flex flex-col items-center gap-2 mb-8">
         <div
-          class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-encode text-lg text-primary"
+          class="w-10 h-10 rounded-full bg-blue-light flex items-center justify-center font-encode text-lg text-primary"
         >
           {{ testimonials[current].author.charAt(0) }}
         </div>
@@ -68,14 +68,14 @@ onUnmounted(() => {
           class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-blue-light hover:text-primary transition"
           aria-label="Précédent"
         >
-          <ArrowIcon direction="left" size="20" />
+          <ArrowIcon direction="left" :size="20" />
         </button>
         <div class="flex gap-2">
           <span
             v-for="(t, i) in testimonials"
             :key="i"
             class="w-2 h-2 rounded-full"
-            :class="i === current ? 'bg-primary' : 'bg-gray-300'"
+            :class="i === current ? 'bg-primary' : 'bg-blue-light'"
           ></span>
         </div>
         <button
@@ -83,7 +83,7 @@ onUnmounted(() => {
           class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-blue-light hover:text-primary transition"
           aria-label="Suivant"
         >
-          <ArrowIcon direction="right" size="20" />
+          <ArrowIcon direction="right" :size="20" />
         </button>
       </div>
     </div>

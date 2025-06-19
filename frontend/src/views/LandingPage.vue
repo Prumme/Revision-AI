@@ -6,6 +6,9 @@ import LandingBenefits from "@/components/landing/LandingBenefits.vue";
 import LandingPricing from "@/components/landing/LandingPricing.vue";
 import LandingPartners from "@/components/landing/LandingPartners.vue";
 import LandingTestimonials from "@/components/landing/LandingTestimonials.vue";
+import LandingFAQ from "@/components/landing/LandingFAQ.vue";
+import LandingCTA from "@/components/landing/LandingCTA.vue";
+import LandingFooter from "@/components/landing/LandingFooter.vue";
 </script>
 
 <template>
@@ -16,5 +19,8 @@ import LandingTestimonials from "@/components/landing/LandingTestimonials.vue";
   <LandingPricing />
   <LandingPartners />
   <LandingTestimonials />
+  <LandingFAQ />
+  <LandingCTA />
+  <LandingFooter />
   <!-- ...autres sections de la landing page à venir... -->
 </template>
