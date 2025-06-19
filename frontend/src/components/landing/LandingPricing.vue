@@ -10,8 +10,8 @@ import { RouterLink } from "vue-router";
       <h2 class="text-3xl md:text-4xl font-encode font-bold text-black text-center mb-12">
         Des abonnements pour tous les besoins
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="relative rounded-2xl shadow p-8 flex flex-col">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div class="relative rounded-2xl shadow p-8 flex flex-col h-full">
           <h3 class="font-encode text-xl font-semibold mb-2">Gratuit</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">0&nbsp;€ / mois</div>
           <ul class="font-outfit text-gray-700 text-sm mt-6 mb-6 space-y-4">
@@ -22,12 +22,12 @@ import { RouterLink } from "vue-router";
             </li>
             <li class="flex items-center gap-2"><CheckIcon color="primary" />Historique limité</li>
           </ul>
-          <RouterLink to="/register">
+          <RouterLink to="/register" class="mt-auto">
             <ButtonComponent variant="secondary"> S'inscrire </ButtonComponent>
           </RouterLink>
         </div>
 
-        <div class="relative rounded-2xl shadow p-8 flex flex-col bg-primary">
+        <div class="relative rounded-2xl shadow p-8 flex flex-col bg-primary h-full">
           <h3 class="font-encode text-xl font-semibold mb-2 text-white">Basic</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-white">4,99&nbsp;€ / mois</div>
           <ul class="font-outfit text-white text-sm mt-6 mb-6 space-y-4">
@@ -43,11 +43,11 @@ import { RouterLink } from "vue-router";
               <CheckIcon color="white" />Génération par thème / niveau
             </li>
           </ul>
-          <RouterLink to="/register">
+          <RouterLink to="/register" class="mt-auto">
             <ButtonComponent variant="secondary-inverted"> S'inscrire </ButtonComponent>
           </RouterLink>
         </div>
-        <div class="relative rounded-2xl shadow p-8 flex flex-col">
+        <div class="relative rounded-2xl shadow p-8 flex flex-col h-full">
           <h3 class="font-encode text-xl font-semibold mb-2">Pro</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">7,99&nbsp;€ / mois</div>
           <ul class="font-outfit text-gray-700 text-sm mt-6 mb-6 space-y-4">
@@ -67,7 +67,7 @@ import { RouterLink } from "vue-router";
               <CheckIcon color="primary" />Assistance prioritaire
             </li>
           </ul>
-          <RouterLink to="/register">
+          <RouterLink to="/register" class="mt-auto">
             <ButtonComponent variant="secondary">S'inscrire</ButtonComponent>
           </RouterLink>
         </div>
