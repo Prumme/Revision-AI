@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { RouterLink } from "vue-router";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 
@@ -7,10 +7,70 @@ const menuOpen = ref(false);
 function closeMenu() {
   menuOpen.value = false;
 }
+
+function smoothScrollTo(element: HTMLElement, duration = 1000) {
+  const targetPosition = element.getBoundingClientRect().top + window.pageYOffset;
+  const startPosition = window.pageYOffset;
+  const distance = targetPosition - startPosition;
+  let startTime: number | null = null;
+
+  function animation(currentTime: number) {
+    if (!startTime) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const run = ease(timeElapsed, startPosition, distance, duration);
+    window.scrollTo(0, run);
+    if (timeElapsed < duration) requestAnimationFrame(animation);
+  }
+
+  function ease(t: number, b: number, c: number, d: number) {
+    // easeInOutQuad
+    t /= d / 2;
+    if (t < 1) return (c / 2) * t * t + b;
+    t--;
+    return (-c / 2) * (t * (t - 2) - 1) + b;
+  }
+
+  requestAnimationFrame(animation);
+}
+
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    smoothScrollTo(el, 1000);
+    closeMenu();
+  }
+}
+
+const showHeader = ref(true);
+let lastScrollY = window.scrollY;
+
+function handleScroll() {
+  const currentScrollY = window.scrollY;
+  if (currentScrollY <= 0) {
+    showHeader.value = true;
+  } else if (currentScrollY > lastScrollY) {
+    // Scroll down
+    showHeader.value = false;
+  } else {
+    // Scroll up
+    showHeader.value = true;
+  }
+  lastScrollY = currentScrollY;
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
-  <header class="sticky top-0 z-30 bg-white shadow-md">
+  <header
+    class="sticky top-0 z-30 bg-white shadow-md transition-transform duration-300"
+    :class="{ '-translate-y-full': !showHeader }"
+  >
     <nav class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 md:py-4">
       <!-- Logo -->
       <a href="/" class="font-encode font-bold text-2xl text-black tracking-tight">
@@ -20,11 +80,34 @@ function closeMenu() {
       <!-- Desktop navigation -->
       <ul class="hidden md:flex items-center gap-8 font-outfit text-base">
         <li>
-          <a href="#fonctionnalites" class="hover:text-primary transition">Fonctionnalités</a>
+          <a
+            href="#fonctionnalites"
+            @click.prevent="scrollTo('fonctionnalites')"
+            class="hover:text-primary transition"
+            >Fonctionnalités</a
+          >
         </li>
-        <li><a href="#tarifs" class="hover:text-primary transition">Tarifs</a></li>
-        <li><a href="#partenaires" class="hover:text-primary transition">Partenaires</a></li>
-        <li><a href="#faq" class="hover:text-primary transition">FAQ</a></li>
+        <li>
+          <a
+            href="#tarifs"
+            @click.prevent="scrollTo('tarifs')"
+            class="hover:text-primary transition"
+            >Tarifs</a
+          >
+        </li>
+        <li>
+          <a
+            href="#partenaires"
+            @click.prevent="scrollTo('partenaires')"
+            class="hover:text-primary transition"
+            >Partenaires</a
+          >
+        </li>
+        <li>
+          <a href="#faq" @click.prevent="scrollTo('faq')" class="hover:text-primary transition"
+            >FAQ</a
+          >
+        </li>
       </ul>
 
       <!-- Desktop actions -->
@@ -66,10 +149,25 @@ function closeMenu() {
             </button>
           </div>
           <ul class="flex flex-col gap-4 font-outfit text-lg">
-            <li><a href="#fonctionnalites" @click="closeMenu">Fonctionnalités</a></li>
-            <li><a href="#tarifs" @click="closeMenu">Tarifs</a></li>
-            <li><a href="#partenaires" @click="closeMenu">Partenaires</a></li>
-            <li><a href="#faq" @click="closeMenu">FAQ</a></li>
+            <li>
+              <a
+                href="#fonctionnalites"
+                @click="closeMenu"
+                @click.prevent="scrollTo('fonctionnalites')"
+                >Fonctionnalités</a
+              >
+            </li>
+            <li>
+              <a href="#tarifs" @click="closeMenu" @click.prevent="scrollTo('tarifs')">Tarifs</a>
+            </li>
+            <li>
+              <a href="#partenaires" @click="closeMenu" @click.prevent="scrollTo('partenaires')"
+                >Partenaires</a
+              >
+            </li>
+            <li>
+              <a href="#faq" @click="closeMenu" @click.prevent="scrollTo('faq')">FAQ</a>
+            </li>
           </ul>
           <div class="flex flex-col gap-3 mt-4">
             <RouterLink to="/login" class="font-outfit font-medium" @click="closeMenu"

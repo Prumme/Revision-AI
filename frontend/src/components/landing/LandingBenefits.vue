@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import caracterRed from "@/assets/caracters/caracterRed.png";
 import caracterBlue from "@/assets/caracters/caracterBlue.png";
+import caracterYellow from "@/assets/caracters/caracterYellow.png";
+import caracterOrange from "@/assets/caracters/caracterOrange.png";
 </script>
 
 <template>
@@ -15,7 +17,7 @@ import caracterBlue from "@/assets/caracters/caracterBlue.png";
           class="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
         >
           <div class="mb-4 flex items-center justify-center">
-            <img :src="caracterRed" alt="Mascotte IA" class="w-16 h-16 object-contain" />
+            <img :src="caracterOrange" alt="Mascotte IA" class="w-16 h-16 object-contain" />
           </div>
           <h3 class="font-encode text-lg font-semibold mb-2">Quiz personnalisés</h3>
           <p class="font-outfit text-gray-700 text-sm">Adaptés à ton niveau et à tes matières.</p>
@@ -25,7 +27,7 @@ import caracterBlue from "@/assets/caracters/caracterBlue.png";
           class="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center text-center hover:shadow-lg transition"
         >
           <div class="mb-4 flex items-center justify-center">
-            <img :src="caracterRed" alt="Mascotte IA" class="w-16 h-16 object-contain" />
+            <img :src="caracterYellow" alt="Mascotte IA" class="w-16 h-16 object-contain" />
           </div>
           <h3 class="font-encode text-lg font-semibold mb-2">Gain de temps</h3>
           <p class="font-outfit text-gray-700 text-sm">Fini les fiches, l’IA fait le taf.</p>
