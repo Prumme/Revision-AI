@@ -11,7 +11,6 @@ import { RouterLink } from "vue-router";
         Des abonnements pour tous les besoins
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- Gratuit -->
         <div class="relative rounded-2xl shadow p-8 flex flex-col">
           <h3 class="font-encode text-xl font-semibold mb-2">Gratuit</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">0&nbsp;€ / mois</div>
@@ -28,7 +27,6 @@ import { RouterLink } from "vue-router";
           </RouterLink>
         </div>
 
-        <!-- Premium Étudiant -->
         <div class="relative rounded-2xl shadow p-8 flex flex-col bg-primary">
           <h3 class="font-encode text-xl font-semibold mb-2 text-white">Basic</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-white">4,99&nbsp;€ / mois</div>
@@ -49,7 +47,6 @@ import { RouterLink } from "vue-router";
             <ButtonComponent variant="secondary-inverted"> S'inscrire </ButtonComponent>
           </RouterLink>
         </div>
-        <!-- Premium+ -->
         <div class="relative rounded-2xl shadow p-8 flex flex-col">
           <h3 class="font-encode text-xl font-semibold mb-2">Pro</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">7,99&nbsp;€ / mois</div>

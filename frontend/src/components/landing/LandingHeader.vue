@@ -150,23 +150,18 @@ onUnmounted(() => {
           </div>
           <ul class="flex flex-col gap-4 font-outfit text-lg">
             <li>
-              <a
-                href="#fonctionnalites"
-                @click="closeMenu"
-                @click.prevent="scrollTo('fonctionnalites')"
+              <a href="#fonctionnalites" @click.prevent="scrollTo('fonctionnalites')"
                 >Fonctionnalités</a
               >
             </li>
             <li>
-              <a href="#tarifs" @click="closeMenu" @click.prevent="scrollTo('tarifs')">Tarifs</a>
+              <a href="#tarifs" @click.prevent="scrollTo('tarifs')">Tarifs</a>
             </li>
             <li>
-              <a href="#partenaires" @click="closeMenu" @click.prevent="scrollTo('partenaires')"
-                >Partenaires</a
-              >
+              <a href="#partenaires" @click.prevent="scrollTo('partenaires')">Partenaires</a>
             </li>
             <li>
-              <a href="#faq" @click="closeMenu" @click.prevent="scrollTo('faq')">FAQ</a>
+              <a href="#faq" @click.prevent="scrollTo('faq')">FAQ</a>
             </li>
           </ul>
           <div class="flex flex-col gap-3 mt-4">
