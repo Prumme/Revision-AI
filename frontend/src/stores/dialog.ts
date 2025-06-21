@@ -7,6 +7,7 @@ interface DialogOptions {
   confirmText?: string;
   cancelText?: string;
   type?: "info" | "warning" | "error" | "success";
+  rawHtml?: boolean;
 }
 
 export const useDialogStore = defineStore("dialog", () => {
@@ -17,6 +18,7 @@ export const useDialogStore = defineStore("dialog", () => {
     confirmText: "Confirmer",
     cancelText: "Annuler",
     type: "info",
+    rawHtml: false,
   });
   let resolvePromise: ((value: boolean) => void) | null = null;
 
