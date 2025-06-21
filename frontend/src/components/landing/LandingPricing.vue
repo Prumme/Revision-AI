@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
-import CheckIcon from "../icons/CheckIcon.vue";
 import { RouterLink } from "vue-router";
+import { CheckIcon } from "lucide-vue-next";
 </script>
 
 <template>
@@ -15,12 +15,16 @@ import { RouterLink } from "vue-router";
           <h3 class="font-encode text-xl font-semibold mb-2">Gratuit</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">0&nbsp;€ / mois</div>
           <ul class="font-outfit text-gray-700 text-sm mt-6 mb-6 space-y-4">
-            <li class="flex items-center gap-2"><CheckIcon color="primary" />1 quiz / jour</li>
-            <li class="flex items-center gap-2"><CheckIcon color="primary" />Fichier max 10 Mo</li>
+            <li class="flex items-center gap-2"><CheckIcon class="text-primary" />1 quiz / jour</li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Pas de rappel intelligent
+              <CheckIcon class="text-primary" />Fichier max 10 Mo
             </li>
-            <li class="flex items-center gap-2"><CheckIcon color="primary" />Historique limité</li>
+            <li class="flex items-center gap-2">
+              <CheckIcon class="text-primary" />Pas de rappel intelligent
+            </li>
+            <li class="flex items-center gap-2">
+              <CheckIcon class="text-primary" />Historique limité
+            </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
             <ButtonComponent variant="secondary"> S'inscrire </ButtonComponent>
@@ -31,16 +35,18 @@ import { RouterLink } from "vue-router";
           <h3 class="font-encode text-xl font-semibold mb-2 text-white">Basic</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-white">4,99&nbsp;€ / mois</div>
           <ul class="font-outfit text-white text-sm mt-6 mb-6 space-y-4">
-            <li class="flex items-center gap-2"><CheckIcon color="white" />Quiz illimités</li>
+            <li class="flex items-center gap-2"><CheckIcon class="text-white" />Quiz illimités</li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="white" />Taille fichier étendue (jusqu'à 50 Mo)
-            </li>
-            <li class="flex items-center gap-2"><CheckIcon color="white" />Rappels intelligents</li>
-            <li class="flex items-center gap-2">
-              <CheckIcon color="white" />Suivi de progression détaillé
+              <CheckIcon class="text-white" />Taille fichier étendue (jusqu'à 50 Mo)
             </li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="white" />Génération par thème / niveau
+              <CheckIcon class="text-white" />Rappels intelligents
+            </li>
+            <li class="flex items-center gap-2">
+              <CheckIcon class="text-white" />Suivi de progression détaillé
+            </li>
+            <li class="flex items-center gap-2">
+              <CheckIcon class="text-white" />Génération par thème / niveau
             </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
@@ -52,19 +58,19 @@ import { RouterLink } from "vue-router";
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">7,99&nbsp;€ / mois</div>
           <ul class="font-outfit text-gray-700 text-sm mt-6 mb-6 space-y-4">
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Tout dans l'offre Basic
+              <CheckIcon class="text-primary" />Tout dans l'offre Basic
             </li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Analyse avancée des cours
+              <CheckIcon class="text-primary" />Analyse avancée des cours
             </li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Mode Révision Express
+              <CheckIcon class="text-primary" />Mode Révision Express
             </li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Création de sessions de révision intelligentes
+              <CheckIcon class="text-primary" />Création de sessions de révision intelligentes
             </li>
             <li class="flex items-center gap-2">
-              <CheckIcon color="primary" />Assistance prioritaire
+              <CheckIcon class="text-primary" />Assistance prioritaire
             </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
@@ -75,21 +81,3 @@ import { RouterLink } from "vue-router";
     </div>
   </section>
 </template>
-
-<style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-.bg-pale-purple {
-  background-color: var(--color-pale-purple);
-}
-.bg-pale-yellow {
-  background-color: var(--color-pale-yellow);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-.border-primary {
-  border-color: var(--color-primary);
-}
-</style>

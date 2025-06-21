@@ -36,9 +36,3 @@ import ecitvLogo from "@/assets/partners/ecitv.png";
     </div>
   </section>
 </template>
-
-<style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-</style>

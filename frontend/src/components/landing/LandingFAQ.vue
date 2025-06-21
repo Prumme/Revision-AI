@@ -108,24 +108,6 @@ function toggle(index: number) {
 </template>
 
 <style scoped>
-.font-encode {
-  font-family: var(--font-encode);
-}
-.font-outfit {
-  font-family: var(--font-outfit);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-.bg-primary {
-  background-color: var(--color-primary);
-}
-.bg-pale-yellow {
-  background-color: var(--color-pale-yellow);
-}
-.bg-white {
-  background-color: #fff;
-}
 .animate-fade-in {
   animation: fadeIn 0.3s;
 }

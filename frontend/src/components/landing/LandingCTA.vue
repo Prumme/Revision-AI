@@ -18,15 +18,3 @@ import { RouterLink } from "vue-router";
     </div>
   </section>
 </template>
-
-<style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-.font-encode {
-  font-family: var(--font-encode);
-}
-.font-outfit {
-  font-family: var(--font-outfit);
-}
-</style>

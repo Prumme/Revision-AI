@@ -71,15 +71,3 @@ const socials = [
     </div>
   </footer>
 </template>
-
-<style scoped>
-.text-primary {
-  color: var(--color-primary);
-}
-.font-encode {
-  font-family: var(--font-encode);
-}
-.font-outfit {
-  font-family: var(--font-outfit);
-}
-</style>

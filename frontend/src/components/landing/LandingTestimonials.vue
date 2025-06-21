@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import ArrowIcon from "@/components/icons/ArrowIcon.vue";
+import { ChevronRightIcon, ChevronLeftIcon } from "lucide-vue-next";
 
 const testimonials = [
   {
@@ -68,7 +68,7 @@ onUnmounted(() => {
           class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-blue-light hover:text-primary transition"
           aria-label="Précédent"
         >
-          <ArrowIcon direction="left" :size="20" />
+          <ChevronLeftIcon class="text-gray-400" />
         </button>
         <div class="flex gap-2">
           <span
@@ -83,7 +83,7 @@ onUnmounted(() => {
           class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-blue-light hover:text-primary transition"
           aria-label="Suivant"
         >
-          <ArrowIcon direction="right" :size="20" />
+          <ChevronRightIcon class="text-gray-400" />
         </button>
       </div>
     </div>
@@ -91,22 +91,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-.bg-primary {
-  background-color: var(--color-primary);
-}
-.font-encode {
-  font-family: var(--font-encode);
-}
-.font-outfit {
-  font-family: var(--font-outfit);
-}
-
 /* Slide transition for testimonials */
 .testimonial-slide-enter-active,
 .testimonial-slide-leave-active {

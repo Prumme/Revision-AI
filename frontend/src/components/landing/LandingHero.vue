@@ -37,15 +37,3 @@ import { RouterLink } from "vue-router";
     </div>
   </section>
 </template>
-
-<style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-.bg-pale-yellow {
-  background-color: var(--color-pale-yellow);
-}
-</style>

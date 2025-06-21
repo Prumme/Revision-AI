@@ -179,12 +179,6 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.text-primary {
-  color: var(--color-primary);
-}
-.bg-primary {
-  background-color: var(--color-primary);
-}
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

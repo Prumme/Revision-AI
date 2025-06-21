@@ -58,24 +58,3 @@ import caracterOrange from "@/assets/caracters/caracterOrange.png";
     </div>
   </section>
 </template>
-
-<style scoped>
-.bg-blue-light {
-  background-color: var(--color-blue-light);
-}
-.bg-pale-yellow {
-  background-color: var(--color-pale-yellow);
-}
-.bg-pale-green {
-  background-color: var(--color-pale-green);
-}
-.bg-pale-purple {
-  background-color: var(--color-pale-purple);
-}
-.bg-pale-red {
-  background-color: var(--color-pale-red);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-</style>
