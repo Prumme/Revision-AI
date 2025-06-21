@@ -65,7 +65,7 @@ const handleFileChange = async (event: Event) => {
         v-if="profilePicture"
         :src="profilePicture"
         alt="Profile Picture"
-        class="w-64 h-64 border-5 border-primary rounded-full object-cover mb-4 drop-shadow-xl hover:backdrop-blur-sm"
+        class="w-32 lg:w-64 h-32 lg:h-64 border-5 border-primary rounded-full object-cover mb-4 drop-shadow-xl hover:backdrop-blur-sm"
       />
       <AvatarComponent v-else size="full" :user="user" />
     </button>

@@ -33,7 +33,6 @@ export class UserService {
 
   async findById(id: string): Promise<User | null> {
     const user = await this.userRepository.findById(id);
-    console.log(user);
     return user;
   }
 
