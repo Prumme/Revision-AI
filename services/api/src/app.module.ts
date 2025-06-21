@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from '@modules/auth/auth.module';
 import { QuizModule } from '@modules/quiz/quiz.module';
 import { CacheModule } from '@nestjs/cache-manager';
+
 import { SubscriptionModule } from '@modules/subscription/subscription.module';
 
 @Module({

@@ -20,22 +20,12 @@ services:
     env_file:
       - .env
     ports:
-      - "3001:3000"
+      - "3000:3000"
     volumes:
       - ./services/api:/app
     depends_on:
       database:
         condition: service_started
-
-  database:
-    container_name: database
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=api
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -91,6 +81,17 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
       - prometheus
+
+
+  database:
+    container_name: database
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=api
 
 volumes:
   grafana-storage:

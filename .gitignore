@@ -1,8 +1,18 @@
+
 **/.env
 
 # compiled output
 **/dist
 **/node_modules
+.env
+.DS_Store
+
+.env.services.api
+.env.frontend
+.env
+.DS_Store
+k8s/secrets/.gitignore
+
 
 .env.services.api
 .env.frontend
@@ -39,4 +49,3 @@
 **/.vscode/tasks.json
 **/.vscode/launch.json
 **/.vscode/extensions.json
-

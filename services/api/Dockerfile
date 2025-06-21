@@ -1,12 +1,14 @@
-
 FROM node:22-bullseye-slim as base
 # Create app directory
 
+# Set the working directory
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-# Install app dependencies
+# Copy package.json and package-lock.json
+COPY package*.json ./
 RUN npm install
+COPY tsconfig.build.json ./
+COPY tsconfig.json ./
 
 ## PRODUCTION
 FROM base as production

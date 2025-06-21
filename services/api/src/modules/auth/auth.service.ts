@@ -5,6 +5,8 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcryptjs';
 import { User } from '@entities/user.entity';
 import { ReqUser } from '@common/types/request';
+import { CustomerRepository } from '@repositories/customer.repository';
+import { CustomerAndUser } from '@entities/customer.entity';
 import { MailService } from '@infrastructure/resend/mail.service';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { CustomerAndUser } from '@entities/customer.entity';

@@ -6,8 +6,8 @@ import { raw } from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use('/stripe/webhook', raw({ type: 'application/json' }));
 
+  app.use('/stripe/webhook', raw({ type: 'application/json' }));
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -20,7 +20,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
   // Configuration de Swagger
   const config = new DocumentBuilder()
     .setTitle('API Revision-AI')
