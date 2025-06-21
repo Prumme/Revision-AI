@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { ReqUser } from '@common/types/request';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { CustomerRepository } from '@repositories/customer.repository';
+import { MailService } from '@infrastructure/resend/mail.service';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -20,6 +21,7 @@ export class SubscriptionController {
     @Inject('CustomerRepository')
     private customerRepository: CustomerRepository,
     private authService: AuthService,
+    private mailService: MailService,
   ) {}
 
   @Post('/subscribe')
