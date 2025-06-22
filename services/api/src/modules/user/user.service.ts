@@ -133,7 +133,6 @@ export class UserService {
 
   async anonymizeAccount(userId: string): Promise<User> {
     const user = await this.userRepository.findById(userId);
-    console.log(user);
     if (!user) {
       throw new Error('Utilisateur non trouvé');
     }
