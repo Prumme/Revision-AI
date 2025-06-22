@@ -1,8 +1,7 @@
-export interface MinioOptions {
-  endPoint: string;
-  port: number;
-  useSSL: boolean;
-  accessKey: string;
-  secretKey: string;
+export interface ScalewayS3Options {
+  accessKeyId: string;
+  secretAccessKey: string;
+  endpoint: string;
+  region: string;
   bucketName: string;
 }

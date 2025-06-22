@@ -1,52 +1,112 @@
-import { Injectable, OnModuleInit, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  NotFoundException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Minio from 'minio';
-import { MinioOptions } from './interfaces/minio-options.interface';
+import * as AWS from 'aws-sdk';
+import { ScalewayS3Options } from './interfaces/minio-options.interface';
 import { Readable } from 'stream';
 
-interface MinioFile {
+interface StorageFile {
   stream: Readable;
   metadata: { [key: string]: string };
+  contentType?: string;
 }
 
 @Injectable()
 export class MinioService implements OnModuleInit {
-  private minioClient: Minio.Client;
+  private s3Client: AWS.S3;
   private readonly bucketName: string;
 
-  constructor(private configService: ConfigService) {
-    const options: MinioOptions = {
-      endPoint: this.configService.get<string>('MINIO_ENDPOINT'),
-      port: parseInt(
-        this.configService.get<string>('MINIO_PORT') || '9000',
-        10,
-      ),
-      useSSL: this.configService.get<string>('MINIO_USE_SSL') === 'true',
-      accessKey: this.configService.get<string>('MINIO_ROOT_USER'),
-      secretKey: this.configService.get<string>('MINIO_ROOT_PASSWORD'),
-      bucketName: this.configService.get<string>('MINIO_BUCKET_NAME'),
+  constructor(
+    private configService: ConfigService,
+    private readonly logger: Logger,
+  ) {
+    // Validation des variables d'environnement requises
+    const accessKeyId = this.configService.get<string>(
+      'SCALEWAY_ACCESS_KEY_ID',
+    );
+    const secretAccessKey = this.configService.get<string>(
+      'SCALEWAY_ACCESS_KEY',
+    );
+    const bucketUrl = this.configService.get<string>('SCALEWAY_BUCKET_URL');
+    const bucketName = this.configService.get<string>('SCALEWAY_BUCKET_NAME');
+
+    if (!accessKeyId) {
+      throw new Error('SCALEWAY_ACCESS_KEY_ID manquant dans le fichier .env');
+    }
+    if (!secretAccessKey) {
+      throw new Error('SCALEWAY_ACCESS_KEY manquant dans le fichier .env');
+    }
+    if (!bucketUrl) {
+      throw new Error('SCALEWAY_BUCKET_URL manquant dans le fichier .env');
+    }
+    if (!bucketName) {
+      throw new Error('SCALEWAY_BUCKET_NAME manquant dans le fichier .env');
+    }
+
+    // Configuration pour Scaleway S3
+    const options: ScalewayS3Options = {
+      accessKeyId,
+      secretAccessKey,
+      endpoint: bucketUrl,
+      region: this.configService.get<string>('SCALEWAY_REGION') || 'fr-par',
+      bucketName,
     };
 
     this.bucketName = options.bucketName;
-    this.minioClient = new Minio.Client({
-      endPoint: options.endPoint,
-      port: options.port,
-      useSSL: options.useSSL,
-      accessKey: options.accessKey,
-      secretKey: options.secretKey,
+
+    console.log(`Configuration Scaleway S3:`);
+    console.log(`- Endpoint: ${options.endpoint}`);
+    console.log(`- Region: ${options.region}`);
+    console.log(`- Bucket: ${options.bucketName}`);
+    console.log(`- Access Key ID: ${accessKeyId.substring(0, 8)}...`);
+
+    this.s3Client = new AWS.S3({
+      accessKeyId: options.accessKeyId,
+      secretAccessKey: options.secretAccessKey,
+      endpoint: options.endpoint,
+      region: options.region,
+      signatureVersion: 'v4',
+      s3ForcePathStyle: true,
     });
   }
 
   async onModuleInit() {
     try {
-      const bucketExists = await this.minioClient.bucketExists(this.bucketName);
-      if (!bucketExists) {
-        await this.minioClient.makeBucket(this.bucketName);
-        console.log(`Bucket ${this.bucketName} created successfully`);
-      }
+      // Vérifier que le bucket existe
+      await this.s3Client.headBucket({ Bucket: this.bucketName }).promise();
+      this.logger.log(
+        `Connexion au bucket Scaleway S3 ${this.bucketName} réussie`,
+      );
     } catch (error) {
-      console.error('Error initializing MinIO:', error);
-      throw error;
+      if (error.statusCode === 404) {
+        console.log(
+          `Le bucket ${this.bucketName} n'existe pas. Tentative de création...`,
+        );
+        try {
+          await this.s3Client
+            .createBucket({
+              Bucket: this.bucketName,
+              CreateBucketConfiguration: {
+                LocationConstraint:
+                  this.configService.get<string>('SCALEWAY_REGION') || 'fr-par',
+              },
+            })
+            .promise();
+          console.log(
+            `Bucket ${this.bucketName} créé avec succès sur Scaleway S3`,
+          );
+        } catch (createError) {
+          console.error('Erreur lors de la création du bucket:', createError);
+          throw createError;
+        }
+      } else {
+        console.error("Erreur lors de l'initialisation de Scaleway S3:", error);
+        throw error;
+      }
     }
   }
 
@@ -55,66 +115,105 @@ export class MinioService implements OnModuleInit {
     objectName: string,
   ): Promise<string> {
     try {
-      await this.minioClient.putObject(
-        this.bucketName,
-        objectName,
-        file.buffer,
-        file.size,
-        {
-          'Content-Type': file.mimetype,
-        },
-      );
+      const params: AWS.S3.PutObjectRequest = {
+        Bucket: this.bucketName,
+        Key: objectName,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+      };
+
+      const result = await this.s3Client.upload(params).promise();
+      this.logger.log(`Fichier uploadé avec succès: ${result.Location}`);
       return objectName;
     } catch (error) {
-      console.error('Error uploading file to MinIO:', error);
+      this.logger.error("Erreur lors de l'upload vers Scaleway S3:", error);
       throw error;
     }
   }
 
   async getFileUrl(objectName: string): Promise<string> {
     try {
-      return await this.minioClient.presignedGetObject(
-        this.bucketName,
-        objectName,
-      );
+      const params = {
+        Bucket: this.bucketName,
+        Key: objectName,
+        Expires: 24 * 60 * 60, // URL valide 24h
+      };
+
+      return this.s3Client.getSignedUrl('getObject', params);
     } catch (error) {
-      console.error('Error getting file URL from MinIO:', error);
+      this.logger.error(
+        "Erreur lors de la génération de l'URL Scaleway S3:",
+        error,
+      );
       throw error;
     }
   }
 
   async deleteFile(objectName: string): Promise<void> {
     try {
-      await this.minioClient.removeObject(this.bucketName, objectName);
+      const params = {
+        Bucket: this.bucketName,
+        Key: objectName,
+      };
+
+      await this.s3Client.deleteObject(params).promise();
     } catch (error) {
-      console.error('Error deleting file from MinIO:', error);
+      this.logger.error(
+        'Erreur lors de la suppression du fichier sur Scaleway S3:',
+        error,
+      );
       throw error;
     }
   }
 
-  async getFile(objectName: string): Promise<MinioFile> {
+  async getFile(objectName: string): Promise<StorageFile> {
     try {
-      const exists = await this.minioClient.statObject(
-        this.bucketName,
-        objectName,
-      );
-      if (!exists) {
-        throw new NotFoundException(`Le fichier ${objectName} n'existe pas`);
+      // Vérifier que l'objet existe
+      const headParams = {
+        Bucket: this.bucketName,
+        Key: objectName,
+      };
+
+      const headResult = await this.s3Client.headObject(headParams).promise();
+
+      // Récupérer l'objet
+      const getParams = {
+        Bucket: this.bucketName,
+        Key: objectName,
+      };
+
+      const result = await this.s3Client.getObject(getParams).promise();
+
+      if (!result.Body) {
+        throw new NotFoundException(
+          `Le fichier ${objectName} n'a pas de contenu`,
+        );
+      }
+      this.logger.log(`Fichier ${objectName} récupéré avec succès`);
+
+      // Convertir le Body en Readable stream
+      let stream: Readable;
+      if (result.Body instanceof Buffer) {
+        stream = Readable.from(result.Body);
+      } else if (result.Body instanceof Uint8Array) {
+        stream = Readable.from(Buffer.from(result.Body));
+      } else {
+        stream = result.Body as Readable;
       }
 
-      const stream = await this.minioClient.getObject(
-        this.bucketName,
-        objectName,
-      );
       return {
         stream,
-        metadata: exists.metaData,
+        metadata: headResult.Metadata || {},
+        contentType: headResult.ContentType,
       };
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
+      if (error.statusCode === 404) {
+        throw new NotFoundException(`Le fichier ${objectName} n'existe pas`);
       }
-      console.error('Error getting file from MinIO:', error);
+      this.logger.error(
+        'Erreur lors de la récupération du fichier depuis Scaleway S3:',
+        error,
+      );
       throw new NotFoundException(
         `Erreur lors de la récupération du fichier ${objectName}`,
       );
