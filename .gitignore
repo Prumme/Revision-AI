@@ -14,6 +14,9 @@
 k8s/secrets/.gitignore
 
 
+.env.services.api
+.env.frontend
+
 
 # Logs
 **/logs

@@ -7,6 +7,10 @@ import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '@mongo/user/user.schema';
 import { MailModule } from '@infrastructure/resend/mail.module';
+import { AuthController } from './auth.controller';
+import { CustomerRepositoryProvider } from '@repositories/customer.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserSchema } from '@mongo/user/user.schema';
 
 @Module({
   imports: [
