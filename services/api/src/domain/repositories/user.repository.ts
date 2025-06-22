@@ -27,11 +27,9 @@ export interface PaginatedResult<T> {
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
-  findAll(): Promise<User[]>;
-  findAllWithFilters(filters: UserFilters): Promise<User[]>;
-  findAllWithFiltersPaginated(
-    filters: UserFilters,
-    pagination: PaginationOptions,
+  findAll(
+    filters?: UserFilters,
+    pagination?: PaginationOptions,
   ): Promise<PaginatedResult<User>>;
   create(user: Omit<User, 'id'>): Promise<User>;
   update(id: string, user: Partial<User>): Promise<User>;

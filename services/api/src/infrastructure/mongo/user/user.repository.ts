@@ -28,65 +28,6 @@ export class MongoUserRepository implements UserRepository {
     return this.documentToUser(document);
   }
 
-  async findAll(): Promise<User[]> {
-    const users = await this.userModel.find();
-    return users.map((user) => this.documentToUser(user));
-  }
-
-  async findAllWithFilters(filters: UserFilters): Promise<User[]> {
-    let query: any = {};
-
-    if (filters.onlyDeleted && filters.onlyBlocked) {
-      // Utilisateurs qui sont soit supprimés soit bloqués
-      query = { $or: [{ deleted: true }, { blocked: true }] };
-    } else if (filters.onlyDeleted) {
-      // Seulement les utilisateurs supprimés
-      query.deleted = true;
-    } else if (filters.onlyBlocked) {
-      // Seulement les utilisateurs bloqués
-      query.blocked = true;
-    } else {
-      // Logique par défaut : exclure deleted et blocked sauf si spécifiquement inclus
-      if (!filters.includeDeleted) {
-        query.deleted = { $ne: true };
-      }
-      if (!filters.includeBlocked) {
-        query.blocked = { $ne: true };
-      }
-    }
-
-    // Ajouter la recherche textuelle
-    if (filters.search && filters.search.trim()) {
-      const searchRegex = new RegExp(filters.search.trim(), 'i');
-      query.$and = query.$and || [];
-      query.$and.push({
-        $or: [
-          { username: { $regex: searchRegex } },
-          { email: { $regex: searchRegex } },
-        ],
-      });
-    }
-
-    // Construire l'objet de tri
-    let sortQuery: any = { createdAt: -1 }; // Tri par défaut
-    if (filters.sortBy && filters.sortOrder) {
-      // Valider les champs autorisés pour le tri
-      const allowedSortFields = [
-        'username',
-        'email',
-        'role',
-        'createdAt',
-        'emailVerified',
-      ];
-      if (allowedSortFields.includes(filters.sortBy)) {
-        sortQuery = { [filters.sortBy]: filters.sortOrder === 'asc' ? 1 : -1 };
-      }
-    }
-
-    const users = await this.userModel.find(query).sort(sortQuery);
-    return users.map((user) => this.documentToUser(user));
-  }
-
   async create(user: User): Promise<User> {
     const document = await this.userModel.create(user);
     return this.documentToUser(document);
@@ -121,7 +62,7 @@ export class MongoUserRepository implements UserRepository {
     }
   }
 
-  async findAllWithFiltersPaginated(
+  async findAll(
     filters: UserFilters,
     pagination: PaginationOptions,
   ): Promise<PaginatedResult<User>> {

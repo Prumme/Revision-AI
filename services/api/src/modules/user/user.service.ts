@@ -41,19 +41,11 @@ export class UserService {
     return await this.userRepository.findById(id);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.findAll();
-  }
-
-  async findAllWithFilters(filters: UserFilters): Promise<User[]> {
-    return this.userRepository.findAllWithFilters(filters);
-  }
-
-  async findAllWithFiltersPaginated(
+  async findAll(
     filters: UserFilters,
     pagination: PaginationOptions,
   ): Promise<PaginatedResult<User>> {
-    return this.userRepository.findAllWithFiltersPaginated(filters, pagination);
+    return this.userRepository.findAll(filters, pagination);
   }
 
   async findByEmail(email: string): Promise<User | null> {
