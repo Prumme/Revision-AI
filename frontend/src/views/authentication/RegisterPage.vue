@@ -4,24 +4,48 @@ import Card from "@/components/cards/CardComponent.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import AppLayout from "@/components/layouts/AppLayout.vue";
 import { useUserStore } from "@/stores/user";
+import { useDialogStore } from "@/stores/dialog";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { cguCgvCookie } from "@/assets/rgpd/cgu-cgv-cookie";
 
 const router = useRouter();
 const userStore = useUserStore();
+const dialogStore = useDialogStore();
 
 // Form props
 const username = ref<string>("");
 const email = ref<string>("");
 const password = ref<string>("");
 const passwordConfirmation = ref<string>("");
+const acceptTerms = ref<boolean>(false);
 
 const error = ref("");
+
+const showTermsModal = async () => {
+  const result = await dialogStore.show({
+    title: "Conditions Générales",
+    message: cguCgvCookie,
+    confirmText: "J'accepte",
+    cancelText: "Fermer",
+    type: "info",
+    rawHtml: true,
+  });
+
+  if (result) {
+    acceptTerms.value = true;
+  }
+};
 
 const handleRegister = async () => {
   try {
     if (password.value !== passwordConfirmation.value) {
       error.value = "Les mots de passe ne correspondent pas";
+      return;
+    }
+
+    if (!acceptTerms.value) {
+      error.value = "Vous devez accepter les conditions générales pour vous inscrire";
       return;
     }
 
@@ -109,7 +133,7 @@ const handleRegister = async () => {
                   />
                 </div>
 
-                <div class="mb-8">
+                <div class="mb-6">
                   <Input
                     v-model="passwordConfirmation"
                     label="Confirmation du mot de passe"
@@ -119,6 +143,34 @@ const handleRegister = async () => {
                     :show-criteria="false"
                     required
                   />
+                </div>
+
+                <!-- Checkbox opt-in pour les conditions générales -->
+                <div class="mb-8">
+                  <div class="flex items-center gap-3">
+                    <input
+                      id="accept-terms"
+                      v-model="acceptTerms"
+                      type="checkbox"
+                      class="w-4 h-4 rounded focus:ring-primary focus:ring-2"
+                      style="accent-color: var(--color-primary)"
+                      required
+                    />
+                    <label
+                      for="accept-terms"
+                      class="text-sm font-medium text-gray-900 cursor-pointer"
+                    >
+                      J'accepte les
+                      <button
+                        type="button"
+                        @click="showTermsModal"
+                        class="text-primary hover:underline font-medium cursor-pointer"
+                      >
+                        CGU, CGV et politique des cookies
+                      </button>
+                      *
+                    </label>
+                  </div>
                 </div>
               </form>
             </template>
