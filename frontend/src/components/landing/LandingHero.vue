@@ -13,7 +13,7 @@ import { RouterLink } from "vue-router";
       <!-- Texte -->
       <div class="flex-1 text-center md:text-left">
         <h1 class="font-encode text-3xl md:text-5xl font-extrabold text-black mb-4 leading-tight">
-          Révisez plus intelligemment avec l'<span class="text-primary">IA</span>
+          Révisez plus intelligemment grâce à l'<span class="text-primary">IA</span>
         </h1>
         <p class="font-outfit text-lg md:text-2xl text-gray-700 mb-8">
           Transformez vos cours en quiz personnalisés, en un seul clic.
