@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -19,4 +19,13 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   username?: string;
+
+  @ApiProperty({
+    description: "Statut de blocage de l'utilisateur",
+    example: false,
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  blocked?: boolean;
 }

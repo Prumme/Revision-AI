@@ -6,11 +6,13 @@ export const UserSchema = new Schema({
   password: { type: String, required: true },
   lastUpdatedPassword: { type: Date, default: Date.now },
   emailVerified: { type: Boolean, default: false },
+  role: { type: String, required: true, default: 'user' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   avatar: { type: String, required: false },
   bio: { type: String, required: false, default: '' },
   deleted: { type: Boolean, default: false },
+  blocked: { type: Boolean, default: false },
   subscriptionTier: { type: String, required: true, default: 'free' },
   customerId: { type: String, required: false },
   firstName: { type: String, required: false },
@@ -30,11 +32,13 @@ export interface UserDocument extends Document {
   password: string;
   lastUpdatedPassword: Date;
   emailVerified: boolean;
+  role: string;
   createdAt: Date;
   updatedAt: Date;
   avatar?: string;
   bio?: string;
   deleted?: boolean;
+  blocked?: boolean;
   subscriptionTier: string;
   customerId?: string;
   firstName?: string;

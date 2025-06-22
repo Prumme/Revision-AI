@@ -6,7 +6,7 @@ import type {
   RegisterCredentials,
 } from "@/types/auth";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { API_URL } from "@/config/api";
 import { useRouter } from "vue-router";
 
@@ -18,6 +18,10 @@ export const useUserStore = defineStore("user", () => {
   const getFullName = () => {
     return user?.value?.username;
   };
+
+  const isAdmin = computed(() => {
+    return user?.value?.role === "admin";
+  });
 
   function setUser(newUser: User) {
     user.value = newUser;
@@ -149,6 +153,7 @@ export const useUserStore = defineStore("user", () => {
   return {
     user,
     token,
+    isAdmin,
     setUser,
     clearUser,
     getFullName,

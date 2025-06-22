@@ -8,6 +8,7 @@ import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
+import AdminUserView from "@/views/admin/AdminUserView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 
@@ -45,6 +46,12 @@ const router = createRouter({
           path: "/profile",
           name: "profile",
           component: ProfilePage,
+        },
+        {
+          path: "/admin/user",
+          name: "admin-users",
+          component: AdminUserView,
+          meta: { requiresAdmin: true },
         },
       ],
     },
@@ -109,6 +116,15 @@ router.beforeEach(async (to, from, next) => {
       if (!userStore.user) {
         await userStore.fetchCurrentUser();
       }
+
+      // Vérification des permissions admin
+      if (to.matched.some((record) => record.meta.requiresAdmin)) {
+        if (!userStore.isAdmin) {
+          next({ name: "404 not found" });
+          return;
+        }
+      }
+
       next();
     } catch {
       // En cas d'erreur (token invalide par exemple)

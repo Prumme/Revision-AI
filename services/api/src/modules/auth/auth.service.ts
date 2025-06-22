@@ -52,7 +52,6 @@ export class AuthService {
     const verifyLink = `${process.env.FRONTEND_URL}/auth/verify-email?token=${verifyToken}`;
 
     // Envoi de l'email de vérification
-    console.log(verifyLink);
     await this.mailService.sendVerifyEmail(user.email, {
       username: user.username,
       verifyLink: verifyLink,
@@ -79,6 +78,7 @@ export class AuthService {
         email: user.email,
         username: user.username,
         avatar: user.avatar,
+        role: user.role,
         bio: user.bio,
       },
     };

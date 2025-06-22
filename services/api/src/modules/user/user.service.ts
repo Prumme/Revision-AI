@@ -1,7 +1,12 @@
 import { User } from '@entities/user.entity';
 import { RegisterDto } from '@modules/auth/dto/register.dto';
 import { Inject, Injectable } from '@nestjs/common';
-import { UserRepository } from '@repositories/user.repository';
+import {
+  UserRepository,
+  UserFilters,
+  PaginationOptions,
+  PaginatedResult,
+} from '@repositories/user.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { MinioService } from '@modules/minio/minio.service';
@@ -24,6 +29,7 @@ export class UserService {
       password: hashedPassword,
       lastUpdatedPassword: new Date(),
       emailVerified: false,
+      role: 'user',
       createdAt: new Date(),
       updatedAt: new Date(),
       deleted: false,
@@ -33,12 +39,22 @@ export class UserService {
 
   async findById(id: string): Promise<User | null> {
     const user = await this.userRepository.findById(id);
-    console.log(user);
     return user;
   }
 
   async findAll(): Promise<User[]> {
     return this.userRepository.findAll();
+  }
+
+  async findAllWithFilters(filters: UserFilters): Promise<User[]> {
+    return this.userRepository.findAllWithFilters(filters);
+  }
+
+  async findAllWithFiltersPaginated(
+    filters: UserFilters,
+    pagination: PaginationOptions,
+  ): Promise<PaginatedResult<User>> {
+    return this.userRepository.findAllWithFiltersPaginated(filters, pagination);
   }
 
   async findByEmail(email: string): Promise<User | null> {

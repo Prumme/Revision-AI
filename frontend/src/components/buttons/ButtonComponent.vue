@@ -1,53 +1,56 @@
 <script setup lang="ts">
 const props = defineProps<{
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "outline" | "rounded-full";
+  variant?: "primary" | "outline" | "rounded-full" | "danger";
   size?: "default" | "icon";
   positionIcon?: "left" | "right";
   withIcon?: boolean;
   disabled?: boolean;
 }>();
 
-const { type = "button", variant = "primary", size = "default", disabled = false } = props;
+// Ne pas destructurer les props pour conserver la réactivité
+const { type = "button" } = props;
 </script>
 
 <template>
   <button
     :type="type"
-    :disabled="disabled"
+    :disabled="props.disabled"
     :class="{
       'w-full inline-flex items-center justify-center font-outfit font-medium transition-all duration-75 ease-in-out border-2 border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed': true,
 
       // Sizes (Responsive with Tailwind classes)
       'px-3 py-1.5 text-sm md:px-4 md:py-2 md:text-base lg:px-6 lg:py-2.5 lg:text-base':
-        size == 'default',
+        (props.size || 'default') === 'default',
 
       // Icon size
-      'px-1.5 py-1.5 w-min': size == 'icon',
+      'px-1.5 py-1.5 w-min': (props.size || 'default') === 'icon',
 
       // Variants
       'bg-primary text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base':
-        variant === 'primary',
+        (props.variant || 'primary') === 'primary',
       'bg-transparent text-black hover:bg-primary hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
-        variant === 'outline',
+        (props.variant || 'primary') === 'outline',
       'bg-primary/80 text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
-        variant === 'rounded-full',
+        (props.variant || 'primary') === 'rounded-full',
+      'bg-red-500 text-white shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base hover:bg-red-600':
+        (props.variant || 'primary') === 'danger',
 
       // Icon position
-      'flex items-center flex-row-reverse gap-2.5': positionIcon === 'right',
-      'flex items-center flex-row gap-2.5': positionIcon === 'left',
+      'flex items-center flex-row-reverse gap-2.5': props.positionIcon === 'right',
+      'flex items-center flex-row gap-2.5': props.positionIcon === 'left',
     }"
   >
-    <span v-if="positionIcon === 'left'">
+    <span v-if="props.positionIcon === 'left'">
       <slot name="icon" />
     </span>
 
-    <span v-if="positionIcon === 'right'">
+    <span v-if="props.positionIcon === 'right'">
       <slot name="icon" />
     </span>
 
-    <slot v-if="size === 'icon'" />
+    <slot v-if="(props.size || 'default') === 'icon'" />
 
-    <slot v-if="size === 'default'" />
+    <slot v-if="(props.size || 'default') === 'default'" />
   </button>
 </template>

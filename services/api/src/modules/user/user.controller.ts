@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,16 +21,19 @@ import {
   ApiParam,
   ApiBearerAuth,
   ApiConsumes,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserFiltersDto } from './dto/user-filters.dto';
 import { User } from '@entities/user.entity';
 import { Request } from 'express';
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { ReqUser } from '@common/types/request';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { AdminGuard } from '@common/guards/admin.guard';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -38,14 +42,78 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
+  @UseGuards(AdminGuard)
+  @ApiOperation({
+    summary: 'Récupérer tous les utilisateurs (admin seulement)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Liste des utilisateurs',
+    description: 'Liste des utilisateurs filtrée',
     type: [CreateUserDto],
   })
-  async findAll(): Promise<User[]> {
-    return await this.userService.findAll();
+  @ApiResponse({
+    status: 401,
+    description: 'Accès refusé : rôle admin requis',
+  })
+  @ApiQuery({
+    name: 'includeDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Inclure les utilisateurs supprimés/anonymisés',
+  })
+  @ApiQuery({
+    name: 'includeBlocked',
+    required: false,
+    type: Boolean,
+    description: 'Inclure les utilisateurs bloqués',
+  })
+  @ApiQuery({
+    name: 'onlyDeleted',
+    required: false,
+    type: Boolean,
+    description: 'Récupérer seulement les utilisateurs supprimés/anonymisés',
+  })
+  @ApiQuery({
+    name: 'onlyBlocked',
+    required: false,
+    type: Boolean,
+    description: 'Récupérer seulement les utilisateurs bloqués',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description:
+      "Terme de recherche pour filtrer par nom d'utilisateur ou email",
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    description: 'Champ pour le tri',
+    enum: ['username', 'email', 'role', 'createdAt', 'emailVerified'],
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    type: String,
+    description: 'Direction du tri',
+    enum: ['asc', 'desc'],
+  })
+  async findAll(@Query() filters: UserFiltersDto) {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      sortBy,
+      sortOrder,
+      ...userFilters
+    } = filters;
+
+    return await this.userService.findAllWithFiltersPaginated(
+      { ...userFilters, search, sortBy, sortOrder },
+      { page, limit },
+    );
   }
 
   @Get(':id')
@@ -94,12 +162,17 @@ export class UserController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur (admin seulement)' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
   @ApiResponse({
     status: 200,
     description: "L'utilisateur a été mis à jour.",
     type: UpdateUserDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Accès refusé : rôle admin requis',
   })
   @ApiResponse({
     status: 404,
@@ -167,11 +240,16 @@ export class UserController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'Supprimer un utilisateur (admin seulement)' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
   @ApiResponse({
     status: 200,
     description: "L'utilisateur a été supprimé",
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Accès refusé : rôle admin requis',
   })
   @ApiResponse({
     status: 404,
