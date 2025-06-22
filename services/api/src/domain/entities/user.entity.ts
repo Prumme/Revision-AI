@@ -13,5 +13,4 @@ export interface User {
   bio?: string; // Biographie de l'utilisateur
   deleted?: boolean; // Indique si le compte a été supprimé/anonymisé
   blocked?: boolean; // Indique si le compte a été bloqué par un admin
-  customerId?: string; // Optional, as not all users may be customers
 }
