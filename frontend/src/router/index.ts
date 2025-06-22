@@ -4,6 +4,7 @@ import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
+import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizView from "@/views/QuizView.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
@@ -18,14 +19,14 @@ const router = createRouter({
   routes: [
     {
       path: "/",
+      name: "Revision AI",
+      component: LandingPage,
+    },
+    {
+      path: "/",
       component: UserSidenav,
       meta: { requiresAuth: true },
       children: [
-        {
-          path: "/",
-          name: "Dashboard",
-          component: DashboardView,
-        },
         {
           path: "/dashboard",
           name: "Dashboard",
