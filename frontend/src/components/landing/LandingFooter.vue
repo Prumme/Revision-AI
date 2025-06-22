@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import TwitterIcon from "@/components/icons/TwitterIcon.vue";
-import InstagramIcon from "@/components/icons/InstagramIcon.vue";
-import LinkedinIcon from "@/components/icons/LinkedinIcon.vue";
+import { Instagram, Linkedin } from "lucide-vue-next";
 
 const links = [
   { label: "À propos", href: "#" },
@@ -19,12 +18,12 @@ const socials = [
   {
     label: "Instagram",
     href: "https://instagram.com/",
-    icon: InstagramIcon,
+    icon: Instagram,
   },
   {
     label: "LinkedIn",
     href: "https://linkedin.com/",
-    icon: LinkedinIcon,
+    icon: Linkedin,
   },
 ];
 </script>
