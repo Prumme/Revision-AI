@@ -38,8 +38,7 @@ export class UserService {
   }
 
   async findById(id: string): Promise<User | null> {
-    const user = await this.userRepository.findById(id);
-    return user;
+    return await this.userRepository.findById(id);
   }
 
   async findAll(): Promise<User[]> {

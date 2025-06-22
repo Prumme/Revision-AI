@@ -20,39 +20,9 @@ export class AdminService {
     filters: UserApiFilters = {},
     pagination: PaginationParams = {},
   ): Promise<PaginatedUsersResponse> {
-    const queryParams = new URLSearchParams();
+    const queryParams = this.buildQueryParams({ ...filters, ...pagination });
 
-    if (filters.includeDeleted) {
-      queryParams.append("includeDeleted", "true");
-    }
-    if (filters.includeBlocked) {
-      queryParams.append("includeBlocked", "true");
-    }
-    if (filters.onlyDeleted) {
-      queryParams.append("onlyDeleted", "true");
-    }
-    if (filters.onlyBlocked) {
-      queryParams.append("onlyBlocked", "true");
-    }
-    if (filters.search && filters.search.trim()) {
-      queryParams.append("search", filters.search.trim());
-    }
-    if (filters.sortBy) {
-      queryParams.append("sortBy", filters.sortBy);
-    }
-    if (filters.sortOrder) {
-      queryParams.append("sortOrder", filters.sortOrder);
-    }
-
-    // Ajout des paramètres de pagination
-    if (pagination.page) {
-      queryParams.append("page", pagination.page.toString());
-    }
-    if (pagination.limit) {
-      queryParams.append("limit", pagination.limit.toString());
-    }
-
-    const endpoint = `/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    const endpoint = `/users${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`;
 
     const response = await ApiService.get<PaginatedUsersResponse>(endpoint);
 
@@ -69,5 +39,17 @@ export class AdminService {
 
   static async deleteUser(userId: string): Promise<void> {
     await ApiService.delete(`/users/${userId}`);
+  }
+
+  private static buildQueryParams(filters: UserApiFilters): string[] {
+    const queryParams: string[] = [];
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value) {
+        queryParams.push(`${key}=${value}`);
+      }
+    }
+
+    return queryParams;
   }
 }
