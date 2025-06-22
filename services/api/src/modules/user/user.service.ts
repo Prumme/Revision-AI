@@ -132,7 +132,6 @@ export class UserService {
   }
 
   async anonymizeAccount(userId: string): Promise<User> {
-    console.log('anonymizeAccount', userId);
     const user = await this.userRepository.findById(userId);
     console.log(user);
     if (!user) {
