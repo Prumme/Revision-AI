@@ -1,13 +1,13 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '@modules/user/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from './dto/register.dto';
-import * as bcrypt from 'bcryptjs';
-import { User } from '@entities/user.entity';
 import { ReqUser } from '@common/types/request';
-import { CustomerRepository } from '@repositories/customer.repository';
 import { CustomerAndUser } from '@entities/customer.entity';
+import { User } from '@entities/user.entity';
 import { MailService } from '@infrastructure/resend/mail.service';
+import { UserService } from '@modules/user/user.service';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { CustomerRepository } from '@repositories/customer.repository';
+import * as bcrypt from 'bcryptjs';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private mailService: MailService,
-  ) {}
+  ) { }
 
   async signIn(
     email: string,
@@ -42,6 +42,10 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
       user: user,
     };
+  }
+
+  async logout(): Promise<{ message: string }> {
+    return { message: 'Déconnexion réussie' };
   }
 
   async register(registerDto: RegisterDto) {

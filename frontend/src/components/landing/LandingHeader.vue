@@ -1,8 +1,14 @@
+s
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { RouterLink } from "vue-router";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
+import { useUserStore } from "@/stores/user";
+import { MenuIcon, XIcon } from "lucide-vue-next";
+import { onMounted, onUnmounted, ref } from "vue";
+import { RouterLink } from "vue-router";
+import AvatarComponent from "../../components/profile/avatar/AvatarComponent.vue";
 
+const userStore = useUserStore();
+const user = userStore?.user;
 const menuOpen = ref(false);
 function closeMenu() {
   menuOpen.value = false;
@@ -111,7 +117,7 @@ onUnmounted(() => {
       </ul>
 
       <!-- Desktop actions -->
-      <div class="hidden md:flex items-center gap-4">
+      <div v-if="!user" class="hidden md:flex items-center gap-4">
         <RouterLink to="/login" class="font-outfit font-medium hover:text-primary transition"
           >Connexion</RouterLink
         >
@@ -120,16 +126,26 @@ onUnmounted(() => {
         </RouterLink>
       </div>
 
+      <div v-else class="hidden md:flex items-center gap-4">
+        <RouterLink to="/profile" class="font-outfit font-medium hover:text-primary transition">
+          <AvatarComponent
+            :user="user"
+            class="w-8 h-8 rounded-full border border-gray-300 hover:bg-primary transition-all"
+          />
+        </RouterLink>
+        <RouterLink to="/logout">
+          <ButtonComponent variant="secondary"> Déconnexion </ButtonComponent>
+        </RouterLink>
+      </div>
+
       <!-- Hamburger (mobile) -->
-      <button
-        class="md:hidden flex items-center justify-center p-2 rounded focus:outline-none"
-        @click="menuOpen = true"
-        aria-label="Ouvrir le menu"
-      >
-        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h20M4 16h20" />
-        </svg>
-      </button>
+      <nav class="md:hidden flex items-center justify-center p-2 rounded focus:outline-none">
+        <component
+          :is="menuOpen ? XIcon : MenuIcon"
+          class="h-6 w-6 text-foreground-alt hover:text-primary cursor-pointer"
+          @click="menuOpen = !menuOpen"
+        />
+      </nav>
     </nav>
 
     <!-- Mobile menu slide-in -->
@@ -164,12 +180,24 @@ onUnmounted(() => {
               <a href="#faq" @click.prevent="scrollTo('faq')">FAQ</a>
             </li>
           </ul>
-          <div class="flex flex-col gap-3 mt-4">
+          <div v-if="!user" class="flex flex-col gap-3 mt-4">
             <RouterLink to="/login" class="font-outfit font-medium" @click="closeMenu"
               >Connexion</RouterLink
             >
             <RouterLink to="/register" @click="closeMenu">
               <ButtonComponent variant="primary" class="w-full"> Créer un compte </ButtonComponent>
+            </RouterLink>
+          </div>
+
+          <div v-else class="flex flex-col justify-center items-center gap-4">
+            <RouterLink to="/profile" class="font-outfit font-medium hover:text-primary transition">
+              <AvatarComponent
+                :user="user"
+                class="w-8 h-8 rounded-full border border-gray-300 hover:bg-primary transition-all"
+              />
+            </RouterLink>
+            <RouterLink to="/logout">
+              <ButtonComponent variant="secondary"> Déconnexion </ButtonComponent>
             </RouterLink>
           </div>
         </aside>
