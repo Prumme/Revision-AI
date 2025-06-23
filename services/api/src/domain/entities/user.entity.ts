@@ -11,5 +11,4 @@ export interface User {
   avatar?: string; // URL de l'avatar stocké dans MinIO
   bio?: string; // Biographie de l'utilisateur
   deleted?: boolean; // Indique si le compte a été supprimé/anonymisé
-  customerId?: string; // Optional, as not all users may be customers
 }

@@ -8,8 +8,6 @@ import { ReqUser } from '@common/types/request';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { MailService } from '@infrastructure/resend/mail.service';
-import { CustomerRepository } from '@repositories/customer.repository';
-import { CustomerAndUser } from '@entities/customer.entity';
 
 @Injectable()
 export class AuthService {
