@@ -24,7 +24,7 @@ const handleLogin = async () => {
     });
 
     // Redirection vers la page d'accueil
-    router.push("/");
+    router.push("/dashboard");
   } catch (e) {
     if (e instanceof Error && e.message === "Email not verified, please verify your email") {
       error.value = "Email non vérifié, veuillez vérifier votre email";

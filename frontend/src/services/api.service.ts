@@ -70,7 +70,7 @@ export class ApiService {
 
   // Méthodes utilitaires pour les requêtes courantes
   static async get<T>(endpoint: string, requiresAuth = true, headers?: Record<string, string>) {
-    return this.request<T>({ method: "GET", endpoint, requiresAuth, headers });
+    return this.request<T>({ method: "GET", endpoint, requiresAuth, headers, body: false });
   }
 
   static async post<T>(

@@ -52,7 +52,6 @@ export class SubscriptionController {
       this.subscriptionProvider,
       this.customerRepository,
     );
-    console.log('id', req.user.sub);
     const customer = await useCase({ ...body, userId: req.user.sub });
     if (customer instanceof Error) throw customer;
     return { message: 'Customer created/updated successfully', customer };
