@@ -18,7 +18,6 @@ export class MongoCustomerRepository implements CustomerRepository {
     userId: string,
     customer: CustomerDto & { customerId?: string },
   ): Promise<CustomerAndUser | null | Error> {
-    console.log('putCustomer', userId, customer);
     return this.userModel.findOneAndUpdate(
       { _id: userId },
       {

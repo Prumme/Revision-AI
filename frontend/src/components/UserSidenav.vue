@@ -49,7 +49,7 @@ const handleLogout = () => {
     >
       <div class="flex flex-col justify-between h-full">
         <!-- Menus -->
-        <div class="font-outfit flex flex-col gap-2.5 mt-5 text-black">
+        <div class="font-outfit flex flex-col gap-2.5 mt-5 text-black overflow-hidden">
           <div class="flex items-center justify-center">
             <h1
               class="text-xl truncate font-medium text-black font-outfit grow text-left pl-3"
@@ -63,6 +63,8 @@ const handleLogout = () => {
               @click="toggleSidebar"
             />
           </div>
+
+          <!-- Section principale -->
           <NavLink
             to="/dashboard"
             icon="Home"
@@ -84,6 +86,24 @@ const handleLogout = () => {
             :active="false"
             :showText="isSidebarOpen"
           />
+
+          <!-- Section Admin -->
+          <div v-if="userStore.isAdmin" class="mt-6">
+            <div
+              v-if="isSidebarOpen"
+              class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 py-2"
+            >
+              Administration
+            </div>
+            <div v-else class="border-t border-gray-200 my-3"></div>
+            <NavLink
+              to="/admin/user"
+              icon="Users"
+              :text="isSidebarOpen ? 'Utilisateurs' : ''"
+              :active="false"
+              :showText="isSidebarOpen"
+            />
+          </div>
         </div>
 
         <!-- Profile Section avec Dropdown -->
@@ -147,9 +167,25 @@ const handleLogout = () => {
             @click="toggleSidebar"
           />
         </div>
-        <NavLink to="/home" icon="Home" :text="'Accueil'" :active="true" :showText="true" />
+
+        <!-- Section principale -->
+        <NavLink to="/dashboard" icon="Home" :text="'Accueil'" :active="true" :showText="true" />
         <NavLink to="/quizz" icon="FileQuestion" :text="'Quiz'" :active="false" :showText="true" />
         <NavLink to="/courses" icon="File" :text="'Cours'" :active="false" :showText="true" />
+
+        <!-- Section Admin -->
+        <div v-if="userStore.isAdmin" class="mt-6">
+          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 py-2">
+            Administration
+          </div>
+          <NavLink
+            to="/admin/user"
+            icon="Users"
+            :text="'Utilisateurs'"
+            :active="false"
+            :showText="true"
+          />
+        </div>
       </div>
 
       <!-- Profile Section with Dropdown -->
