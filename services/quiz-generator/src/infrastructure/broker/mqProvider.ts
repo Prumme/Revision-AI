@@ -1,7 +1,7 @@
 import amqp from "amqplib";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
-const QUEUE_NAME = process.env.OUTPUT_QUEUE_NAME || 'file-parsed';
+const QUEUE_NAME = process.env.OUTPUT_QUEUE_NAME || 'quiz-generated';
 
 export async function mqProvide(message: object, queueName: string = QUEUE_NAME) {
   try {

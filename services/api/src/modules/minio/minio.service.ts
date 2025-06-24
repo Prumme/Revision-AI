@@ -1,13 +1,13 @@
 import {
   Injectable,
-  OnModuleInit,
-  NotFoundException,
   Logger,
+  NotFoundException,
+  OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
-import { ScalewayS3Options } from './interfaces/minio-options.interface';
 import { Readable } from 'stream';
+import { ScalewayS3Options } from './interfaces/minio-options.interface';
 
 interface StorageFile {
   stream: Readable;
@@ -18,7 +18,7 @@ interface StorageFile {
 @Injectable()
 export class MinioService implements OnModuleInit {
   private s3Client: AWS.S3;
-  private readonly bucketName: string;
+  public readonly bucketName: string;
 
   constructor(
     private configService: ConfigService,

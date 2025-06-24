@@ -1,63 +1,141 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Question } from '@common/types/question';
+import { Type } from 'class-transformer';
 import {
-  IsString,
+  ArrayMinSize,
   IsArray,
   IsBoolean,
   IsNumber,
   IsOptional,
+  IsString,
   ValidateNested,
-  ArrayMinSize,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-export class CreateQuizDto {
-  @ApiProperty({ description: "ID de l'utilisateur créant le quiz" })
-  @IsString()
-  userId: string;
-
-  @ApiProperty({ description: 'Nom du quiz' })
-  @IsString()
-  name: string;
-
-  @ApiProperty({ description: 'Description du quiz', required: false })
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @ApiProperty({ description: 'Liste des questions du quiz', type: [Question] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Question)
-  @ArrayMinSize(1)
-  questions: Question[];
-
-  @ApiProperty({ description: 'Tags associés au quiz', required: false })
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  tags?: string[];
-
+class AnswerDto {
   @ApiProperty({
-    description: 'Score de rigueur du quiz',
-    required: false,
-    default: 0,
+    description: 'Texte de la réponse',
+    example: 'En 1638',
   })
-  @IsNumber()
-  @IsOptional()
-  rigorScore?: number;
+  @IsString()
+  a: string;
 
   @ApiProperty({
-    description: 'Visibilité publique du quiz',
-    required: false,
-    default: false,
+    description: 'Indique si cette réponse est la bonne',
+    example: true,
   })
   @IsBoolean()
-  @IsOptional()
-  public?: boolean;
+  correct: boolean;
+}
 
-  @ApiProperty({ description: 'Contexte du quiz', required: false })
+class QuestionDto {
+  @ApiProperty({
+    description: 'Texte de la question',
+    example: 'Quand est né Louis XIV ?',
+  })
   @IsString()
+  q: string;
+
+  @ApiProperty({
+    description: 'Liste des réponses possibles à la question',
+    type: [AnswerDto],
+  })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => AnswerDto)
+  answers: AnswerDto[];
+}
+
+export class CreateQuizDto {
+  userId: string;
+
+  @ApiProperty({
+    description: 'ID de l’utilisateur créant le quiz',
+    example: '1234567890abcdef12345678',
+  })
+  @ApiProperty({
+    description: 'Titre du quiz',
+    example: "Mon super quiz d'histoire",
+  })
+  @IsString()
+  title: string;
+
+  @ApiProperty({
+    description: 'Catégorie du quiz (ex: Histoire, Science, etc.)',
+    example: 'Histoire',
+    required: false,
+  })
   @IsOptional()
-  context?: string;
+  @IsString()
+  category?: string;
+
+  @ApiProperty({
+    description: 'Nombre total de questions dans le quiz',
+    example: 10,
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  questionsNumbers?: number;
+
+  @ApiProperty({
+    description: 'Description détaillée du quiz',
+    example: 'Ce quiz porte sur les grands événements historiques.',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty({
+    description: 'Définit si le quiz est accessible publiquement',
+    example: false,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
+
+  @ApiProperty({
+    description: 'URL du média associé au quiz (image, vidéo, etc.)',
+    example: 'https://monstockage.com/media/quiz-cover.jpg',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  media?: string;
+
+  // @ApiProperty({
+  //   description: 'Liste des questions du quiz',
+  //   type: [QuestionDto],
+  // })
+  // @IsArray()
+  // @ArrayMinSize(1)
+  // @ValidateNested({ each: true })
+  // @Type(() => QuestionDto)
+  // questions: QuestionDto[];
+
+  @ApiProperty({
+    description: 'Statut du quiz (par défaut "pending")',
+    example: 'pending',
+    required: false,
+  })
+  @IsString()
+  status?: 'pending' | 'processing' | 'completed' | 'failed' = 'pending';
+
+  @ApiProperty({
+    description: 'Date de création du quiz (générée automatiquement)',
+    example: new Date().toISOString(),
+    required: false,
+  })
+  @IsString()
+  createdAt?: string = new Date().toISOString();
+
+  @ApiProperty({
+    description:
+      'Date de dernière mise à jour du quiz (générée automatiquement)',
+    example: new Date().toISOString(),
+    required: false,
+  })
+  @IsString()
+  updatedAt?: string = new Date().toISOString();
 }

@@ -1,12 +1,15 @@
 s
 <script setup lang="ts">
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
+import Dropdown from "@/components/dropdowns/DropdownInput.vue";
+import ProfileComponent from "@/components/profile/ProfileComponent.vue";
 import { useUserStore } from "@/stores/user";
-import { MenuIcon, XIcon } from "lucide-vue-next";
+import { LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
 import { onMounted, onUnmounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import AvatarComponent from "../../components/profile/avatar/AvatarComponent.vue";
 
+const router = useRouter();
 const userStore = useUserStore();
 const user = userStore?.user;
 const menuOpen = ref(false);
@@ -63,6 +66,11 @@ function handleScroll() {
   }
   lastScrollY = currentScrollY;
 }
+
+const handleLogout = () => {
+  userStore.logout();
+  router.push("/login");
+};
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
@@ -127,15 +135,27 @@ onUnmounted(() => {
       </div>
 
       <div v-else class="hidden md:flex items-center gap-4">
-        <RouterLink to="/profile" class="font-outfit font-medium hover:text-primary transition">
-          <AvatarComponent
-            :user="user"
-            class="w-8 h-8 rounded-full border border-gray-300 hover:bg-primary transition-all"
-          />
-        </RouterLink>
-        <RouterLink to="/logout">
-          <ButtonComponent variant="secondary"> Déconnexion </ButtonComponent>
-        </RouterLink>
+        <Dropdown position="top-right">
+          <template #trigger>
+            <ProfileComponent :isSidebarOpen="menuOpen" :icon="true" />
+          </template>
+
+          <template #menus>
+            <ProfileComponent :isSidebarOpen="menuOpen" :icon="false" class="block px-4 py-4" />
+            <a href="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              >Mon profil</a
+            >
+            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
+            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
+            <span
+              class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
+              @click="handleLogout"
+            >
+              <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
+              Se déconnecter
+            </span>
+          </template>
+        </Dropdown>
       </div>
 
       <!-- Hamburger (mobile) -->
@@ -193,7 +213,7 @@ onUnmounted(() => {
             <RouterLink to="/profile" class="font-outfit font-medium hover:text-primary transition">
               <AvatarComponent
                 :user="user"
-                class="w-8 h-8 rounded-full border border-gray-300 hover:bg-primary transition-all"
+                class="w-8 h-8 rounded-full border border-gray-300 transition-all"
               />
             </RouterLink>
             <RouterLink to="/logout">

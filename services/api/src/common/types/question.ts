@@ -1,24 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsString, ValidateNested } from 'class-validator';
 
-export class Choice {
-  @ApiProperty({ description: 'Libellé du choix' })
+export class Answer {
+  @ApiProperty({
+    description: 'Texte de la réponse',
+    example: 'En 1638',
+  })
   @IsString()
-  label: string;
+  a: string;
 
-  @ApiProperty({ description: 'Indique si le choix est correct' })
-  correct: boolean;
+  @ApiProperty({
+    description: 'Indique si cette réponse est la bonne',
+    example: true,
+  })
+  @IsBoolean()
+  c: boolean;
 }
 
 export class Question {
-  @ApiProperty({ description: 'Libellé de la question' })
+  @ApiProperty({
+    description: 'Texte de la question',
+    example: 'Quand est né Louis XIV?',
+  })
   @IsString()
-  label: string;
+  q: string;
 
-  @ApiProperty({ description: 'Choix possibles', type: [Choice] })
+  @ApiProperty({
+    description: 'Liste des réponses possibles',
+    type: [Answer],
+  })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => Choice)
-  choices: Choice[];
+  @Type(() => Answer)
+  answers: Answer[];
 }

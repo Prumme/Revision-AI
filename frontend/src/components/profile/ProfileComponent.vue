@@ -2,8 +2,6 @@
 import { useUserStore } from "@/stores/user";
 import { ArrowRightFromLineIcon } from "lucide-vue-next";
 import AvatarComponent from "./avatar/AvatarComponent.vue";
-// @TODO : Implement user context inside this component
-// import { useUserContext } from "@/context/UserContext";
 
 const { isSidebarOpen } = defineProps<{
   isSidebarOpen: boolean;
@@ -15,7 +13,7 @@ const { getFullName, user } = useUserStore();
 
 <template>
   <div class="flex justify-between items-center gap-4 w-full">
-    <AvatarComponent :user="user" />
+    <AvatarComponent :user="user" class="transition-all" />
 
     <div
       class="flex justify-between items-center text-black grow"

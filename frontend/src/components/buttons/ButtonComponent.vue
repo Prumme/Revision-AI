@@ -1,7 +1,14 @@
 <script setup lang="ts">
 const props = defineProps<{
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "outline" | "rounded-full" | "secondary" | "secondary-inverted" | "danger";
+  variant?:
+    | "primary"
+    | "outline"
+    | "rounded-full"
+    | "secondary"
+    | "secondary-inverted"
+    | "danger"
+    | "ghost";
   size?: "default" | "icon";
   positionIcon?: "left" | "right";
   withIcon?: boolean;
@@ -39,6 +46,8 @@ const { type = "button" } = props;
         variant === 'secondary-inverted',
       'bg-red-500 text-white shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base hover:bg-red-600':
         (props.variant || 'primary') === 'danger',
+      'bg-transparent text-black hover:bg-gray-100 hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
+        (props.variant || 'primary') === 'ghost',
 
       // Icon position
       'flex items-center flex-row-reverse gap-2.5': props.positionIcon === 'right',

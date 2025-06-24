@@ -2,17 +2,23 @@
 import Button from "@/components/buttons/ButtonComponent.vue";
 import Label from "@/components/inputs/LabelComponent.vue";
 import { CloudUploadIcon, TrashIcon } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = withDefaults(
   defineProps<{
     multiple: boolean;
     variant?: "yellow" | "blue";
+    modelValue?: File | File[] | null; // Ajout de la prop modelValue pour v-model
   }>(),
   {
     variant: "blue",
+    modelValue: null,
   },
 );
+
+const emit = defineEmits<{
+  (e: "update:modelValue", value: File | File[] | null): void;
+}>();
 
 const acceptedFileTypes = ["image/*", "application/pdf"];
 const maxFileSize = 2 * 1024 * 1024;
@@ -20,6 +26,36 @@ const maxImageSize = { width: 100, height: 100 };
 
 const files = ref<File[]>([]);
 const error = ref<string | null>(null);
+
+// Surveiller les changements de fichiers pour les émettre au parent
+watch(
+  files,
+  (newValue) => {
+    if (props.multiple) {
+      emit("update:modelValue", newValue.length > 0 ? [...newValue] : null);
+    } else {
+      emit("update:modelValue", newValue.length > 0 ? newValue[0] : null);
+    }
+  },
+  { deep: true },
+);
+
+// Initialiser les fichiers depuis modelValue (si fourni)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue) {
+      if (Array.isArray(newValue)) {
+        files.value = [...newValue];
+      } else {
+        files.value = [newValue];
+      }
+    } else {
+      files.value = [];
+    }
+  },
+  { immediate: true },
+);
 
 const handleDrop = (e: DragEvent) => {
   e.preventDefault();
@@ -29,10 +65,16 @@ const handleDrop = (e: DragEvent) => {
 };
 
 const handleFiles = (fileList: FileList) => {
+  if (!props.multiple && files.value.length + fileList.length > 1) {
+    error.value = "Un seul fichier est autorisé.";
+    setErrorTimeout();
+    return;
+  }
+
   for (let i = 0; i < fileList.length; i++) {
     const file = fileList[i];
 
-    if (!acceptedFileTypes.some((type) => file.type.includes(type))) {
+    if (!acceptedFileTypes.some((type) => file.type.match(new RegExp(type.replace("*", ".*"))))) {
       error.value = "Ce type de fichier n'est pas accepté.";
       setErrorTimeout();
       return;
@@ -51,12 +93,22 @@ const handleFiles = (fileList: FileList) => {
           error.value = `L'image doit être de ${maxImageSize.width}x${maxImageSize.height} max.`;
           setErrorTimeout();
         } else {
-          files.value.push(file);
+          // Si mode non-multiple, remplacer les fichiers existants
+          if (!props.multiple) {
+            files.value = [file];
+          } else {
+            files.value.push(file);
+          }
         }
       };
       img.src = URL.createObjectURL(file);
     } else {
-      files.value.push(file);
+      // Si mode non-multiple, remplacer les fichiers existants
+      if (!props.multiple) {
+        files.value = [file];
+      } else {
+        files.value.push(file);
+      }
     }
   }
 };

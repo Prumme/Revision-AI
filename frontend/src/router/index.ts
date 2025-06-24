@@ -1,6 +1,7 @@
 import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 import UserSidenav from "@/components/UserSidenav.vue";
 import { useUserStore } from "@/stores/user";
+import AdminUserView from "@/views/admin/AdminUserView.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
 import ForgotPassword from "@/views/authentication/ForgotPassword.vue";
 import LoginPage from "@/views/authentication/LoginPage.vue";
@@ -16,6 +17,7 @@ import EmailSend from "@/views/authentication/EmailSend.vue";
 import AdminUserView from "@/views/admin/AdminUserView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import CheckoutView from "@/views/CheckoutView.vue";
+import QuizList from "@/views/quiz/QuizList.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -42,19 +44,14 @@ const router = createRouter({
           component: DashboardView,
         },
         {
-          path: "/quizz",
-          name: "quizz",
+          path: "/quiz/create",
+          name: "quiz-create",
           component: QuizView,
         },
         {
-          path: "/subscription",
-          name: "subscription",
-          component: SubscriptionView,
-        },
-        {
-          path: "/subscription/checkout",
-          name: "subscription-checkout",
-          component: CheckoutView,
+          path: "/quiz",
+          name: "quiz",
+          component: QuizList,
         },
         {
           path: "/profile",

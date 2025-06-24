@@ -1,45 +1,45 @@
+import { AdminGuard } from '@common/guards/admin.guard';
+import { ReqUser } from '@common/types/request';
+import { User } from '@entities/user.entity';
+import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
   Req,
-  UseInterceptors,
   UploadedFile,
   UseGuards,
-  Query,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
   ApiBearerAuth,
   ApiConsumes,
+  ApiOperation,
+  ApiParam,
   ApiQuery,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UserService } from './user.service';
+import { Request } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
-import { User } from '@entities/user.entity';
-import { Request } from 'express';
-import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
-import { ReqUser } from '@common/types/request';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { AdminGuard } from '@common/guards/admin.guard';
+import { UserService } from './user.service';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   @UseGuards(AdminGuard)

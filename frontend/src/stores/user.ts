@@ -1,13 +1,13 @@
-import type { User } from "@/types/user";
+import { API_URL } from "@/config/api";
 import type {
   AuthResponse,
   LoginCredentials,
   LoginResponse,
   RegisterCredentials,
 } from "@/types/auth";
+import type { User } from "@/types/user";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { API_URL } from "@/config/api";
 import { useRouter } from "vue-router";
 
 export const useUserStore = defineStore("user", () => {
@@ -67,6 +67,7 @@ export const useUserStore = defineStore("user", () => {
     } catch (error) {
       console.error("Erreur lors de la récupération du profil:", error);
       clearUser();
+
       router.push("/login");
     }
   }

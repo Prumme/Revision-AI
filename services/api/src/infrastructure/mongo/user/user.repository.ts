@@ -28,7 +28,7 @@ export class MongoUserRepository implements UserRepository {
     return this.documentToUser(document);
   }
 
-  async create(user: User): Promise<User> {
+  async create(user: User): Promise<User> { 
     const document = await this.userModel.create(user);
     return this.documentToUser(document);
   }

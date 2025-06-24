@@ -1,31 +1,36 @@
+import { ReqUser } from '@common/types/request';
+import { Quiz } from '@entities/quiz.entity';
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
   Body,
-  Param,
+  Controller,
+  Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  Put,
+  Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
   ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { QuizService } from './quiz.service';
-import { Quiz } from '@entities/quiz.entity';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { QuizService } from './quiz.service';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
 @ApiBearerAuth('JWT-auth')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) {}
+  constructor(private readonly quizService: QuizService) { }
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les quiz' })
@@ -56,14 +61,22 @@ export class QuizController {
   }
 
   @Post()
+  @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: 'Créer un nouveau quiz' })
   @ApiResponse({
     status: 201,
-    description: 'Quiz créé avec succès',
+    description: 'Le quiz a été créé avec succès.',
     type: Quiz,
   })
-  async create(@Body() createQuizDto: CreateQuizDto): Promise<Quiz> {
-    return this.quizService.create(createQuizDto);
+  async create(
+    @Body() createQuizDto: CreateQuizDto,
+    @UploadedFile() files: Express.Multer.File[] = [],
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Quiz> {
+    return this.quizService.create(
+      { ...createQuizDto, userId: user.sub },
+      files,
+    );
   }
 
   @Put(':id')

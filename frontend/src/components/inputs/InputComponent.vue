@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import Label from "@/components/inputs/LabelComponent.vue";
 import { CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from "lucide-vue-next";
 import { computed, defineEmits, defineProps, ref, watch } from "vue";
-import Label from "@/components/inputs/LabelComponent.vue";
 
 const props = defineProps({
   modelValue: { type: [String, Number], required: true },
@@ -17,6 +17,8 @@ const props = defineProps({
     default: () => `input-${Math.random().toString(36).substring(2, 9)}`,
   },
   disabled: { type: Boolean, default: false },
+  min: { type: Number, required: false },
+  max: { type: Number, required: false },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -138,6 +140,8 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
         :placeholder="placeholder"
         :autocomplete="autocomplete"
         :disabled="disabled"
+        :min="type === 'number' ? min : undefined"
+        :max="type === 'number' ? max : undefined"
       />
 
       <textarea

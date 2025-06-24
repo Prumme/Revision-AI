@@ -1,11 +1,11 @@
 import { API_CONFIG } from "../config/api.config";
 
-type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+type RequestMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD";
 
 interface RequestOptions {
   method: RequestMethod;
   endpoint: string;
-  body?: unknown;
+  bodyToParse?: unknown;
   requiresAuth?: boolean;
   headers?: Record<string, string>;
 }
@@ -24,7 +24,7 @@ export class ApiService {
   private static async request<T>({
     method,
     endpoint,
-    body = {},
+    bodyToParse,
     requiresAuth = true,
     headers = {},
   }: RequestOptions): Promise<ApiResponse<T>> {
@@ -42,12 +42,26 @@ export class ApiService {
       requestHeaders["Authorization"] = `Bearer ${token}`;
     }
 
+    console.log("body", bodyToParse);
+
+    const options: RequestInit = {
+      method,
+      headers: requestHeaders
+    };
+
+    // N'ajouter un body que si ce n'est pas une requête GET ou HEAD
+    if (bodyToParse !== undefined && method !== "GET" && method !== "HEAD") {
+      if (bodyToParse instanceof FormData) {
+        // Si c'est un FormData, supprimer Content-Type pour laisser le navigateur définir la limite multipart
+        delete requestHeaders["Content-Type"];
+        options.body = bodyToParse;
+      } else {
+        options.body = JSON.stringify(bodyToParse);
+      }
+    }
+
     try {
-      const response = await fetch(url, {
-        method,
-        headers: requestHeaders,
-        body: body ? JSON.stringify(body) : undefined,
-      });
+      const response = await fetch(url, options);
 
       const data = await response.json();
 
@@ -70,7 +84,7 @@ export class ApiService {
 
   // Méthodes utilitaires pour les requêtes courantes
   static async get<T>(endpoint: string, requiresAuth = true, headers?: Record<string, string>) {
-    return this.request<T>({ method: "GET", endpoint, requiresAuth, headers, body: false });
+    return this.request<T>({ method: "GET", endpoint, requiresAuth, headers });
   }
 
   static async post<T>(
@@ -79,7 +93,7 @@ export class ApiService {
     requiresAuth = true,
     headers?: Record<string, string>,
   ) {
-    return this.request<T>({ method: "POST", endpoint, body, requiresAuth, headers });
+    return this.request<T>({ method: "POST", endpoint, bodyToParse: body, requiresAuth, headers });
   }
 
   static async put<T>(
@@ -88,7 +102,7 @@ export class ApiService {
     requiresAuth = true,
     headers?: Record<string, string>,
   ) {
-    return this.request<T>({ method: "PUT", endpoint, body, requiresAuth, headers });
+    return this.request<T>({ method: "PUT", endpoint, bodyToParse: body, requiresAuth, headers });
   }
 
   static async patch<T>(
@@ -97,7 +111,7 @@ export class ApiService {
     requiresAuth = true,
     headers?: Record<string, string>,
   ) {
-    return this.request<T>({ method: "PATCH", endpoint, body, requiresAuth, headers });
+    return this.request<T>({ method: "PATCH", endpoint, bodyToParse: body, requiresAuth, headers });
   }
 
   static async delete<T>(endpoint: string, requiresAuth = true, headers?: Record<string, string>) {

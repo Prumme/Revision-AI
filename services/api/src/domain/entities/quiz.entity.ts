@@ -1,40 +1,38 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Question } from '@common/types/question';
-import { Answer } from '@common/types/answer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class Quiz {
-  @ApiProperty({ description: 'ID du quiz' })
   id: string;
 
   @ApiProperty({ description: "ID de l'utilisateur" })
   userId: string;
 
-  @ApiProperty({ description: 'Nom du quiz' })
-  name: string;
+  @ApiProperty({ description: 'Titre du quiz' })
+  title: string;
 
-  @ApiProperty({ description: 'Description du quiz' })
-  description: string;
+  @ApiProperty({ description: 'Catégorie du quiz' })
+  category: string;
 
   @ApiProperty({ description: 'Questions du quiz', type: [Question] })
   questions: Question[];
 
-  @ApiProperty({ description: 'Tags du quiz' })
-  tags: string[];
+  @ApiProperty({ description: 'Nombre de questions' })
+  questionsNumbers: number;
 
-  @ApiProperty({ description: 'Score de rigueur' })
-  rigorScore: number;
+  @ApiProperty({ description: 'Description du quiz' })
+  description: string;
 
   @ApiProperty({ description: 'Visibilité publique' })
-  public: boolean;
+  isPublic: boolean;
 
-  @ApiProperty({ description: 'Réponses au quiz', type: [Answer] })
-  answers: Answer[];
+  @ApiProperty({ description: 'Médias associés au quiz', type: [String] })
+  media: string[];
 
-  @ApiProperty({ description: 'Contexte du quiz' })
-  context: string;
-
-  @ApiProperty({ description: 'Liste des likes' })
-  likes: string[];
+  @ApiProperty({
+    description: 'Statut du quiz',
+    enum: ['pending', 'processing', 'completed', 'failed'],
+  })
+  status: 'pending' | 'processing' | 'completed' | 'failed';
 
   @ApiProperty({ description: 'Date de création' })
   createdAt: Date;
