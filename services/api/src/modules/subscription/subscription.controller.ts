@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Put, Req } from '@nestjs/common';
 import {
   UpsertCustomerUseCaseFactory,
   SubscribeUseCaseFactory,
@@ -12,7 +12,6 @@ import { ReqUser } from '@common/types/request';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailService } from '@infrastructure/resend/mail.service';
-
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -55,5 +54,14 @@ export class SubscriptionController {
     const customer = await useCase({ ...body, userId: req.user.sub });
     if (customer instanceof Error) throw customer;
     return { message: 'Customer created/updated successfully', customer };
+  }
+
+  @Get('/customer')
+  async getCustomer(@Req() req: Request & { user: ReqUser }) {
+    const customer = await this.authService.getCurrentCustomer(req.user);
+    if (!customer) {
+      return { message: 'No customer found' };
+    }
+    return { customer };
   }
 }

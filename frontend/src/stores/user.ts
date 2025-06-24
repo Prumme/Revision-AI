@@ -67,6 +67,34 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
+  async function fetchCustomerInfo() {
+    try {
+      if (!token.value) {
+        clearUser();
+        router.push("/login");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/subscription/customer`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des informations du client");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des informations du client:", error);
+      clearUser();
+      router.push("/login");
+    }
+  }
+
   async function updateUser(userData: Partial<User>) {
     try {
       if (!token.value) {
@@ -161,6 +189,7 @@ export const useUserStore = defineStore("user", () => {
     login,
     logout,
     fetchCurrentUser,
+    fetchCustomerInfo,
     updateUser,
   };
 });
