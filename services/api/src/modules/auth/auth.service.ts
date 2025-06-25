@@ -80,6 +80,7 @@ export class AuthService {
         avatar: user.avatar,
         role: user.role,
         bio: user.bio,
+        subscriptionTier: user.subscriptionTier,
       },
     };
   }
