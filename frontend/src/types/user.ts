@@ -11,4 +11,14 @@ export interface User {
   emailVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  subscriptionTier?: string;
+  customerId?: string;
+  firstName?: string;
+  lastName?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+  };
 }

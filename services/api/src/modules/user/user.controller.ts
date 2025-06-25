@@ -110,7 +110,7 @@ export class UserController {
       ...userFilters
     } = filters;
 
-    return await this.userService.findAllWithFiltersPaginated(
+    return await this.userService.findAll(
       { ...userFilters, search, sortBy, sortOrder },
       { page, limit },
     );
