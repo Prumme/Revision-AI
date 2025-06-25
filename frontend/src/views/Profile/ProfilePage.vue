@@ -4,7 +4,6 @@ import Input from "@/components/inputs/InputComponent.vue";
 import ProfilePicture from "@/components/profile/ProfilePicture.vue";
 import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
 import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
-import BillingAddressComponent from "@/components/cards/BillingAddressComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { useToastStore } from "@/stores/toast";
 import { ref, computed, watch } from "vue";
@@ -136,9 +135,6 @@ const handleSubmit = async () => {
         <PasswordChangeCard />
       </div>
 
-      <div class="col-span-full w-full">
-        <BillingAddressComponent />
-      </div>
       <DeleteAccountCard />
     </div>
   </section>
