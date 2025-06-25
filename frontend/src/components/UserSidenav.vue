@@ -86,6 +86,13 @@ const handleLogout = () => {
             :active="false"
             :showText="isSidebarOpen"
           />
+          <NavLink
+            to="/subscription"
+            icon="Gem"
+            :text="isSidebarOpen ? 'Abonnement' : ''"
+            :active="false"
+            :showText="isSidebarOpen"
+          />
 
           <!-- Section Admin -->
           <div v-if="userStore.isAdmin" class="mt-6">
