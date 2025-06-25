@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BillingAddressComponent from "@/components/cards/BillingAddressComponent.vue";
 import { ref, onMounted } from "vue";
 //import { useUserStore } from "@/stores/user";
 
@@ -50,9 +51,7 @@ const tabs = [
     </div>
     <div v-else-if="activeTab === 'adresse'">
       <!-- Contenu Adresse de facturation -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <p class="font-outfit text-black">Adresse de facturation à afficher ici.</p>
-      </div>
+      <BillingAddressComponent />
     </div>
     <div v-else-if="activeTab === 'paiement'">
       <!-- Contenu Information de paiement -->

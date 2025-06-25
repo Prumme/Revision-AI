@@ -21,7 +21,7 @@ const country = ref("");
 onMounted(async () => {
   const customer = await userStore.fetchCustomerInfo();
 
-  if (customer) {
+  if (customer && customer.customer) {
     firstName.value = customer.customer.firstName || "";
     lastName.value = customer.customer.lastName || "";
     line1.value = customer.customer.address?.line1 || "";

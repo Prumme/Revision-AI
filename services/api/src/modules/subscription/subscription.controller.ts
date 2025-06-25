@@ -59,9 +59,6 @@ export class SubscriptionController {
   @Get('/customer')
   async getCustomer(@Req() req: Request & { user: ReqUser }) {
     const customer = await this.authService.getCurrentCustomer(req.user);
-    if (!customer) {
-      return { message: 'No customer found' };
-    }
     return { customer };
   }
 
