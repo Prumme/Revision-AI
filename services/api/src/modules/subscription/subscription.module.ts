@@ -8,6 +8,7 @@ import { UserSchema } from '@mongo/user/user.schema';
 import { AuthModule } from '@modules/auth/auth.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
 import { MailerServiceProvider } from '@services/MailerService';
+import { StripeSubscriptionProvider } from '@infrastructure/stripe/StripeSubscriptionProvider';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MailerServiceProvider } from '@services/MailerService';
     SubscriptionPrvProvider,
     CustomerRepositoryProvider,
     MailerServiceProvider,
+    StripeSubscriptionProvider,
   ],
 })
 export class SubscriptionModule {}
