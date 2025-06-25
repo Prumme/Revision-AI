@@ -11,6 +11,7 @@ import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
 import AdminUserView from "@/views/admin/AdminUserView.vue";
 import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
+import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 
@@ -43,6 +44,11 @@ const router = createRouter({
           path: "/quizz",
           name: "quizz",
           component: QuizView,
+        },
+        {
+          path: "/subscription",
+          name: "subscription",
+          component: SubscriptionView,
         },
         {
           path: "/profile",

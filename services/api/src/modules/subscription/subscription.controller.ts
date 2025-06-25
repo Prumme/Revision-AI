@@ -64,4 +64,11 @@ export class SubscriptionController {
     }
     return { customer };
   }
+
+  @Get('/subscription-products')
+  async getSubscriptionProducts() {
+    const products = await this.subscriptionProvider.getStripeProductPrices();
+    if (products instanceof Error) throw products;
+    return { products };
+  }
 }

@@ -1,5 +1,6 @@
 import Stripe from 'stripe';
 import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
+import { SubscriptionInfo } from 'domain/value-objects/subscriptionPrice';
 import { SubscriptionProvider } from '@services/SubscriptionProvider';
 import { Injectable } from '@nestjs/common';
 import { CustomerIdentifier } from '@entities/customer.entity';
@@ -14,6 +15,40 @@ import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 export class StripeSubscriptionProvider implements SubscriptionProvider {
   private readonly stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   constructor() {}
+
+  async getStripeProductPrices(): Promise<SubscriptionInfo[] | Error> {
+    try {
+      // Add conditions to filter only product and prices that are for RevisionAI
+      const products = await this.stripe.products.list({
+        active: true,
+      });
+
+      const prices = await this.stripe.prices.list({
+        active: true,
+      });
+
+      const subscriptionInfos: SubscriptionInfo[] = products.data.map(
+        (product) => {
+          const price = prices.data.find(
+            (p) => p.product === product.id && p.active,
+          );
+          return {
+            productId: product.id,
+            productName: product.name,
+            priceId: price ? price.id : null,
+            recurringInterval: price ? price.recurring?.interval : null,
+            amount: price ? price.unit_amount || 0 : 0,
+            currency: price ? price.currency : 'eur',
+          };
+        },
+      );
+      subscriptionInfos.sort((a, b) => a.amount - b.amount);
+      return subscriptionInfos;
+    } catch (error) {
+      console.error('Error fetching Stripe product prices:', error);
+      return new Error('Failed to fetch Stripe product prices');
+    }
+  }
 
   async upsertCustomer(
     customerPayload: CustomerDto & { customerId?: string; email: string },
