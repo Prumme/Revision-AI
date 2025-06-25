@@ -28,7 +28,6 @@ export const useUserStore = defineStore("user", () => {
   }
 
   function setAvatar(newAvatar: string) {
-    console.log("newAvatar", newAvatar);
     user.value!.avatar = newAvatar;
   }
 
