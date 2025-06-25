@@ -9,14 +9,14 @@ import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 const products = ref<SubscriptionInfo[]>([]);
 
 const featuresMap: Record<string, string[]> = {
-  Basic: [
+  basic: [
     "Quiz illimités",
     "Taille fichier étendue (jusqu'à 50 Mo)",
     "Rappels intelligents",
     "Suivi de progression détaillé",
     "Génération par thème / niveau",
   ],
-  Pro: [
+  pro: [
     "Tout dans l'offre Basic",
     "Analyse avancée des cours",
     "Mode Révision Express",
@@ -65,36 +65,36 @@ onMounted(async () => {
           v-for="product in products"
           :key="product.productId"
           class="relative rounded-2xl shadow p-8 flex flex-col h-full"
-          :class="product.productName === 'Basic' ? 'bg-primary' : ''"
+          :class="product.productName === 'basic' ? 'bg-primary' : ''"
         >
           <h3
-            class="font-encode text-xl font-semibold mb-2"
-            :class="product.productName === 'Basic' ? 'text-white' : ''"
+            class="font-encode text-xl font-semibold mb-2 capitalize"
+            :class="product.productName === 'basic' ? 'text-white' : ''"
           >
             {{ product.productName }}
           </h3>
           <div
             class="font-outfit text-3xl font-bold mb-1"
-            :class="product.productName === 'Basic' ? 'text-white' : 'text-primary'"
+            :class="product.productName === 'basic' ? 'text-white' : 'text-primary'"
           >
             {{ (product.amount / 100).toFixed(2) }}&nbsp;€ / mois
           </div>
           <ul
             class="font-outfit text-sm mt-6 mb-6 space-y-4"
-            :class="product.productName === 'Basic' ? 'text-white' : 'text-gray-700'"
+            :class="product.productName === 'basic' ? 'text-white' : 'text-gray-700'"
           >
             <li
               v-for="feature in featuresMap[product.productName]"
               :key="feature"
               class="flex items-center gap-2"
             >
-              <CheckIcon :class="product.productName === 'Basic' ? 'text-white' : 'text-primary'" />
+              <CheckIcon :class="product.productName === 'basic' ? 'text-white' : 'text-primary'" />
               {{ feature }}
             </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
             <ButtonComponent
-              :variant="product.productName === 'Basic' ? 'secondary-inverted' : 'secondary'"
+              :variant="product.productName === 'basic' ? 'secondary-inverted' : 'secondary'"
             >
               S'inscrire
             </ButtonComponent>

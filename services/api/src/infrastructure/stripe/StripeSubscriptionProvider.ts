@@ -4,17 +4,71 @@ import { SubscriptionInfo } from 'domain/value-objects/subscriptionPrice';
 import { SubscriptionProvider } from '@services/SubscriptionProvider';
 import { Injectable } from '@nestjs/common';
 import { CustomerIdentifier } from '@entities/customer.entity';
-import {
-  StripeSubscriptionDict,
-  StripeSubscriptionDictReverse,
-} from './StripeSubscriptionDict';
 import { CustomerNotFoundError } from '../../domain/errors/SubscriptionError';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 
 @Injectable()
 export class StripeSubscriptionProvider implements SubscriptionProvider {
   private readonly stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  constructor() {}
+  private stripeProductIdToTier: Record<string, SubscriptionTier> = {};
+  private tierToStripeProductId: Partial<Record<SubscriptionTier, string>> = {};
+  private mappingInitialized = false;
+
+  constructor() {
+    this.initStripeMappings();
+  }
+
+  private async initStripeMappings() {
+    if (this.mappingInitialized) return;
+    const productsOrError = await this.getStripeProductPrices();
+    if (productsOrError instanceof Error) {
+      console.error('Failed to initialize Stripe mappings:', productsOrError);
+      return;
+    }
+    const products = productsOrError;
+    for (const product of products) {
+      // Convention: productName doit correspondre à SubscriptionTier (ex: 'Basic', 'Pro')
+      let tier: SubscriptionTier | undefined;
+      switch (product.productName.toLowerCase()) {
+        case 'basic':
+          tier = SubscriptionTier.BASIC;
+          break;
+        case 'pro':
+          tier = SubscriptionTier.PRO;
+          break;
+        default:
+          console.warn(
+            `Produit Stripe inconnu pour le mapping: ${product.productName}`,
+          );
+          continue;
+      }
+      this.stripeProductIdToTier[product.productId] = tier;
+      this.tierToStripeProductId[tier] = product.productId;
+    }
+    this.mappingInitialized = true;
+  }
+
+  private async ensureMappingsInitialized() {
+    if (!this.mappingInitialized) {
+      await this.initStripeMappings();
+    }
+  }
+
+  async getTierByProductId(
+    productId: string,
+  ): Promise<SubscriptionTier | undefined> {
+    await this.ensureMappingsInitialized();
+    return this.stripeProductIdToTier[productId];
+  }
+
+  async getProductIdByTier(
+    tier: SubscriptionTier,
+  ): Promise<string | undefined> {
+    await this.ensureMappingsInitialized();
+    // FREE n'est jamais dans le mapping
+    if (tier === SubscriptionTier.FREE) return undefined;
+    return this.tierToStripeProductId[tier];
+  }
 
   async getStripeProductPrices(): Promise<SubscriptionInfo[] | Error> {
     try {
@@ -104,7 +158,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
 
     const subscription = subscriptions.data[0];
     const productId = subscription.items.data[0].price.product as string;
-    const tier = StripeSubscriptionDict[productId];
+    const tier = await this.getTierByProductId(productId);
     if (!tier) return new Error('Customer is subscribed to an unknown tier');
     return tier;
   }
@@ -154,7 +208,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
       return new CustomerNotFoundError(customerIdentifier);
     }
 
-    const productId = StripeSubscriptionDictReverse[tier];
+    const productId = await this.getProductIdByTier(tier);
     if (!productId) return new Error('Invalid subscription tier');
     try {
       const priceId = await this.stripe.prices
