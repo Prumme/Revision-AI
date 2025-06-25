@@ -27,6 +27,10 @@ export const useUserStore = defineStore("user", () => {
     user.value = newUser;
   }
 
+  function setAvatar(newAvatar: string) {
+    user.value!.avatar = newAvatar;
+  }
+
   function setToken(newToken: string) {
     token.value = newToken;
     localStorage.setItem("token", newToken);
@@ -162,5 +166,6 @@ export const useUserStore = defineStore("user", () => {
     logout,
     fetchCurrentUser,
     updateUser,
+    setAvatar,
   };
 });
