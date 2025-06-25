@@ -42,26 +42,19 @@ export class ApiService {
       requestHeaders["Authorization"] = `Bearer ${token}`;
     }
 
-    console.log("body", bodyToParse);
+    const isFormData = bodyToParse instanceof FormData;
+    const body = isFormData ? bodyToParse : JSON.stringify(bodyToParse ?? {});
 
-    const options: RequestInit = {
-      method,
-      headers: requestHeaders
-    };
-
-    // N'ajouter un body que si ce n'est pas une requête GET ou HEAD
-    if (bodyToParse !== undefined && method !== "GET" && method !== "HEAD") {
-      if (bodyToParse instanceof FormData) {
-        // Si c'est un FormData, supprimer Content-Type pour laisser le navigateur définir la limite multipart
-        delete requestHeaders["Content-Type"];
-        options.body = bodyToParse;
-      } else {
-        options.body = JSON.stringify(bodyToParse);
-      }
+    if (isFormData) {
+      delete requestHeaders["Content-Type"];
     }
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, {
+        method,
+        headers: requestHeaders,
+        body,
+      });
 
       const data = await response.json();
 
