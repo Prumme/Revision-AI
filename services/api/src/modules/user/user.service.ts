@@ -30,6 +30,7 @@ export class UserService {
       lastUpdatedPassword: new Date(),
       emailVerified: false,
       role: 'user',
+      subscriptionTier: 'free', // Niveau d'abonnement par défaut
       createdAt: new Date(),
       updatedAt: new Date(),
       deleted: false,

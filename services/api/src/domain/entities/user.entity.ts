@@ -6,6 +6,7 @@ export interface User {
   lastUpdatedPassword: Date;
   emailVerified: boolean;
   role: string;
+  subscriptionTier: string; // Niveau d'abonnement de l'utilisateur
   createdAt: Date;
   updatedAt: Date;
   customerId?: string; // Optional, as not all users may be customers

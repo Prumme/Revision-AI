@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import { ApiService } from "@/services/api.service";
 import { useToastStore } from "@/stores/toast";
-import { useUserStore } from "@/stores/user";
+
+const props = defineProps({
+  customer: {
+    type: Object,
+    default: null,
+  },
+});
+
+const emit = defineEmits(["updated"]);
 
 const toastStore = useToastStore();
-const userStore = useUserStore();
 
 const firstName = ref("");
 const lastName = ref("");
@@ -18,20 +25,23 @@ const state = ref("");
 const postalCode = ref("");
 const country = ref("");
 
-onMounted(async () => {
-  const customer = await userStore.fetchCustomerInfo();
-
-  if (customer && customer.customer) {
-    firstName.value = customer.customer.firstName || "";
-    lastName.value = customer.customer.lastName || "";
-    line1.value = customer.customer.address?.line1 || "";
-    line2.value = customer.customer.address?.line2 || "";
-    city.value = customer.customer.address?.city || "";
-    state.value = customer.customer.address?.state || "";
-    postalCode.value = customer.customer.address?.postal_code || "";
-    country.value = customer.customer.address?.country || "";
-  }
-});
+// Initialiser les champs du formulaire lorsque customer change
+watch(
+  () => props.customer,
+  (newCustomer) => {
+    if (newCustomer && newCustomer.customer) {
+      firstName.value = newCustomer.customer.firstName || "";
+      lastName.value = newCustomer.customer.lastName || "";
+      line1.value = newCustomer.customer.address?.line1 || "";
+      line2.value = newCustomer.customer.address?.line2 || "";
+      city.value = newCustomer.customer.address?.city || "";
+      state.value = newCustomer.customer.address?.state || "";
+      postalCode.value = newCustomer.customer.address?.postal_code || "";
+      country.value = newCustomer.customer.address?.country || "";
+    }
+  },
+  { immediate: true },
+);
 
 const isFormValid = computed(() => {
   return line1.value && city.value && state.value && postalCode.value && country.value;
@@ -44,7 +54,7 @@ const handleSubmit = async () => {
   }
 
   try {
-    await ApiService.put<Customer>(
+    await ApiService.put(
       "/subscription/customer",
       {
         firstName: firstName.value,
@@ -62,6 +72,7 @@ const handleSubmit = async () => {
     );
 
     toastStore.showToast("success", "Votre adresse de facturation a été mise à jour avec succès");
+    emit("updated"); // Émettre l'événement après une mise à jour réussie
   } catch (error) {
     const errorMessage =
       error instanceof Error

@@ -2,6 +2,7 @@ export interface User {
   id: string;
   username: string;
   email: string;
+  subscriptionTier: string;
   profilePicture?: string;
   avatar?: string;
   bio?: string;
