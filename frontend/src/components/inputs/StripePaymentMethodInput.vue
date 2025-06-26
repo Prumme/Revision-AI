@@ -7,6 +7,8 @@ const cardElement = ref<HTMLElement | null>(null);
 const errorMessage = ref("");
 const isCardValid = ref(false);
 const isCardComplete = ref(false);
+const isCardEmpty = ref(true);
+const isProcessing = ref(false);
 
 let stripe: Stripe | null = null;
 let card: StripeCardElement | null = null;
@@ -49,37 +51,49 @@ const createCardStyles = () => {
 };
 
 onMounted(async () => {
-  stripe = await loadStripe(
-    "pk_test_51RXLRGPK9ltfb6kbBwDbGkiAJG4wDDjSVS7kGnovrqzQnglpc4uOUlp2XOVL1vI5txShBmo4pomwBRnY76fP510000bGMPAWnG",
-  );
+  try {
+    stripe = await loadStripe(
+      "pk_test_51RXLRGPK9ltfb6kbBwDbGkiAJG4wDDjSVS7kGnovrqzQnglpc4uOUlp2XOVL1vI5txShBmo4pomwBRnY76fP510000bGMPAWnG",
+    );
 
-  if (!stripe) {
-    errorMessage.value = "Stripe n'a pas pu être initialisé.";
-    return;
+    if (!stripe) {
+      errorMessage.value = "Stripe n'a pas pu être initialisé.";
+      return;
+    }
+
+    const elements = stripe.elements({
+      appearance: {
+        theme: "stripe",
+        variables: createStripeTheme(),
+      },
+    });
+
+    card = elements.create("card", {
+      style: createCardStyles(),
+    });
+
+    if (cardElement.value) {
+      card.mount(cardElement.value);
+    } else {
+      return;
+    }
+
+    // Gestionnaire d'événements
+    card.on("change", (event) => {
+      // Mise à jour des états
+      errorMessage.value = event.error?.message || "";
+      isCardEmpty.value = event.empty;
+      isCardComplete.value = event.complete;
+
+      // Une carte est valide si elle n'a pas d'erreur ET n'est pas vide
+      isCardValid.value = !event.error && !event.empty;
+    });
+  } catch (error) {
+    errorMessage.value =
+      error instanceof Error
+        ? error.message
+        : "Erreur lors de l'initialisation du système de paiement.";
   }
-
-  const elements = stripe.elements({
-    appearance: {
-      theme: "stripe",
-      variables: createStripeTheme(),
-    },
-  });
-
-  card = elements.create("card", {
-    style: createCardStyles(),
-  });
-
-  if (cardElement.value) {
-    card.mount(cardElement.value);
-  } else {
-    console.error("❌ cardElement.value is null");
-  }
-
-  card.on("change", (event) => {
-    errorMessage.value = event.error?.message || "";
-    isCardValid.value = !event.error;
-    isCardComplete.value = event.complete;
-  });
 });
 
 const submitPaymentMethod = async () => {
@@ -88,17 +102,44 @@ const submitPaymentMethod = async () => {
     return;
   }
 
-  const { paymentMethod, error } = await stripe.createPaymentMethod({
-    type: "card",
-    card: card,
-  });
-
-  if (error) {
-    errorMessage.value = error.message || "Une erreur est survenue lors du traitement du paiement";
-  } else {
-    console.log("✅ PaymentMethod ID:", paymentMethod.id);
-    // TODO: Envoyer paymentMethod.id à votre backend
+  if (!isCardValid.value || !isCardComplete.value) {
+    errorMessage.value = "Veuillez compléter les informations de la carte.";
+    return;
   }
+
+  isProcessing.value = true;
+  errorMessage.value = "";
+
+  try {
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: "card",
+      card: card,
+    });
+
+    if (error) {
+      errorMessage.value =
+        error.message || "Une erreur est survenue lors du traitement du paiement";
+    } else {
+      console.log("Payment Method created:", paymentMethod);
+    }
+  } catch (error) {
+    errorMessage.value =
+      error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+  } finally {
+    isProcessing.value = false;
+  }
+};
+
+// Fonction utilitaire pour vérifier si le bouton doit être activé
+const isButtonEnabled = () => {
+  return (
+    stripe &&
+    card &&
+    isCardValid.value &&
+    isCardComplete.value &&
+    !isCardEmpty.value &&
+    !isProcessing.value
+  );
 };
 </script>
 
@@ -121,6 +162,10 @@ const submitPaymentMethod = async () => {
       <div
         ref="cardElement"
         class="stripe-card-element bg-white border-2 border-gray-300 rounded-lg p-4 transition-all duration-200 focus-within:border-primary hover:border-gray-400"
+        :class="{
+          'border-error': errorMessage && !isCardEmpty,
+          'border-green-500': isCardValid && isCardComplete && !errorMessage,
+        }"
       ></div>
 
       <!-- Message d'erreur -->
@@ -136,10 +181,33 @@ const submitPaymentMethod = async () => {
     <!-- Bouton de soumission -->
     <button
       @click="submitPaymentMethod"
-      :disabled="!stripe || !card || !isCardValid || !isCardComplete"
+      :disabled="!isButtonEnabled()"
       class="w-full bg-primary text-black font-outfit font-medium text-base px-6 py-3 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
     >
-      Confirmer le paiement
+      <span v-if="!isProcessing">Confirmer le paiement</span>
+      <span v-else class="flex items-center justify-center gap-2">
+        <svg
+          class="animate-spin h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        Traitement en cours...
+      </span>
     </button>
 
     <!-- Informations de sécurité -->
@@ -182,5 +250,19 @@ const submitPaymentMethod = async () => {
 /* Style du placeholder et du texte dans l'élément Stripe */
 .StripeElement {
   font-family: var(--font-outfit) !important;
+}
+
+/* Animation du spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 </style>
