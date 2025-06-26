@@ -6,7 +6,7 @@ import AvatarComponent from "./avatar/AvatarComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { API_URL } from "@/config/api";
 
-const { user, token } = useUserStore();
+const { user, token, setAvatar } = useUserStore();
 
 const profilePicture = ref<string | null>(null);
 const showSuccessToast = ref(false);
@@ -40,9 +40,11 @@ const handleFileChange = async (event: Event) => {
       }
 
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         if (e.target && e.target.result) {
           updateProfilePicture(e.target.result as string);
+          const data = await response.json();
+          setAvatar(data.user.avatar);
           showSuccessToast.value = true;
         }
       };
