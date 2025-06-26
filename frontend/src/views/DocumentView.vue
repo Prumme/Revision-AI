@@ -82,10 +82,10 @@ const deleteDocument = (document: Document) => {
   }
 };
 
-const fetchDocuments = async () => {
-  const response = await ApiService.get("/documents/me");
-  documents.value = response.data;
-};
+// const fetchDocuments = async () => {
+//   const response = await ApiService.get("/documents/me");
+//   documents.value = response.data;
+// };
 </script>
 
 <template>
