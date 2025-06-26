@@ -5,25 +5,9 @@ import { CheckIcon } from "lucide-vue-next";
 import { ref, onMounted } from "vue";
 import { fetchSubscriptionProducts } from "@/services/subscription.service";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
+import { SUBSCRIPTION_FEATURES, type SubscriptionTier } from "@/config/subscription.config";
 
 const products = ref<SubscriptionInfo[]>([]);
-
-const featuresMap: Record<string, string[]> = {
-  basic: [
-    "Quiz illimités",
-    "Taille fichier étendue (jusqu'à 50 Mo)",
-    "Rappels intelligents",
-    "Suivi de progression détaillé",
-    "Génération par thème / niveau",
-  ],
-  pro: [
-    "Tout dans l'offre Basic",
-    "Analyse avancée des cours",
-    "Mode Révision Express",
-    "Création de sessions de révision intelligentes",
-    "Assistance prioritaire",
-  ],
-};
 
 onMounted(async () => {
   const response = await fetchSubscriptionProducts();
@@ -44,15 +28,12 @@ onMounted(async () => {
           <h3 class="font-encode text-xl font-semibold mb-2">Gratuit</h3>
           <div class="font-outfit text-3xl font-bold mb-1 text-primary">0&nbsp;€ / mois</div>
           <ul class="font-outfit text-gray-700 text-sm mt-6 mb-6 space-y-4">
-            <li class="flex items-center gap-2"><CheckIcon class="text-primary" />1 quiz / jour</li>
-            <li class="flex items-center gap-2">
-              <CheckIcon class="text-primary" />Fichier max 10 Mo
-            </li>
-            <li class="flex items-center gap-2">
-              <CheckIcon class="text-primary" />Pas de rappel intelligent
-            </li>
-            <li class="flex items-center gap-2">
-              <CheckIcon class="text-primary" />Historique limité
+            <li
+              v-for="feature in SUBSCRIPTION_FEATURES.free"
+              :key="feature"
+              class="flex items-center gap-2"
+            >
+              <CheckIcon class="text-primary" />{{ feature }}
             </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
@@ -84,7 +65,7 @@ onMounted(async () => {
             :class="product.productName === 'basic' ? 'text-white' : 'text-gray-700'"
           >
             <li
-              v-for="feature in featuresMap[product.productName]"
+              v-for="feature in SUBSCRIPTION_FEATURES[product.productName as SubscriptionTier]"
               :key="feature"
               class="flex items-center gap-2"
             >
