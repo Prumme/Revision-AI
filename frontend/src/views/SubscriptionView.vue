@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BillingAddressComponent from "@/components/cards/BillingAddressComponent.vue";
+import BillingPlanCard from "@/components/cards/BillingPlanCard.vue";
 import { ref, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 
@@ -7,7 +8,7 @@ const userStore = useUserStore();
 const activeTab = ref("apercu");
 const customer = ref(null);
 
-//const user = userStore.user;
+const user = userStore.user;
 
 const fetchCustomerInfo = async () => {
   customer.value = await userStore.fetchCustomerInfo();
@@ -51,9 +52,7 @@ const tabs = [
     <!-- Tab Contents -->
     <div v-if="activeTab === 'apercu'">
       <!-- Contenu Aperçu -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <p class="font-outfit text-black">Contenu de l’aperçu de l’abonnement.</p>
-      </div>
+      <BillingPlanCard :user="user" />
     </div>
     <div v-else-if="activeTab === 'adresse'">
       <!-- Contenu Adresse de facturation -->
