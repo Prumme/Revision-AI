@@ -80,9 +80,9 @@ const handleLogout = () => {
             :showText="isSidebarOpen"
           />
           <NavLink
-            to="/courses"
+            to="/documents"
             icon="File"
-            :text="isSidebarOpen ? 'Cours' : ''"
+            :text="isSidebarOpen ? 'Documents' : ''"
             :active="false"
             :showText="isSidebarOpen"
           />

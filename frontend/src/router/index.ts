@@ -12,7 +12,7 @@ import EmailSend from "@/views/authentication/EmailSend.vue";
 import AdminUserView from "@/views/admin/AdminUserView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
-
+import DocumentView from "@/views/DocumentView.vue";
 import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
@@ -36,7 +36,7 @@ const router = createRouter({
         {
           path: "/documents",
           name: "documents",
-          component: DashboardView,
+          component: DocumentView,
         },
         {
           path: "/quizz",
