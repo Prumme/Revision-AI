@@ -3,8 +3,9 @@ import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 
 export async function fetchSubscriptionProducts() {
   try {
-    const response = await ApiService.get<SubscriptionInfo[]>(
+    const response = await ApiService.get<{ products: SubscriptionInfo[] }>(
       "/subscription/subscription-products",
+      false,
     );
     return response.data;
   } catch (error) {

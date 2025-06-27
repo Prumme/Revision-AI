@@ -61,7 +61,7 @@ const currentPlanFeatures = computed(() => {
 const canUpgrade = computed(() => props.user?.subscriptionTier !== "pro");
 
 const handleUpgrade = () => {
-  router.push("/checkout");
+  router.push("/subscription/checkout");
 };
 
 const handleCancelSubscription = () => {
@@ -140,7 +140,7 @@ onMounted(async () => {
       </div>
 
       <!-- Plan features -->
-      <div class="border-t pt-4">
+      <div class="border-t pt-4 border-gray-200">
         <h4 class="font-outfit font-semibold text-gray-900 mb-3">Fonctionnalités incluses :</h4>
         <ul class="space-y-2">
           <li
