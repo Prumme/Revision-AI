@@ -200,7 +200,7 @@ const isButtonEnabled = () => {
       :disabled="!isButtonEnabled()"
       class="w-full bg-primary text-black font-outfit font-medium text-base px-6 py-3 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
     >
-      <span v-if="!isProcessing">Confirmer le paiement</span>
+      <span v-if="!isProcessing">Ajouter ma carte</span>
       <span v-else class="flex items-center justify-center gap-2">
         <svg
           class="animate-spin h-4 w-4"

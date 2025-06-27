@@ -96,32 +96,5 @@ const handlePaymentMethodCreated = (paymentMethod: PaymentMethod) => {
         Vous pouvez maintenant passer à l'étape suivante pour finaliser votre abonnement.
       </p>
     </div>
-
-    <!-- Payment security info -->
-    <div class="bg-gray-50 rounded-lg p-4">
-      <div class="flex items-start gap-3">
-        <div
-          class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
-        >
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-        </div>
-        <div>
-          <h4 class="font-outfit font-semibold text-gray-900 text-sm mb-1">
-            Paiement 100% sécurisé
-          </h4>
-          <p class="font-outfit text-sm text-gray-600">
-            Vos informations de paiement sont traitées de manière sécurisée par Stripe. Nous ne
-            stockons pas vos données de carte bancaire sur nos serveurs.
-          </p>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
