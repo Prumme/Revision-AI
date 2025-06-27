@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { onUnmounted } from "vue";
+import { onUnmounted, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCheckoutFlow } from "@/composables/useCheckoutFlow";
 import CheckoutStepper from "@/components/checkout/CheckoutStepper.vue";
 import PlanSelectionStep from "@/components/checkout/PlanSelectionStep.vue";
 import BillingAddressStep from "@/components/checkout/BillingAddressStep.vue";
 import PaymentMethodStep from "@/components/checkout/PaymentMethodStep.vue";
+import OrderSummaryStep from "@/components/checkout/OrderSummaryStep.vue";
+import { useUserStore } from "@/stores/user";
+import type { SubscriptionInfo } from "@/types/subscriptionInfo";
+import type { CheckoutData } from "@/composables/useCheckoutFlow";
 
 const router = useRouter();
 const checkout = useCheckoutFlow();
+const userStore = useUserStore();
 
-// Placeholder components pour les étapes restantes (à créer dans les prochaines étapes)
-const OrderSummaryStep = {
-  template:
-    "<div class='p-8 bg-gray-50 rounded-lg text-center'><h3 class='font-outfit text-xl'>Étape 4: Récapitulatif</h3><p class='text-gray-600 mt-2'>À implémenter dans l'étape 5</p></div>",
-};
+const isOrderLoading = ref(false);
+const orderError = ref<string | null>(null);
 
 const handleStepNavigation = (stepIndex: number) => {
   checkout.goToStep(stepIndex);
@@ -32,6 +34,55 @@ const handleCancel = () => {
   checkout.resetCheckout();
   router.push("/subscription");
 };
+
+const handlePlanSelected = (plan: SubscriptionInfo | null) => {
+  checkout.updateSelectedPlan(plan);
+};
+
+const handleBillingAddressUpdate = (address: Partial<CheckoutData["billingAddress"]>) => {
+  checkout.updateBillingAddress(address);
+};
+
+const handleOrderConfirm = async () => {
+  isOrderLoading.value = true;
+  orderError.value = null;
+  try {
+    console.log("Confirmation de la commande avec les données :", checkout.state.data);
+    // TODO: Appel API pour finaliser l'abonnement
+    // await api.subscribe({ ... });
+    // Rediriger ou afficher un message de succès
+  } catch (e) {
+    orderError.value =
+      e instanceof Error ? e.message : "Erreur lors de la validation de l'abonnement.";
+  } finally {
+    isOrderLoading.value = false;
+  }
+};
+
+// Chargement automatique des infos de facturation utilisateur
+onMounted(async () => {
+  try {
+    checkout.setLoading(true);
+    const customerInfo = await userStore.fetchCustomerInfo();
+    if (customerInfo && customerInfo.customer) {
+      checkout.updateBillingAddress({
+        firstName: customerInfo.customer.firstName || "",
+        lastName: customerInfo.customer.lastName || "",
+        line1: customerInfo.customer.address?.line1 || "",
+        line2: customerInfo.customer.address?.line2 || "",
+        city: customerInfo.customer.address?.city || "",
+        state: customerInfo.customer.address?.state || "",
+        postalCode: customerInfo.customer.address?.postal_code || "",
+        country: customerInfo.customer.address?.country || "",
+      });
+    }
+  } catch (error) {
+    checkout.setError("Erreur lors du chargement de vos informations de facturation");
+    console.error("Erreur lors de la récupération des informations client:", error);
+  } finally {
+    checkout.setLoading(false);
+  }
+});
 
 // Nettoyage au démontage
 onUnmounted(() => {
@@ -54,7 +105,6 @@ onUnmounted(() => {
     <CheckoutStepper
       :steps="checkout.stepsWithStatus.value"
       :current-step-index="checkout.state.currentStepIndex"
-      :progress-percentage="checkout.progressPercentage.value"
       @go-to-step="handleStepNavigation"
     />
 
@@ -98,18 +148,35 @@ onUnmounted(() => {
       <!-- Step content -->
       <div v-else class="p-6">
         <!-- Plan Selection Step -->
-        <PlanSelectionStep v-if="checkout.currentStep.value.id === 'plan-selection'" />
+        <PlanSelectionStep
+          v-if="checkout.currentStep.value.id === 'plan-selection'"
+          @select-plan="handlePlanSelected"
+          :selected-plan="checkout.state.data.selectedPlan"
+        />
 
         <!-- Billing Address Step -->
-        <BillingAddressStep v-else-if="checkout.currentStep.value.id === 'billing-address'" />
+        <BillingAddressStep
+          v-else-if="checkout.currentStep.value.id === 'billing-address'"
+          :billing-address="checkout.state.data.billingAddress"
+          @update-billing-address="handleBillingAddressUpdate"
+        />
 
         <!-- Payment Method Step -->
-        <PaymentMethodStep v-else-if="checkout.currentStep.value.id === 'payment-method'" />
+        <PaymentMethodStep
+          v-else-if="checkout.currentStep.value.id === 'payment-method'"
+          :payment-method="checkout.state.data.paymentMethod"
+          @update-payment-method="checkout.updatePaymentMethod"
+        />
 
         <!-- Order Summary Step -->
-        <component
+        <OrderSummaryStep
           v-else-if="checkout.currentStep.value.id === 'order-summary'"
-          :is="OrderSummaryStep"
+          :selected-plan="checkout.state.data.selectedPlan"
+          :billing-address="checkout.state.data.billingAddress"
+          :payment-method="checkout.state.data.paymentMethod"
+          :is-loading="isOrderLoading"
+          :error="orderError"
+          @confirm-order="handleOrderConfirm"
         />
       </div>
     </div>
@@ -144,15 +211,6 @@ onUnmounted(() => {
           class="bg-primary hover:bg-primary/90 text-black font-outfit font-medium px-6 py-2 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
         >
           Suivant
-        </button>
-
-        <button
-          v-else
-          @click="handleNext"
-          :disabled="!checkout.canGoNext.value"
-          class="bg-green-500 hover:bg-green-600 text-white font-outfit font-medium px-6 py-2 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
-        >
-          Finaliser l'achat
         </button>
       </div>
     </div>

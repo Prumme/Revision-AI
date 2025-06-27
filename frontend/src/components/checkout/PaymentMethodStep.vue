@@ -3,13 +3,18 @@ import { ref, computed } from "vue";
 import { useCheckoutFlow } from "@/composables/useCheckoutFlow";
 import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 import type { PaymentMethod } from "@stripe/stripe-js";
+import type { CheckoutData } from "@/composables/useCheckoutFlow";
 
-const checkout = useCheckoutFlow();
+const emit =
+  defineEmits<
+    (event: "update-payment-method", paymentInfo: Partial<CheckoutData["paymentMethod"]>) => void
+  >();
 
 // État local pour le composant
 const paymentMethodCreated = ref(false);
 
 // Computed pour les informations du plan sélectionné
+const checkout = useCheckoutFlow();
 const selectedPlan = computed(() => checkout.state.data.selectedPlan);
 const planPrice = computed(() => {
   if (!selectedPlan.value) return "0.00";
@@ -19,7 +24,7 @@ const planName = computed(() => selectedPlan.value?.productName.toUpperCase() ||
 
 // Gestionnaire pour les changements de validation
 const handleValidationChange = (isValid: boolean, isComplete: boolean) => {
-  checkout.updatePaymentMethod({
+  emit("update-payment-method", {
     isValid,
     isComplete,
   });
@@ -28,16 +33,12 @@ const handleValidationChange = (isValid: boolean, isComplete: boolean) => {
 // Gestionnaire pour la création de la méthode de paiement
 const handlePaymentMethodCreated = (paymentMethod: PaymentMethod) => {
   paymentMethodCreated.value = true;
-
-  // Sauvegarder la paymentMethod complète dans l'état
-  checkout.updatePaymentMethod({
+  emit("update-payment-method", {
     isValid: true,
     isComplete: true,
     paymentMethodId: paymentMethod.id,
     paymentMethodObject: paymentMethod,
   });
-
-  console.log("PaymentMethod sauvegardée:", paymentMethod);
 };
 </script>
 

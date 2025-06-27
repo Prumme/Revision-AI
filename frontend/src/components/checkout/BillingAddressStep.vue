@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
-import { useCheckoutFlow } from "@/composables/useCheckoutFlow";
-import { useUserStore } from "@/stores/user";
+import { ref, computed, onMounted, defineProps, defineEmits, watch } from "vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import { ApiService } from "@/services/api.service";
+import type { CheckoutData } from "@/composables/useCheckoutFlow";
 
-const checkout = useCheckoutFlow();
-const userStore = useUserStore();
+const props = defineProps<{ billingAddress: CheckoutData["billingAddress"] }>();
+const emit =
+  defineEmits<
+    (event: "update-billing-address", address: Partial<CheckoutData["billingAddress"]>) => void
+  >();
 
-// Références pour les champs du formulaire
-const firstName = ref("");
-const lastName = ref("");
-const line1 = ref("");
-const line2 = ref("");
-const city = ref("");
-const state = ref("");
-const postalCode = ref("");
-const country = ref("");
+const firstName = ref(props.billingAddress.firstName || "");
+const lastName = ref(props.billingAddress.lastName || "");
+const line1 = ref(props.billingAddress.line1 || "");
+const line2 = ref(props.billingAddress.line2 || "");
+const city = ref(props.billingAddress.city || "");
+const state = ref(props.billingAddress.state || "");
+const postalCode = ref(props.billingAddress.postalCode || "");
+const country = ref(props.billingAddress.country || "");
 
 const isLoading = ref(false);
-const customer = ref(null);
 
 // Computed pour la validation
 const isFormValid = computed(() => {
@@ -34,9 +34,9 @@ const isFormValid = computed(() => {
   );
 });
 
-// Watcher pour mettre à jour l'état du checkout quand les champs changent
+// Watcher pour émettre l'événement de mise à jour de l'adresse de facturation quand les champs changent
 watch([firstName, lastName, line1, line2, city, state, postalCode, country], () => {
-  checkout.updateBillingAddress({
+  emit("update-billing-address", {
     firstName: firstName.value,
     lastName: lastName.value,
     line1: line1.value,
@@ -47,35 +47,6 @@ watch([firstName, lastName, line1, line2, city, state, postalCode, country], () 
     country: country.value,
   });
 });
-
-// Fonction pour récupérer les informations client existantes
-const fetchCustomerInfo = async () => {
-  try {
-    isLoading.value = true;
-    checkout.setLoading(true);
-
-    const customerInfo = await userStore.fetchCustomerInfo();
-    customer.value = customerInfo;
-
-    // Pré-remplir les champs avec les données existantes
-    if (customerInfo && customerInfo.customer) {
-      firstName.value = customerInfo.customer.firstName || "";
-      lastName.value = customerInfo.customer.lastName || "";
-      line1.value = customerInfo.customer.address?.line1 || "";
-      line2.value = customerInfo.customer.address?.line2 || "";
-      city.value = customerInfo.customer.address?.city || "";
-      state.value = customerInfo.customer.address?.state || "";
-      postalCode.value = customerInfo.customer.address?.postal_code || "";
-      country.value = customerInfo.customer.address?.country || "";
-    }
-  } catch (error) {
-    console.error("Erreur lors de la récupération des informations client:", error);
-    checkout.setError("Erreur lors du chargement de vos informations");
-  } finally {
-    isLoading.value = false;
-    checkout.setLoading(false);
-  }
-};
 
 // Fonction pour sauvegarder l'adresse (optionnel - pour mettre à jour en temps réel)
 const saveAddress = async () => {
@@ -103,8 +74,8 @@ const saveAddress = async () => {
   }
 };
 
-onMounted(async () => {
-  await fetchCustomerInfo();
+onMounted(() => {
+  // Aucune donnée à charger, les props sont déjà fournies par le parent
 });
 </script>
 

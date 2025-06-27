@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, defineProps, defineEmits } from "vue";
 import { fetchSubscriptionProducts } from "@/services/subscription.service";
-import { useCheckoutFlow } from "@/composables/useCheckoutFlow";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import CheckoutPlanCard from "@/components/checkout/CheckoutPlanCard.vue";
 
-const checkout = useCheckoutFlow();
+const props = defineProps<{ selectedPlan: SubscriptionInfo | null }>();
+const emit = defineEmits<(event: "select-plan", plan: SubscriptionInfo) => void>();
+
 const products = ref<SubscriptionInfo[]>([]);
 const loading = ref(true);
 
@@ -17,26 +18,20 @@ const availablePlans = computed(() => {
   );
 });
 
-const selectedPlan = computed({
-  get: () => checkout.state.data.selectedPlan,
-  set: (plan: SubscriptionInfo | null) => checkout.updateSelectedPlan(plan),
-});
-
 const handlePlanSelect = (plan: SubscriptionInfo) => {
-  selectedPlan.value = plan;
+  emit("select-plan", plan);
 };
 
 onMounted(async () => {
   try {
-    checkout.setLoading(true);
+    loading.value = true;
     const data = await fetchSubscriptionProducts();
     products.value = data.products || [];
   } catch (error) {
-    checkout.setError("Erreur lors du chargement des plans d'abonnement");
+    // Gérer l'erreur ici si besoin
     console.error("Erreur lors de la récupération des produits:", error);
   } finally {
     loading.value = false;
-    checkout.setLoading(false);
   }
 });
 </script>
@@ -62,7 +57,7 @@ onMounted(async () => {
         v-for="plan in availablePlans"
         :key="plan.productId"
         :plan="plan"
-        :is-selected="selectedPlan?.productId === plan.productId"
+        :is-selected="props.selectedPlan?.productId === plan.productId"
         @select="handlePlanSelect"
       />
     </div>
@@ -75,15 +70,14 @@ onMounted(async () => {
     </div>
 
     <!-- Selection summary -->
-    <div v-if="selectedPlan" class="bg-primary/5 border border-primary/20 rounded-lg p-4">
+    <div v-if="props.selectedPlan" class="bg-primary/5 border border-primary/20 rounded-lg p-4">
       <div class="flex items-center justify-between">
         <div>
           <h3 class="font-outfit font-semibold text-black">Plan sélectionné :</h3>
           <p class="font-outfit text-primary font-medium">
-            {{ selectedPlan.productName.toUpperCase() }} -
-            {{ (selectedPlan.amount / 100).toFixed(2) }}€ /{{
-              selectedPlan.recurringInterval === "month" ? "mois" : "an"
-            }}
+            {{ props.selectedPlan.productName.toUpperCase() }} -
+            {{ (props.selectedPlan.amount / 100).toFixed(2) }}€ /
+            {{ props.selectedPlan.recurringInterval === "month" ? "mois" : "an" }}
           </p>
         </div>
         <div class="text-right">
