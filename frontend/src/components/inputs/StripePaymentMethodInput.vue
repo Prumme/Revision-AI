@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { loadStripe, type Stripe, type StripeCardElement } from "@stripe/stripe-js";
+import {
+  loadStripe,
+  type Stripe,
+  type StripeCardElement,
+  type PaymentMethod,
+} from "@stripe/stripe-js";
 import { XCircleIcon, ShieldCheckIcon } from "lucide-vue-next";
+
+// Props et emits
+const emit = defineEmits<{
+  paymentMethodCreated: [paymentMethod: PaymentMethod];
+  validationChange: [isValid: boolean, isComplete: boolean];
+}>();
 
 const cardElement = ref<HTMLElement | null>(null);
 const errorMessage = ref("");
@@ -87,6 +98,9 @@ onMounted(async () => {
 
       // Une carte est valide si elle n'a pas d'erreur ET n'est pas vide
       isCardValid.value = !event.error && !event.empty;
+
+      // Émettre les changements de validation
+      emit("validationChange", isCardValid.value, isCardComplete.value);
     });
   } catch (error) {
     errorMessage.value =
@@ -121,6 +135,8 @@ const submitPaymentMethod = async () => {
         error.message || "Une erreur est survenue lors du traitement du paiement";
     } else {
       console.log("Payment Method created:", paymentMethod);
+      // Émettre la paymentMethod créée
+      emit("paymentMethodCreated", paymentMethod);
     }
   } catch (error) {
     errorMessage.value =

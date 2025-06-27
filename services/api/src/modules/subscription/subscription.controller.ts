@@ -12,6 +12,7 @@ import { ReqUser } from '@common/types/request';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailService } from '@infrastructure/resend/mail.service';
+import { Public } from '@common/decorators/public.decorator';
 
 @Controller('subscription')
 export class SubscriptionController {
@@ -63,6 +64,7 @@ export class SubscriptionController {
   }
 
   @Get('/subscription-products')
+  @Public()
   async getSubscriptionProducts() {
     const products = await this.subscriptionProvider.getStripeProductPrices();
     if (products instanceof Error) throw products;
