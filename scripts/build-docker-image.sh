@@ -17,6 +17,7 @@ for service in "${SERVICES_DIR}"/*; do
         
         # Check if Dockerfile exists
         if [ -f "${service}/Dockerfile" ]; then
+            echo "building revision-ai/${service_name}:latest"
             docker build -t "revision-ai/${service_name}:latest" \
                         --target production \
                         -f "${service}/Dockerfile" \
