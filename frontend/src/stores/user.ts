@@ -46,7 +46,7 @@ export const useUserStore = defineStore("user", () => {
     try {
       // Si pas de token, on ne fait pas la requête
       if (!token.value) {
-        clearUser();
+        // clearUser();
         router.push("/login");
         return;
       }

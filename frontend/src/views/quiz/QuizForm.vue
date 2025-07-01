@@ -7,7 +7,9 @@ import FormHeader from "@/components/forms/FormHeader.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import Select from "@/components/inputs/SelectComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
+import QuizLoadingSpinner from "@/components/loaders/QuizLoadingSpinner.vue";
 import { QuizService } from "@/services/quiz.service";
+import { useQuizLoadingStore } from "@/stores/quizLoading";
 import { useToastStore } from "@/stores/toast";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -15,12 +17,22 @@ import { useRouter } from "vue-router";
 // Router pour la redirection après création
 const router = useRouter();
 const toast = useToastStore();
+const quizLoadingStore = useQuizLoadingStore();
 
 // Quiz Data
-const formTitle = ref("Titre du quiz");
-const category = ref("");
+// const formTitle = ref("Titre du quiz");
+// const category = ref("");
+// const questionsNumbers = ref(5);
+// const description = ref("");
+// const isPublic = ref(false);
+// const media = ref<File | null>(null);
+// const isLoading = ref(false);
+
+// create a fake quiz data please
+const formTitle = ref("Test Quiz Creation");
+const category = ref("general_history");
 const questionsNumbers = ref(5);
-const description = ref("");
+const description = ref("Description du quiz");
 const isPublic = ref(false);
 const media = ref<File | null>(null);
 const isLoading = ref(false);
@@ -67,32 +79,38 @@ const generateQuiz = async () => {
       questionsNumbers: questionsNumbers.value,
       description: description.value || undefined,
       isPublic: isPublic.value,
-      // questions: generatedQuestions.value.length > 0 ? generatedQuestions.value : undefined,
+      status: "pending", // Définir le statut initial comme 'pending'
     };
 
     console.log("Données du quiz à envoyer:", quizData);
 
     // Préparation des fichiers
     const files = media.value ? [media.value] : [];
+    try {
+      // Appel au service pour créer le quiz
+      const createdQuiz = await QuizService.createQuiz(quizData, files);
+      console.log("Quiz créé:", createdQuiz);
 
-    // Appel au service pour créer le quiz
-    const createdQuiz = await QuizService.createQuiz(quizData, files);
+      // Démarrer le chargement avec l'ID du quiz pour suivre son état
+      quizLoadingStore.startLoading(createdQuiz.id);
 
-    // Mise à jour des questions si retournées par l'API
-    // if (createdQuiz.questions && createdQuiz.questions.length > 0) {
-    //   generatedQuestions.value = createdQuiz.questions;
-    // }
+      toast.showToast("success", "Quiz créé avec succès! Génération des questions en cours...");
 
-    toast.showToast("success", "Quiz créé avec succès!");
-
-    // Redirection vers la page du quiz créé ou une autre page
-    if (createdQuiz.id) {
-      // router.push(`/quiz/${createdQuiz.id}`);
+      // Redirection vers la liste des quiz où le spinner sera affiché
       router.push(`/quiz`);
+
+      // La redirection vers la page détaillée du quiz se fera automatiquement
+      // grâce au mécanisme de polling dans le quizLoadingStore
+    } catch (error) {
+      console.error("Erreur lors de la création du quiz:", error);
+      toast.showToast("error", "Une erreur est survenue lors de la création du quiz");
+      isLoading.value = false;
     }
+    // une fois la génération terminée grâce à l'observateur dans QuizList
   } catch (error) {
     console.error("Erreur lors de la génération du quiz:", error);
     toast.showToast("error", "Une erreur est survenue lors de la création du quiz");
+    quizLoadingStore.stopLoading(); // Arrêter le spinner en cas d'erreur
   } finally {
     isLoading.value = false;
   }
@@ -257,4 +275,9 @@ const generateQuiz = async () => {
       </div>
     </div>
   </section>
+
+  <QuizLoadingSpinner
+    v-if="quizLoadingStore.isLoading"
+    class="fixed bottom-6 right-6 z-50 bg-primary border-2 border-black shadow-[0_4px_0_#000] rounded-lg p-4 flex items-center justify-center"
+  />
 </template>

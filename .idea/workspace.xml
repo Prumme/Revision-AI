@@ -6,10 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/queue/queueProvider.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/queue/queueProvider.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/api/quizApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/api/quizApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,47 +34,47 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
     {
-      "state": "OPEN"
+      &quot;state&quot;: &quot;OPEN&quot;
     }
   ],
-  "lastFilter": {
-    "state": "OPEN"
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
   }
-}</component>
-  <component name="GitHubPullRequestState">{
-  &quot;prStates&quot;: [
+}&lt;/component&gt;
+  &lt;component name=&quot;GitHubPullRequestState&quot;&gt;{
+  &amp;quot;prStates&amp;quot;: [
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86TVCKA&quot;,
-        &quot;number&quot;: 45
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86TVCKA&amp;quot;,
+        &amp;quot;number&amp;quot;: 45
       },
-      &quot;lastSeen&quot;: 1749295346319
+      &amp;quot;lastSeen&amp;quot;: 1749295346319
     },
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86YVJ5G&quot;,
-        &quot;number&quot;: 47
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86YVJ5G&amp;quot;,
+        &amp;quot;number&amp;quot;: 47
       },
-      &quot;lastSeen&quot;: 1749295777122
+      &amp;quot;lastSeen&amp;quot;: 1749295777122
     },
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86Yahp0&quot;,
-        &quot;number&quot;: 49
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86Yahp0&amp;quot;,
+        &amp;quot;number&amp;quot;: 49
       },
-      &quot;lastSeen&quot;: 1749295787678
+      &amp;quot;lastSeen&amp;quot;: 1749295787678
     }
   ]
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:Prumme/Revision-AI.git&quot;,
-    &quot;accountId&quot;: &quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&quot;
+}&lt;/component&gt;
+  &lt;component name=&quot;GithubPullRequestsUISettings&quot;&gt;{
+  &amp;quot;selectedUrlAndAccountId&amp;quot;: {
+    &amp;quot;url&amp;quot;: &amp;quot;git@github.com:Prumme/Revision-AI.git&amp;quot;,
+    &amp;quot;accountId&amp;quot;: &amp;quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&amp;quot;
   }
-}]]></component>
+}</component>
   <component name="JiraServerManager">
     <selected>-1</selected>
     <servers />
@@ -117,7 +118,7 @@
     "prettierjs.PrettierConfiguration.Package": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/ilyam/dev/Revision-AI/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {

@@ -75,6 +75,7 @@ export class CreateQuizDto {
   })
   @IsOptional()
   @IsNumber()
+  @Type(() => Number)
   questionsNumbers?: number;
 
   @ApiProperty({
@@ -93,6 +94,7 @@ export class CreateQuizDto {
   })
   @IsOptional()
   @IsBoolean()
+  @Type(() => Boolean)
   isPublic?: boolean;
 
   @ApiProperty({

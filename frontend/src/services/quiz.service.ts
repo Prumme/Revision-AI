@@ -8,6 +8,26 @@ export interface QuizQuestion {
     }>;
 }
 
+// Ajouter une nouvelle interface pour la conversion des questions du backend
+export interface BackendQuestion {
+    q: string;
+    answers: Array<{
+        a: string;
+        c: boolean;
+    }>;
+}
+
+// Helper function to convert backend question format to frontend format
+function convertBackendQuestions(backendQuestions: BackendQuestion[] = []): QuizQuestion[] {
+    return backendQuestions.map(q => ({
+        question: q.q,
+        answers: q.answers.map(a => ({
+            a: a.a,
+            c: a.c
+        }))
+    }));
+}
+
 export interface PaginationParams {
     page?: number;
     limit?: number;
@@ -31,22 +51,53 @@ export interface Quiz {
     description?: string;
     isPublic?: boolean;
     media?: string[];
-    status?: 'pending' | 'published' | 'draft';
+    status?: 'pending' | 'processing' | 'completed' | 'failed' | 'published' | 'draft';
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export class QuizService {
+    static buildQueryParams(filters: Record<string, unknown>): string[] {
+        const queryParams: string[] = [];
+        for (const [key, value] of Object.entries(filters)) {
+            if (value !== undefined && value !== null && value !== "") {
+                queryParams.push(`${key}=${encodeURIComponent(String(value))}`);
+            }
+        }
+        return queryParams;
+    }
 
     /**
      * Function to get quizzes with optional filters and pagination
-     * 
-     * @param filters - Optional filters for searching quizzes
-     * @param pagination - Optional pagination parameters
-     * @returns Promise resolving to a paginated response of quizzes
      */
-    static async getQuiz(): Promise<Quiz[]> {
-        const response = await ApiService.get<Quiz[]>('/quizzes');
+    static async getQuiz(filters: Record<string, unknown> = {}, pagination: PaginationParams = {}): Promise<PaginatedQuizResponse> {
+        const queryParams = this.buildQueryParams({ ...filters, ...pagination });
+        const endpoint = `/quizzes${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`;
+        const response = await ApiService.get<PaginatedQuizResponse>(endpoint);
+        return response.data;
+    }
+
+    /**
+     * Function to get all quizzes with filters (admin/global)
+     */
+    static async getAllQuizzes(filters: Record<string, unknown> = {}, pagination: PaginationParams = {}): Promise<PaginatedQuizResponse> {
+        const queryParams = this.buildQueryParams({ ...filters, ...pagination });
+        const endpoint = `/quizzes${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`;
+        const response = await ApiService.get<PaginatedQuizResponse>(endpoint);
+        return response.data;
+    }
+
+    /**
+     * Get quizzes for a user with filters and pagination
+     */
+    static async getUserQuizzes(
+        userId: string,
+        filters: Record<string, unknown> = {},
+        pagination: PaginationParams = {}
+    ): Promise<PaginatedQuizResponse> {
+        const queryParams = this.buildQueryParams({ ...filters, ...pagination });
+        const endpoint = `/quizzes/user/${userId}${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`;
+        const response = await ApiService.get<PaginatedQuizResponse>(endpoint);
         return response.data;
     }
 
@@ -84,5 +135,94 @@ export class QuizService {
             const response = await ApiService.post<Quiz>('/quizzes', formData);
             return response.data;
         }
+    }
+
+    /**
+     * Récupère un quiz par son ID
+     * 
+     * @param quizId - L'ID du quiz à récupérer
+     * @returns Promise resolving to the quiz object
+     */
+    static async getQuizById(quizId: string): Promise<Quiz> {
+        const response = await ApiService.get<Quiz>(`/quizzes/${quizId}`);
+        const quiz = response.data;
+
+        // Si le quiz contient des questions au format backend, les convertir au format frontend
+        if (quiz.questions && Array.isArray(quiz.questions)) {
+            const backendQuestions = quiz.questions as unknown as BackendQuestion[];
+            if (backendQuestions.length > 0 && 'q' in backendQuestions[0]) {
+                console.log('Converting backend questions to frontend format');
+                quiz.questions = convertBackendQuestions(backendQuestions);
+            }
+        }
+
+        return quiz;
+    }
+
+    /**
+     * Vérifie si un quiz a des questions générées
+     * 
+     * @param quiz - L'objet quiz à vérifier
+     * @returns boolean - True si le quiz a des questions, false sinon
+     */
+    static hasQuestions(quiz: Quiz): boolean {
+        return Array.isArray(quiz.questions) && quiz.questions.length > 0;
+    }
+
+    /**
+     * Récupère périodiquement les mises à jour d'un quiz jusqu'à ce qu'il soit complété ou échoué
+     * 
+     * @param quizId - L'ID du quiz à surveiller
+     * @param intervalMs - Intervalle entre les requêtes en millisecondes (défaut: 2000)
+     * @param maxAttempts - Nombre maximal de tentatives avant abandon (défaut: 30)
+     * @returns Promise resolving to the completed quiz or null if failed
+     */
+    static async pollQuizUntilComplete(
+        quizId: string,
+        onStatusChange?: (status: string) => void,
+        intervalMs = 2000,
+        maxAttempts = 30
+    ): Promise<Quiz | null> {
+        let attempts = 0;
+        let lastStatus = '';
+
+        return new Promise((resolve, reject) => {
+            const checkStatus = async () => {
+                try {
+                    attempts++;
+                    const quiz = await this.getQuizById(quizId);
+
+                    if (onStatusChange && quiz.status !== lastStatus) {
+                        lastStatus = quiz.status || '';
+                        onStatusChange(lastStatus);
+                    }
+
+                    if (quiz.status === 'completed') {
+                        console.log(`Quiz ${quizId} completed with ${quiz.questions?.length || 0} questions`);
+                        resolve(quiz);
+                        return;
+                    }
+
+                    if (quiz.status === 'failed') {
+                        console.log(`Quiz ${quizId} generation failed`);
+                        resolve(null);
+                        return;
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        console.log(`Max polling attempts (${maxAttempts}) reached for quiz ${quizId}`);
+                        resolve(quiz);
+                        return;
+                    }
+
+                    setTimeout(checkStatus, intervalMs);
+                } catch (error) {
+                    console.error('Error polling quiz status:', error);
+                    reject(error);
+                }
+            };
+
+            checkStatus();
+        });
     }
 }

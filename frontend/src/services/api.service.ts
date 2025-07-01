@@ -43,17 +43,22 @@ export class ApiService {
     }
 
     const isFormData = bodyToParse instanceof FormData;
-    const body = isFormData ? bodyToParse : JSON.stringify(bodyToParse ?? {});
+    let body: BodyInit | undefined = undefined;
 
-    if (isFormData) {
-      delete requestHeaders["Content-Type"];
+    if (method !== "GET" && method !== "HEAD" && bodyToParse !== undefined) {
+      if (isFormData) {
+        delete requestHeaders["Content-Type"];
+        body = bodyToParse;
+      } else {
+        body = JSON.stringify(bodyToParse);
+      }
     }
 
     try {
       const response = await fetch(url, {
         method,
         headers: requestHeaders,
-        body,
+        ...((body !== undefined ? { body } : {})),
       });
 
       const data = await response.json();

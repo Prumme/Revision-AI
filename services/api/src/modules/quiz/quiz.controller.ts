@@ -10,8 +10,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -23,6 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateQuizDto } from './dto/create-quiz.dto';
+import { QuizFiltersDto } from './dto/filters-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizService } from './quiz.service';
 
@@ -60,6 +62,21 @@ export class QuizController {
     return quiz;
   }
 
+  @Get('user/:id')
+  @ApiOperation({ summary: "Récupérer tous les quiz d'un utilisateur par son ID avec filtres" })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Liste des quiz de l'utilisateur récupérée avec succès",
+    type: [Quiz],
+  })
+  async findAllByUserId(
+    @Param('id') id: string,
+    @Query() filters: QuizFiltersDto
+  ): Promise<Quiz[]> {
+    return this.quizService.findAllByUserId(id, filters);
+  }
+
   @Post()
   @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: 'Créer un nouveau quiz' })
@@ -70,12 +87,27 @@ export class QuizController {
   })
   async create(
     @Body() createQuizDto: CreateQuizDto,
-    @UploadedFile() files: Express.Multer.File[] = [],
+    @UploadedFiles() files: Express.Multer.File[],
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Quiz> {
+    // S'assurer que files est un tableau
+    const fileArray = Array.isArray(files) ? files : files ? [files] : [];
+
+    console.log('------ CRÉATION DE QUIZ ------');
+    console.log('Files received:', fileArray?.length || 0);
+    if (fileArray.length > 0) {
+      console.log('File details:', fileArray.map(f => ({
+        name: f.originalname,
+        size: f.size,
+        mimetype: f.mimetype
+      })));
+    }
+    console.log('createQuizDto:', JSON.stringify(createQuizDto));
+    console.log('-----------------------------');
+
     return this.quizService.create(
       { ...createQuizDto, userId: user.sub },
-      files,
+      fileArray,
     );
   }
 

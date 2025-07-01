@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { QuizRepositoryProvider } from '@repositories/quiz.repository';
 import { QuizController } from './quiz.controller';
 import { QuizService } from './quiz.service';
+import { QueueProvider } from "@infrastructure/queue/queueProvider";
 
 @Module({
   imports: [
@@ -14,7 +15,22 @@ import { QuizService } from './quiz.service';
     forwardRef(() => MinioModule),
   ],
   controllers: [QuizController],
-  providers: [QuizService, QuizRepositoryProvider],
-  exports: [QuizService],
+  providers: [
+    QuizService,
+    QuizRepositoryProvider,
+    {
+      provide: 'QueueProvider',
+      useValue: QueueProvider,
+    },
+  ],
+  exports: [
+    QuizService,
+    QuizRepositoryProvider,
+    {
+      provide: 'QueueProvider',
+      useValue: QueueProvider,
+    },
+  ],
 })
-export class QuizModule { }
+export class QuizModule {}
+

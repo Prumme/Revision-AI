@@ -7,17 +7,14 @@ import ForgotPassword from "@/views/authentication/ForgotPassword.vue";
 import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
+import CheckoutView from "@/views/CheckoutView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
 import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
-import QuizView from "@/views/QuizView.vue";
-import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
-import EmailSend from "@/views/authentication/EmailSend.vue";
-import AdminUserView from "@/views/admin/AdminUserView.vue";
-import SubscriptionView from "@/views/SubscriptionView.vue";
-import CheckoutView from "@/views/CheckoutView.vue";
+import QuizForm from "@/views/quiz/QuizForm.vue";
 import QuizList from "@/views/quiz/QuizList.vue";
+import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -46,7 +43,7 @@ const router = createRouter({
         {
           path: "/quiz/create",
           name: "quiz-create",
-          component: QuizView,
+          component: QuizForm,
         },
         {
           path: "/quiz",
@@ -57,6 +54,16 @@ const router = createRouter({
           path: "/profile",
           name: "profile",
           component: ProfilePage,
+        },
+        {
+          path: "/subscription",
+          name: "subscription",
+          component: SubscriptionView,
+        },
+        {
+          path: "/subscription/checkout",
+          name: "subscription-checkout",
+          component: CheckoutView,
         },
         {
           path: "/admin/user",
