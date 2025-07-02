@@ -70,7 +70,6 @@ onMounted(async () => {
       return;
     }
     stripe = await loadStripe(stripePublicKey);
-    console.log("Stripe initialized:", stripe);
 
     if (!stripe) {
       errorMessage.value = "Stripe n'a pas pu être initialisé.";
@@ -139,7 +138,6 @@ const submitPaymentMethod = async () => {
       errorMessage.value =
         error.message || "Une erreur est survenue lors du traitement du paiement";
     } else {
-      console.log("Payment Method created:", paymentMethod);
       // Émettre la paymentMethod créée
       emit("paymentMethodCreated", paymentMethod);
     }
