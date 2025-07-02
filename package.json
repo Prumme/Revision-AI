@@ -1,1 +1,5 @@
-{}
+{
+  "dependencies": {
+    "@vue-flow/core": "^1.45.0"
+  }
+}

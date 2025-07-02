@@ -4,12 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix merge">
+      <change afterPath="$PROJECT_DIR$/k8s/api-ingress.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/k8s/mongodb/mongodb.replicatset.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/k8s/mongodb/mongodb.secrets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s.README.md" beforeDir="false" afterPath="$PROJECT_DIR$/k8s.README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/apps/api.deployement.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/apps/api.deployement.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/apps/api.service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/apps/api.service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/configs/env-config-map.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/configs/env-config-map.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secrets/env-secret.yml.example" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/secrets/env-secret.yml.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.kind.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/local.kind.config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/build-docker-image.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/build-docker-image.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,45 +42,51 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "history": [
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
     {
-      "state": "OPEN"
+      &quot;state&quot;: &quot;OPEN&quot;
     }
   ],
-  "lastFilter": {
-    "state": "OPEN"
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
   }
-}</component>
-  <component name="GitHubPullRequestState">{
-  &quot;prStates&quot;: [
+}&lt;/component&gt;
+  &lt;component name=&quot;GitHubPullRequestState&quot;&gt;{
+  &amp;quot;prStates&amp;quot;: [
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86TVCKA&quot;,
-        &quot;number&quot;: 45
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86TVCKA&amp;quot;,
+        &amp;quot;number&amp;quot;: 45
       },
-      &quot;lastSeen&quot;: 1749295346319
+      &amp;quot;lastSeen&amp;quot;: 1749295346319
     },
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86YVJ5G&quot;,
-        &quot;number&quot;: 47
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86YVJ5G&amp;quot;,
+        &amp;quot;number&amp;quot;: 47
       },
-      &quot;lastSeen&quot;: 1749295777122
+      &amp;quot;lastSeen&amp;quot;: 1749295777122
     },
     {
-      &quot;id&quot;: {
-        &quot;id&quot;: &quot;PR_kwDOOHU1h86Yahp0&quot;,
-        &quot;number&quot;: 49
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86Yahp0&amp;quot;,
+        &amp;quot;number&amp;quot;: 49
       },
-      &quot;lastSeen&quot;: 1749295787678
+      &amp;quot;lastSeen&amp;quot;: 1749295787678
     }
   ]
+}&lt;/component&gt;
+  &lt;component name=&quot;GithubPullRequestsUISettings&quot;&gt;{
+  &amp;quot;selectedUrlAndAccountId&amp;quot;: {
+    &amp;quot;url&amp;quot;: &amp;quot;git@github.com:Prumme/Revision-AI.git&amp;quot;,
+    &amp;quot;accountId&amp;quot;: &amp;quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&amp;quot;
+  }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:Prumme/Revision-AI.git&quot;,
-    &quot;accountId&quot;: &quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:Prumme/Revision-AI.git",
+    "accountId": "3aff0e21-277d-41d7-9fb5-7997b3ad2e34"
   }
 }]]></component>
   <component name="JiraServerManager">
@@ -97,35 +112,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Docker.docker-compose.yaml.frontend: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yaml: Compose Deployment.executor": "Run",
-    "Jest.S3FileDownloader.executor": "Run",
-    "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#56 on 25-billing-et-abbonement",
-    "last_opened_file_path": "/Users/axel/Documents/Cours/Revision-AI",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Docker.docker-compose.yaml.frontend: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yaml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mongo&quot;
+    ],
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -135,11 +153,11 @@
       <recent name="$PROJECT_DIR$/services/quiz-generator" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/k8s/mongodb" />
       <recent name="$PROJECT_DIR$/services/api/src/modules/subscription" />
       <recent name="$PROJECT_DIR$/services/api/src/modules" />
       <recent name="$PROJECT_DIR$/services/quiz-generator" />
       <recent name="$PROJECT_DIR$/services/file-parser" />
-      <recent name="$PROJECT_DIR$/services/file-parser/src/shared" />
     </key>
   </component>
   <component name="RunManager" selected="Docker.docker-compose.yaml.frontend: Compose Deployment">
@@ -232,6 +250,8 @@
       <workItem from="1749301609329" duration="246000" />
       <workItem from="1749301885239" duration="14317000" />
       <workItem from="1749927095568" duration="11888000" />
+      <workItem from="1750659351384" duration="6503000" />
+      <workItem from="1750768341816" duration="633000" />
     </task>
     <task id="LOCAL-00001" summary="🔨 upgrade some lines">
       <option name="closed" value="true" />

@@ -1,78 +1,269 @@
-# Setup 
+# Setup Kubernetes
 
-1. Lancer le cluster kind
+## 1. Lancer le cluster kind
+
 ```bash
 kind create cluster --config=k8s/local.kind.config.yaml
 ```
 
-2. Build image production (pour les rendre disponible dans kind)
+La configuration kind crée un cluster avec 1 nœud master et 2 nœuds workers, avec redirection de port sur les nœuds workers pour l’ingress.
+
+---
+
+## 2. Build de l’image production
+
 ```bash
 sh scripts/build-docker-image.sh
 ```
 
-3. Loader les images dans kind
+Cette étape construit les images Docker pour les rendre disponibles dans kind.
+
+---
+
+## 3. Charger les images dans kind
+
 ```bash
-sh scripts/load-images-to-kind.sh #load les images précédement build dans chaque noeud du cluster
+sh scripts/load-images-to-kind.sh
 ```
 
-4. Créer une config map et un secret avec les clé du .env.example copier le contenu et s'assurer que les env secret ne sont pas présente dans la config map
+Charge les images précédemment buildées dans chaque nœud du cluster kind.
+
+---
+
+## 4. Créer une ConfigMap et un Secret à partir du fichier `.env`
+
 ```bash
 kubectl create configmap NAME --from-env-file=./.env --dry-run=client -o=yaml 
 kubectl create secret generic NAME --from-env-file=./.env --dry-run=client -o=yaml
-#n'execute pas sur le cluster mais affiche en console le yaml a apply
 ```
 
-5. Installer l'operator k8s rabbitmq pour le clustering
+* Copier le contenu et vérifier que les variables sensibles (secrets) ne sont **pas** présentes dans la ConfigMap.
+* Ces commandes n’appliquent pas directement sur le cluster mais affichent le YAML à appliquer.
+
+---
+
+## 5. Installer l’operator Kubernetes RabbitMQ pour le clustering
+
 ```bash
 kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml
 ```
 
-6. Créer un yaml de type `RabbitmqCluster` suivant la documentation, ces etapes on créer un secret nommé `rabbitmq-default-user` qui permet de s'authentifier aux servers rabbitmq dans les app
+---
 
-7. Retirer la clé RABBITMQ_URL de la config map et utiliser la `connection_string` présente dans le secret  `rabbitmq-default-user` dans les déployements
+## 6. Créer un manifest `RabbitmqCluster`
+
+Suivre la documentation officielle pour créer un `RabbitmqCluster`.
+Cela génère un secret nommé `rabbitmq-default-user` utilisé pour s’authentifier aux serveurs RabbitMQ dans les applications.
+
+---
+
+## 7. Mettre à jour les déploiements pour utiliser le secret RabbitMQ
+
+Retirer la clé `RABBITMQ_URL` de la ConfigMap et utiliser la `connection_string` présente dans le secret `rabbitmq-default-user` :
+
 ```yaml
 env:
-    - name: RABBITMQ_URL
+  - name: RABBITMQ_URL
     valueFrom:
-        secretKeyRef:
+      secretKeyRef:
         name: rabbitmq-default-user
         key: connection_string
 ```
 
-8. Créer les deployements des services `api`, `file-parser`, `quiz-generator` en utilisant la `RABBITMQ_URL` du cluster
+---
 
-9. Créer un service pour les pods `api` afin d'exposer sur `8080` sur le noeud (temporaire utilisé ingress par la suite)
+## 8. Créer les déploiements des services
 
-10. Lancer un port-forward du service `api-service` sur localhost:8080 afin d'acceder a l'api pour upload un fichier 
+Déployer les services `api`, `file-parser`, `quiz-generator` en utilisant la variable `RABBITMQ_URL` du cluster.
+
+---
+
+## 9. Créer un service pour les pods `api`
+
+Exposer le service `api` sur le port `8080` du nœud (temporaire, l’ingress sera utilisé ensuite).
+
+---
+
+## 10. Faire un port-forward sur le service `api-service`
+
 ```bash
 kubectl port-forward service/api-service 8080:8080
 ```
 
-11. installer helm macos
+Permet d’accéder à l’API localement pour uploader un fichier.
+
+---
+
+## 11. Installer Helm (sur macOS)
+
 ```bash
 brew install helm
 ```
 
-12. Installer prometheus pour obtenir les metrics business mais aussi les metrics des pods pour définir les ressources necessaire
+---
+
+## 12. Installer Prometheus pour la collecte des métriques
+
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack
 ```
 
-13. Obtenir les credential de connexion graphana dans le secret créer par le chart helm  et se connecter a graphana (se rendre sur http://localhost:8080)
+Permet d’obtenir les métriques business et les métriques des pods pour définir les ressources nécessaires.
+
+---
+
+## 13. Récupérer les credentials Grafana et se connecter
+
 ```bash
 kubectl get secrets prometheus-grafana -o=yaml
 kubectl port-forward services/prometheus-grafana 8080:80
 ```
 
-14. Exporter les metrics de rabitmq, rabbitmq cluster operator vient créer des server rabbitmq avec un exporter prometheus déjà configurer sur le port 15692/TCP il est déjà exposer dans le service/rabbitmq créer par l'operateur. Il faut créer un `ServiceMonitor` (CRD de prometheus-operator) pour spéicifé a prometheus ou scrapper les informations.
+Se connecter à Grafana via [http://localhost:8080](http://localhost:8080).
 
-15. Afficher dans graphana les metrics de rabbitmq avec l'id du dashboard graphana `10991`
+---
 
-16. Créer un le service `quiz-generator` pour exposer le serveur metrics prometheus en clusterIP, puis créer un  `ServiceMonitor` pour créer une target prometheus sur le serveur metrics exposé par le service  `quiz-generator`, Créer un dashboard grapahana pour voir les infos
+## 14. Exporter les métriques RabbitMQ
 
-17. Pour logger les pod business il faut ajouter un label a chaque deployement template avec le label debug=true et tapper la commande
+Le RabbitMQ Cluster Operator crée des serveurs RabbitMQ avec un exporter Prometheus configuré sur le port `15692/TCP`.
+Ce port est exposé dans le service `rabbitmq` créé par l’opérateur.
+Il faut créer un `ServiceMonitor` (CRD de Prometheus Operator) pour spécifier à Prometheus où scrapper les métriques.
+
+---
+
+## 15. Afficher les métriques RabbitMQ dans Grafana
+
+Utiliser le dashboard Grafana avec l’ID `10991`.
+
+---
+
+## 16. Configurer les métriques pour `quiz-generator`
+
+* Créer un service `quiz-generator` exposant le serveur métriques Prometheus en `ClusterIP`.
+* Créer un `ServiceMonitor` pour ajouter une cible Prometheus sur ce service.
+* Créer un dashboard Grafana pour visualiser les métriques.
+
+---
+
+## 17. Logger les pods business
+
+Ajouter un label `debug=true` dans le template des déploiements, puis lancer la commande :
+
 ```bash
 kubectl logs -l debug=true --all-containers=true -f --max-log-requests=20
 ```
+
+---
+
+## 18. Mise à jour des Secrets et ConfigMaps
+
+Mettre à jour pour supporter les nouvelles fonctionnalités : MinIO, Stripe, utilisateurs, billing API.
+Recréer ConfigMaps et Secrets avec les nouvelles variables d’environnement.
+
+```bash
+kubectl create configmap NAME --from-env-file=./.env --dry-run=client -o=yaml
+kubectl create secret generic NAME --from-env-file=./.env --dry-run=client -o=yaml
+```
+
+* Ne prendre que ce qui est utile aux services backend.
+* Ne pas inclure les variables front-end dans ConfigMap ou Secret.
+* Bien distinguer variables d’environnement secrètes et non secrètes.
+
+---
+
+## 20. Mettre en place un cluster MongoDB
+
+Créer un namespace `mongodb` et installer MongoDB via Helm :
+
+```bash
+helm repo add mongodb https://mongodb.github.io/helm-charts
+helm install kubernetes-operator mongodb/mongodb-kubernetes --namespace mongodb --create-namespace
+```
+
+---
+
+## 21. Créer les ressources MongoDB
+
+Créer les secrets et le ReplicaSet dans `k8s/mongo`.
+
+---
+
+## 22. Ajouter la MongoDB URI en secret global
+
+URI MongoDB à utiliser :
+`mongodb://<user>:<password>@mongodb-svc.mongodb.svc.cluster.local:27017/revisionAI?replicaSet=mongodb&authSource=admin`
+
+> Note : `authSource=admin` est nécessaire, je n’ai pas réussi à faire fonctionner l’auth avec un autre utilisateur.
+
+---
+
+## 23. Installer l’Ingress NGINX
+
+```bash
+kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
+```
+
+---
+
+## 24. Modifier la configuration du déploiement de l’Ingress Controller
+
+Ajouter un `nodeSelector` plus spécifique pour forcer le pod sur `worker1` :
+
+Avant :
+
+```yaml
+nodeSelector:
+  kubernetes.io/os: linux
+```
+
+Après :
+
+```yaml
+nodeSelector:
+  kubernetes.io/os: linux
+  ingress-ready: "true"
+```
+
+---
+
+## 26. Ajouter le label `ingress-ready=true` sur le nœud `worker1`
+
+```bash
+kubectl label node kind-worker1 ingress-ready=true
+```
+
+---
+
+## 27. Supprimer les pods controllers existants
+
+```bash
+kubectl delete pod -n ingress-nginx -l app.kubernetes.io/component=controller
+```
+
+L’ingress controller devrait alors être déployé uniquement sur `worker1`.
+
+Exemple de sortie :
+
+```bash
+kubectl get pods -n ingress-nginx -o wide  
+
+NAME                                        READY   STATUS      RESTARTS   AGE     IP            NODE           NOMINATED NODE   READINESS GATES
+ingress-nginx-admission-create-q9scv        0/1     Completed   0          30m     10.244.2.16   kind-worker2   <none>           <none>
+ingress-nginx-admission-patch-8887s         0/1     Completed   1          30m     10.244.2.17   kind-worker2   <none>           <none>
+ingress-nginx-controller-5dbfb97bbd-qrftd   1/1     Running     0          5m20s   10.244.1.20   kind-worker1  <none>           <none>
+```
+
+---
+
+## 28. Modifier le fichier `etc/hosts` pour les domaines de test
+
+Ajouter la ligne suivante :
+
+```bash
+127.0.0.1 api.revision-ai.local
+```
+
+Tester l’API à l’adresse : [http://api.revision-ai.local](http://api.revision-ai.local)
+
