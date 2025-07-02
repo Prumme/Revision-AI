@@ -27,3 +27,16 @@ export async function subscribe(data: SubscribePayload) {
     throw error;
   }
 }
+
+export async function unsubscribe() {
+  try {
+    const response = await ApiService.post<{ message: string }>(
+      "/subscription/unsubscribe",
+      {},
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error unsubscribing:", error);
+    throw error;
+  }
+}

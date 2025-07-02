@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { fetchSubscriptionProducts } from "@/services/subscription.service";
+import { fetchSubscriptionProducts, unsubscribe } from "@/services/subscription.service";
+import { useDialogStore } from "@/stores/dialog";
+import { useToastStore } from "@/stores/toast";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { User } from "@/types/user";
 import { useRouter } from "vue-router";
@@ -19,6 +21,8 @@ const props = defineProps<Props>();
 const router = useRouter();
 const products = ref<SubscriptionInfo[]>([]);
 const loading = ref(true);
+const dialog = useDialogStore();
+const toast = useToastStore();
 
 const currentPlan = computed(() => {
   if (props.user?.subscriptionTier === "free") {
@@ -64,9 +68,24 @@ const handleUpgrade = () => {
   router.push("/subscription/checkout");
 };
 
-const handleCancelSubscription = () => {
-  // TODO: Implémenter la logique de suppression d'abonnement
-  console.log("Suppression d'abonnement à implémenter");
+const handleCancelSubscription = async () => {
+  const confirmed = await dialog.show({
+    title: "Résilier l'abonnement",
+    message: "Êtes-vous sûr de vouloir résilier votre abonnement ? Cette action est irréversible.",
+    confirmText: "Oui, résilier",
+    cancelText: "Annuler",
+    type: "error",
+  });
+  if (!confirmed) return;
+  try {
+    loading.value = true;
+    await unsubscribe();
+    toast.showToast("success", "Votre abonnement a bien été résilié.");
+  } catch {
+    toast.showToast("error", "Erreur lors de la résiliation de l'abonnement.");
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(async () => {
