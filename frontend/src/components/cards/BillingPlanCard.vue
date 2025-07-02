@@ -80,7 +80,7 @@ const handleCancelSubscription = async () => {
   try {
     loading.value = true;
     await unsubscribe();
-    toast.showToast("success", "Votre abonnement a bien été résilié.");
+    toast.showToast("success", "Votre abonnement a bien été résilié. Il restera actif jusqu'à la fin de la période en cours.");
   } catch {
     toast.showToast("error", "Erreur lors de la résiliation de l'abonnement.");
   } finally {
