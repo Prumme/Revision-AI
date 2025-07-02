@@ -20,19 +20,10 @@ const toast = useToastStore();
 const quizLoadingStore = useQuizLoadingStore();
 
 // Quiz Data
-// const formTitle = ref("Titre du quiz");
-// const category = ref("");
-// const questionsNumbers = ref(5);
-// const description = ref("");
-// const isPublic = ref(false);
-// const media = ref<File | null>(null);
-// const isLoading = ref(false);
-
-// create a fake quiz data please
-const formTitle = ref("Test Quiz Creation");
-const category = ref("general_history");
+const formTitle = ref("Titre du quiz");
+const category = ref("");
 const questionsNumbers = ref(5);
-const description = ref("Description du quiz");
+const description = ref("");
 const isPublic = ref(false);
 const media = ref<File | null>(null);
 const isLoading = ref(false);

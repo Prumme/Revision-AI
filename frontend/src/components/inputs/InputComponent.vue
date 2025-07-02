@@ -131,11 +131,10 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
         @input="onInput"
         @focus="isFocused = true"
         @blur="isFocused = false"
-        class="placeholder:font-outfit placeholder:text-gray-extralight"
+        class="placeholder:font-outfit placeholder:text-gray-extralight mt-2 p-2 w-full border rounded-md outline-none text-sm text-black transition-colors duration-150"
         :class="[
-          'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
           isFocused ? 'border-primary' : 'border-gray-300',
-          disabled && 'border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed',
+          disabled ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-70' : '',
         ]"
         :placeholder="placeholder"
         :autocomplete="autocomplete"
@@ -152,12 +151,13 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
         @focus="isFocused = true"
         @blur="isFocused = false"
         :placeholder="placeholder"
-        class="placeholder:font-outfit placeholder:text-gray-extralight mt-2 p-2 w-full border rounded-md outline-none text-sm text-black"
+        class="placeholder:font-outfit placeholder:text-gray-extralight mt-2 p-2 w-full border rounded-md outline-none text-sm text-black transition-colors duration-150"
         :class="[
-          'mt-2 p-2 w-full border rounded-md outline-none text-sm text-black',
           isFocused ? 'border-primary' : 'border-gray-300',
+          disabled ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-70 select-none focus:outline-none' : '',
         ]"
         :rows="4"
+        :disabled="disabled"
       />
     </template>
   </div>

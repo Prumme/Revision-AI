@@ -14,6 +14,7 @@ import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizForm from "@/views/quiz/QuizForm.vue";
 import QuizList from "@/views/quiz/QuizList.vue";
+import QuizDetails from "@/views/quiz/QuizDetails.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -49,6 +50,11 @@ const router = createRouter({
           path: "/quiz",
           name: "quiz",
           component: QuizList,
+        },
+        {
+          path: "/quiz/:id",
+          name: "quiz-detail",
+          component: QuizDetails,
         },
         {
           path: "/profile",

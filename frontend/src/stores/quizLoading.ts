@@ -11,7 +11,7 @@ export const useQuizLoadingStore = defineStore('quizLoading', () => {
     const loadingMessage = computed(() => {
         switch (quizStatus.value) {
             case 'pending':
-                return 'Préparation de votre quiz...'
+                return 'Génération de votre quiz...'
             case 'processing':
                 return 'Génération des questions en cours...'
             case 'completed':
@@ -31,9 +31,19 @@ export const useQuizLoadingStore = defineStore('quizLoading', () => {
             startPolling()
 
             if (quizId) {
-                QuizService.pollQuizUntilComplete(quizId, (status: 'pending' | 'processing' | 'completed' | 'failed' | 'published' | 'draft') => {
-                    quizStatus.value = status;
-                }).then(completedQuiz => {
+                QuizService.pollQuizUntilComplete(
+                    quizId,
+                    (status: 'pending' | 'processing' | 'completed' | 'failed' | 'published' | 'draft') => {
+                        quizStatus.value = status;
+                    },
+                    (errorMsg: string) => {
+                        quizStatus.value = 'failed';
+                        // Affiche le message d'erreur spécifique (ex: FileTooLong)
+                        loadingMessage.value = errorMsg;
+                        // Arrête le spinner après 3s
+                        setTimeout(() => stopLoading(), 3000);
+                    }
+                ).then(completedQuiz => {
                     if (completedQuiz && completedQuiz.status === 'completed') {
                         console.log('Quiz generation completed successfully');
                     } else {

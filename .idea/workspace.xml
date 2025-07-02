@@ -6,11 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/queue/queueProvider.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/queue/queueProvider.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/api/quizApi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/api/quizApi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/draggables/QuestionDraggable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/draggables/QuestionDraggable.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/dropzone/DropzoneComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/dropzone/DropzoneComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IQuizIAAgent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/services/IQuizIAAgent.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/app/usecases/GenerateQuizFromFileContentUseCase.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/broker/mqConsumer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +85,7 @@
     <dismissed value="$PROJECT_DIR$/services/file-parser/package.json" />
   </component>
   <component name="PhpDebugGeneral" listening_started="true" />
-  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.7_2/bin/php" />
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/bin/php" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="ProjectErrors" />
   </component>
@@ -98,35 +100,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Docker.docker-compose.yaml.frontend: Compose Deployment.executor": "Run",
-    "Docker.docker-compose.yaml: Compose Deployment.executor": "Run",
-    "Jest.S3FileDownloader.executor": "Run",
-    "Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#56 on 25-billing-et-abbonement",
-    "last_opened_file_path": "/Users/axel/Documents/Cours/Revision-AI",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "/home/ilyam/dev/Revision-AI/frontend/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Docker.docker-compose.yaml.frontend: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yaml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#56 on 25-billing-et-abbonement&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/ilyam/dev/Revision-AI/frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -208,8 +210,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PS-251.26094.133" />
-        <option value="bundled-php-predefined-a98d8de5180a-c5828cf854d9-com.jetbrains.php.sharedIndexes-PS-251.26094.133" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-PS-251.26927.60" />
+        <option value="bundled-php-predefined-a98d8de5180a-e5747d4f5a45-com.jetbrains.php.sharedIndexes-PS-251.26927.60" />
       </set>
     </attachedChunks>
   </component>

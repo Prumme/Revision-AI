@@ -9,6 +9,7 @@ import { Quiz } from "../value-objects/Quiz";
 
 export type GenerateQuizFromFileContentInput = {
   fileContent: FileContent;
+  questionsNumbers: number;
 }
 
 export type GenerateQuizFromFileContentUseCase = IUseCase<GenerateQuizFromFileContentInput, Result<Quiz>>
@@ -19,7 +20,7 @@ export const generateQuizFromFileContentFactory = (quizIAAgent: IQuizIAAgent, me
     do {
       console.log(`Trying to generate quiz from file content. Attempts left: ${tryLeft}`);
       metricExporter?.incQuizGenerationAttempts();
-      const { result: quiz, duration: generationDuration } = await Timer.measure(() => quizIAAgent.generateQuiz(input.fileContent), TimeUnit.SECOND);
+      const { result: quiz, duration: generationDuration } = await Timer.measure(() => quizIAAgent.generateQuiz(input.fileContent, input.questionsNumbers), TimeUnit.SECOND);
       metricExporter?.reportQuizGenerationTime(generationDuration);
       if (quiz instanceof QuizGenerationError) {
         lastError = quiz;

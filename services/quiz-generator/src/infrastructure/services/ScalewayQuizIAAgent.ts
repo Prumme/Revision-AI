@@ -18,9 +18,11 @@ const model = process.env.SCALEWAY_MODEL || "deepseek-r1-distill-llama-70b";
 const maxTokenOutput = Number(process.env.SCALEWAY_MAX_TOKEN) || 1000;
 const maxTokenInput = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 5000;
 
-const quizGeneratePrompt = `
-Generate a quiz from the "content" key of a JSON file.  
+// Rend le prompt dynamique pour inclure le nombre de questions souhaité
+const quizGeneratePrompt = (questionsCount: number) => `
+Generate a quiz from the \"content\" key of a JSON file.  
 Detect the language of the content and write the quiz in that language.
+Generate exactly ${questionsCount} questions.
 Return **only** this JSON format (no text, no markdown):
 { "t": "Quiz title", 
   "questions": [{ "q": "Question?", "answers": [{ "a": "Answer 1", "c": true }, { "a": "Answer 2", "c": false }]}]
@@ -87,10 +89,11 @@ export class ScalewayQuizIAAgent implements IQuizIAAgent {
     return data.substring(start, end + 1);
   }
 
-  async generateQuiz(fileContent: FileContent): Promise<Quiz | QuizGenerationError> {
+  // Ajoute une fonction pour normaliser les réponses (champ c)
+  async generateQuiz(fileContent: FileContent, questionsNumbers: number): Promise<Quiz | QuizGenerationError> {
     const json = JSON.stringify(fileContent);
     if(json.length > maxTokenInput) return new QuizGenerationError("File content is too long");
-    const data = await this.getStream(quizGeneratePrompt, json);
+    const data = await this.getStream(quizGeneratePrompt(questionsNumbers), json);
     try {
       return QuizSchema.parse(JSON.parse(this.cleanResult(data)));
     } catch (error) {

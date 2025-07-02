@@ -38,7 +38,10 @@ export const mqConsumer = async () => {
             status: 'processing'
          });
 
-         const fileContentResult = await generateQuizUseCase(fileParsed);
+         const fileContentResult = await generateQuizUseCase({
+           fileContent: fileParsed,
+           questionsNumbers: fileParsed.meta.questionsNumbers || 5
+         });
 
          if (!fileContentResult.success) {
             console.error("Error generating the quiz:", fileContentResult.error.message);

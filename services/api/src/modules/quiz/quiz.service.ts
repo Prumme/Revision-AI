@@ -157,7 +157,15 @@ export class QuizService {
       this.logger.error(`Quiz non trouvé pour l'id: ${quizId}`);
       return;
     }
-    quiz.questions = questions;
+    // Normalisation du champ c pour chaque réponse, accepte aussi 'correct' (Mongo schema)
+    const normalizedQuestions = (questions || []).map(q => ({
+      ...q,
+      answers: (q.answers || []).map(a => ({
+        ...a,
+        correct: typeof a.c === 'boolean' ? a.c : (typeof a.correct === 'boolean' ? a.correct : false)
+      }))
+    }));
+    quiz.questions = normalizedQuestions;
     quiz.status = 'completed';
     quiz.updatedAt = new Date();
     await this.quizRepository.update(quizId, quiz);
