@@ -12,7 +12,6 @@ const products = ref<SubscriptionInfo[]>([]);
 onMounted(async () => {
   const response = await fetchSubscriptionProducts();
   products.value = response.products;
-  //console.log("Products fetched:", products.value);
 });
 </script>
 
