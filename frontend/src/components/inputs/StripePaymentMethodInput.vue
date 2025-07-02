@@ -63,9 +63,14 @@ const createCardStyles = () => {
 
 onMounted(async () => {
   try {
-    stripe = await loadStripe(
-      "pk_test_51RXLRGPK9ltfb6kbBwDbGkiAJG4wDDjSVS7kGnovrqzQnglpc4uOUlp2XOVL1vI5txShBmo4pomwBRnY76fP510000bGMPAWnG",
-    );
+    const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+    if (!stripePublicKey) {
+      errorMessage.value =
+        "La clé publique Stripe n'est pas définie. Vérifiez votre fichier .env et redémarrez le serveur.";
+      return;
+    }
+    stripe = await loadStripe(stripePublicKey);
+    console.log("Stripe initialized:", stripe);
 
     if (!stripe) {
       errorMessage.value = "Stripe n'a pas pu être initialisé.";

@@ -3,6 +3,7 @@ export interface User {
   username: string;
   email: string;
   subscriptionTier: string;
+  customerId?: string;
   profilePicture?: string;
   avatar?: string;
   bio?: string;

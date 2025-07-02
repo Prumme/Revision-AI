@@ -8,8 +8,10 @@ import BillingAddressStep from "@/components/checkout/BillingAddressStep.vue";
 import PaymentMethodStep from "@/components/checkout/PaymentMethodStep.vue";
 import OrderSummaryStep from "@/components/checkout/OrderSummaryStep.vue";
 import { useUserStore } from "@/stores/user";
+import { subscribe } from "@/services/subscription.service";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
+import type { SubscribePayload } from "@/types/subscribe";
 
 const router = useRouter();
 const checkout = useCheckoutFlow();
@@ -47,10 +49,21 @@ const handleOrderConfirm = async () => {
   isOrderLoading.value = true;
   orderError.value = null;
   try {
-    console.log("Confirmation de la commande avec les données :", checkout.state.data);
-    // TODO: Appel API pour finaliser l'abonnement
-    // await api.subscribe({ ... });
-    // Rediriger ou afficher un message de succès
+    await userStore.fetchCurrentUser();
+    const customerId = userStore.user?.customerId;
+    const paymentMethodId = checkout.state.data.paymentMethod.paymentMethodId || "";
+    const tier = checkout.state.data.selectedPlan?.productName || "";
+    
+    if (!customerId || !paymentMethodId || !tier) {
+      throw new Error("Informations de souscription incomplètes.");
+    }
+    const payload: SubscribePayload = {
+      customerId,
+      paymentMethodId,
+      tier,
+    };
+    await subscribe(payload);
+    router.push("/subscription");
   } catch (e) {
     orderError.value =
       e instanceof Error ? e.message : "Erreur lors de la validation de l'abonnement.";
