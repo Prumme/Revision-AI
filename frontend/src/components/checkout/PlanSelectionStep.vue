@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, defineProps, defineEmits } from "vue";
-import { fetchSubscriptionProducts } from "@/services/subscription.service";
+import { computed, onMounted, defineProps, defineEmits } from "vue";
+import { useSubscriptionStore } from "@/stores/subscription";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import CheckoutPlanCard from "@/components/checkout/CheckoutPlanCard.vue";
 
 const props = defineProps<{ selectedPlan: SubscriptionInfo | null }>();
 const emit = defineEmits<(event: "select-plan", plan: SubscriptionInfo) => void>();
 
-const products = ref<SubscriptionInfo[]>([]);
-const loading = ref(true);
+const subscriptionStore = useSubscriptionStore();
 
-// Computed pour filtrer seulement les plans payants (Basic et Pro)
 const availablePlans = computed(() => {
-  return products.value.filter(
+  if (!subscriptionStore.products) return [];
+  return subscriptionStore.products.filter(
     (product) =>
-      product.productName.toLowerCase() === "basic" || product.productName.toLowerCase() === "pro",
+      product.productName.toLowerCase() === "basic" ||
+      product.productName.toLowerCase() === "pro",
   );
 });
 
@@ -22,17 +22,8 @@ const handlePlanSelect = (plan: SubscriptionInfo) => {
   emit("select-plan", plan);
 };
 
-onMounted(async () => {
-  try {
-    loading.value = true;
-    const data = await fetchSubscriptionProducts();
-    products.value = data.products || [];
-  } catch (error) {
-    // Gérer l'erreur ici si besoin
-    console.error("Erreur lors de la récupération des produits:", error);
-  } finally {
-    loading.value = false;
-  }
+onMounted(() => {
+  subscriptionStore.fetchProducts();
 });
 </script>
 
@@ -46,8 +37,13 @@ onMounted(async () => {
       </p>
     </div>
 
+    <!-- Error state -->
+    <div v-if="subscriptionStore.error" class="bg-error/10 border border-error text-error rounded-lg p-4 mb-2">
+      <p class="font-outfit font-medium">{{ subscriptionStore.error }}</p>
+    </div>
+
     <!-- Loading state -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div v-if="subscriptionStore.loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div v-for="i in 2" :key="i" class="animate-pulse bg-gray-200 rounded-lg h-96"></div>
     </div>
 
@@ -63,7 +59,7 @@ onMounted(async () => {
     </div>
 
     <!-- Empty state -->
-    <div v-if="!loading && availablePlans.length === 0" class="text-center py-12">
+    <div v-if="!subscriptionStore.loading && availablePlans.length === 0" class="text-center py-12">
       <p class="font-outfit text-gray-500">
         Aucun plan disponible pour le moment. Veuillez réessayer plus tard.
       </p>
