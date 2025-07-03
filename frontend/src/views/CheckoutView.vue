@@ -21,11 +21,27 @@ const userStore = useUserStore();
 const isOrderLoading = ref(false);
 const orderError = ref<string | null>(null);
 
+// Ref pour la step PaymentMethodStep
+const paymentStepRef = ref<{ validateAndCreatePaymentMethod: () => Promise<boolean> } | null>(null);
+const isPaymentStepLoading = ref(false);
+
 const handleStepNavigation = (stepIndex: number) => {
   checkout.goToStep(stepIndex);
 };
 
-const handleNext = () => {
+const handleNext = async () => {
+  // Si on est sur la step payment-method, on déclenche la validation Stripe
+  if (checkout.currentStep.value.id === "payment-method") {
+    if (paymentStepRef.value && paymentStepRef.value.validateAndCreatePaymentMethod) {
+      isPaymentStepLoading.value = true;
+      const result = await paymentStepRef.value.validateAndCreatePaymentMethod();
+      isPaymentStepLoading.value = false;
+      if (!result) {
+        // Erreur Stripe déjà affichée dans la step, on ne passe pas à la suite
+        return;
+      }
+    }
+  }
   checkout.goToNextStep();
 };
 
@@ -179,6 +195,7 @@ onUnmounted(() => {
         <!-- Payment Method Step -->
         <PaymentMethodStep
           v-else-if="checkout.currentStep.value.id === 'payment-method'"
+          ref="paymentStepRef"
           :payment-method="checkout.state.data.paymentMethod"
           @update-payment-method="checkout.updatePaymentMethod"
         />
@@ -222,7 +239,7 @@ onUnmounted(() => {
         <button
           v-if="!checkout.isLastStep.value"
           @click="handleNext"
-          :disabled="!checkout.canGoNext.value"
+          :disabled="!checkout.canGoNext.value || isPaymentStepLoading"
           class="bg-primary hover:bg-primary/90 text-black font-outfit font-medium px-6 py-2 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
         >
           Suivant
