@@ -66,7 +66,7 @@ export class SubscriptionController {
   @Get('/subscription-products')
   @Public()
   async getSubscriptionProducts() {
-    const products = await this.subscriptionProvider.getStripeProductPrices();
+    const products = await this.subscriptionProvider.getProductsPrices();
     if (products instanceof Error) throw products;
     return { products };
   }
