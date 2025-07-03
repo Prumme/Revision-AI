@@ -19,7 +19,7 @@ const handleConfirm = () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-6 relative">
     <div class="flex flex-col gap-2">
       <h2 class="font-encode text-2xl font-bold text-black">Récapitulatif de la commande</h2>
       <p class="font-outfit text-gray-600">

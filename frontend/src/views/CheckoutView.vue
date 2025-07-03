@@ -12,6 +12,7 @@ import { subscribe } from "@/services/subscription.service";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
 import type { SubscribePayload } from "@/types/subscribe";
+import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 
 const router = useRouter();
 const checkout = useCheckoutFlow();
@@ -105,6 +106,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <LoaderOverlay v-if="isOrderLoading" message="Traitement en cours..." />
   <section class="flex flex-col gap-6 w-full max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex flex-col gap-2">
