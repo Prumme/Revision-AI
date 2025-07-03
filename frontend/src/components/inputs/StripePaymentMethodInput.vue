@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineExpose } from "vue";
 import {
   loadStripe,
   type Stripe,
@@ -114,52 +114,38 @@ onMounted(async () => {
   }
 });
 
-const submitPaymentMethod = async () => {
+// Exposer la méthode de création du paymentMethod pour le parent
+const createPaymentMethod = async () => {
   if (!stripe || !card) {
     errorMessage.value = "Stripe n'est pas initialisé.";
-    return;
+    return { error: errorMessage.value };
   }
-
   if (!isCardValid.value || !isCardComplete.value) {
     errorMessage.value = "Veuillez compléter les informations de la carte.";
-    return;
+    return { error: errorMessage.value };
   }
-
   isProcessing.value = true;
   errorMessage.value = "";
-
   try {
     const { paymentMethod, error } = await stripe.createPaymentMethod({
       type: "card",
       card: card,
     });
-
     if (error) {
-      errorMessage.value =
-        error.message || "Une erreur est survenue lors du traitement du paiement";
+      errorMessage.value = error.message || "Une erreur est survenue lors du traitement du paiement";
+      return { error: errorMessage.value };
     } else {
-      // Émettre la paymentMethod créée
       emit("paymentMethodCreated", paymentMethod);
+      return { paymentMethod };
     }
   } catch (error) {
-    errorMessage.value =
-      error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    errorMessage.value = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    return { error: errorMessage.value };
   } finally {
     isProcessing.value = false;
   }
 };
-
-// Fonction utilitaire pour vérifier si le bouton doit être activé
-const isButtonEnabled = () => {
-  return (
-    stripe &&
-    card &&
-    isCardValid.value &&
-    isCardComplete.value &&
-    !isCardEmpty.value &&
-    !isProcessing.value
-  );
-};
+defineExpose({ createPaymentMethod });
 </script>
 
 <template>
@@ -196,38 +182,6 @@ const isButtonEnabled = () => {
         <span>{{ errorMessage }}</span>
       </div>
     </div>
-
-    <!-- Bouton de soumission -->
-    <button
-      @click="submitPaymentMethod"
-      :disabled="!isButtonEnabled()"
-      class="w-full bg-primary text-black font-outfit font-medium text-base px-6 py-3 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
-    >
-      <span v-if="!isProcessing">Ajouter ma carte</span>
-      <span v-else class="flex items-center justify-center gap-2">
-        <svg
-          class="animate-spin h-4 w-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        Traitement en cours...
-      </span>
-    </button>
 
     <!-- Informations de sécurité -->
     <div class="flex items-center justify-center gap-2 text-xs text-gray-light font-outfit">

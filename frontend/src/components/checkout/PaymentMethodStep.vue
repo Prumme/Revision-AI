@@ -5,13 +5,15 @@ import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInp
 import type { PaymentMethod } from "@stripe/stripe-js";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
 
-const emit =
-  defineEmits<
-    (event: "update-payment-method", paymentInfo: Partial<CheckoutData["paymentMethod"]>) => void
-  >();
+const emit = defineEmits<
+  (event: "update-payment-method", paymentInfo: Partial<CheckoutData["paymentMethod"]>) => void
+>();
 
-// État local pour le composant
+// Ref pour StripePaymentMethodInput
+const stripeInputRef = ref<{ createPaymentMethod: () => Promise<{ paymentMethod?: PaymentMethod; error?: string }> } | null>(null);
 const paymentMethodCreated = ref(false);
+const isLoading = ref(false);
+const errorMessage = ref("");
 
 // Computed pour les informations du plan sélectionné
 const checkout = useCheckoutFlow();
@@ -22,11 +24,16 @@ const planPrice = computed(() => {
 });
 const planName = computed(() => selectedPlan.value?.productName.toUpperCase() || "");
 
-// Gestionnaire pour les changements de validation
-const handleValidationChange = (isValid: boolean, isComplete: boolean) => {
+// Validation Stripe (pour activer le bouton Suivant)
+const isValid = ref(false);
+const isComplete = ref(false);
+
+const handleValidationChange = (valid: boolean, complete: boolean) => {
+  isValid.value = valid;
+  isComplete.value = complete;
   emit("update-payment-method", {
-    isValid,
-    isComplete,
+    isValid: valid,
+    isComplete: complete,
   });
 };
 
@@ -40,6 +47,25 @@ const handlePaymentMethodCreated = (paymentMethod: PaymentMethod) => {
     paymentMethodObject: paymentMethod,
   });
 };
+
+// Nouvelle méthode à appeler par le parent (CheckoutView) pour valider la carte et avancer
+const validateAndCreatePaymentMethod = async () => {
+  errorMessage.value = "";
+  if (!stripeInputRef.value) return false;
+  isLoading.value = true;
+  const result = await stripeInputRef.value.createPaymentMethod();
+  isLoading.value = false;
+  if (result && result.paymentMethod) {
+    handlePaymentMethodCreated(result.paymentMethod);
+    return true;
+  } else if (result && result.error) {
+    errorMessage.value = result.error;
+    return false;
+  }
+  return false;
+};
+
+defineExpose({ validateAndCreatePaymentMethod });
 </script>
 
 <template>
@@ -76,6 +102,7 @@ const handlePaymentMethodCreated = (paymentMethod: PaymentMethod) => {
 
     <!-- Payment Method Input -->
     <StripePaymentMethodInput
+      ref="stripeInputRef"
       @validation-change="handleValidationChange"
       @payment-method-created="handlePaymentMethodCreated"
     />
@@ -95,6 +122,11 @@ const handlePaymentMethodCreated = (paymentMethod: PaymentMethod) => {
       <p class="font-outfit text-sm text-green-600 mt-1 ml-6">
         Vous pouvez maintenant passer à l'étape suivante pour finaliser votre abonnement.
       </p>
+    </div>
+
+    <!-- Error message -->
+    <div v-if="errorMessage" class="bg-error/10 border border-error text-error rounded-lg p-4">
+      <p class="font-outfit font-medium">{{ errorMessage }}</p>
     </div>
   </div>
 </template>
