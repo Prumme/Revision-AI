@@ -3,6 +3,8 @@ import { ref, computed, onMounted, defineProps, defineEmits, watch } from "vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import { ApiService } from "@/services/api.service";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
+import { useToastStore } from "@/stores/toast";
+import { SaveIcon } from "lucide-vue-next";
 
 const props = defineProps<{ billingAddress: CheckoutData["billingAddress"] }>();
 const emit =
@@ -20,6 +22,8 @@ const postalCode = ref(props.billingAddress.postalCode || "");
 const country = ref(props.billingAddress.country || "");
 
 const isLoading = ref(false);
+
+const toastStore = useToastStore();
 
 // Computed pour la validation
 const isFormValid = computed(() => {
@@ -69,8 +73,10 @@ const saveAddress = async () => {
       },
       true,
     );
+    toastStore.showToast("success", "Votre adresse de facturation a été mise à jour avec succès");
   } catch (error) {
     console.error("Erreur lors de la sauvegarde de l'adresse:", error);
+    toastStore.showToast("error", "Erreur lors de la mise à jour de l'adresse de facturation");
   }
 };
 
@@ -159,9 +165,10 @@ onMounted(() => {
     <div v-if="!isLoading && isFormValid" class="flex justify-end">
       <button
         @click="saveAddress"
-        class="font-outfit text-sm text-primary hover:text-primary/80 transition-colors duration-150"
+        class="font-outfit text-sm text-primary hover:text-primary/80 transition-colors duration-150 flex items-center gap-2"
       >
-        💾 Sauvegarder l'adresse pour plus tard
+        <SaveIcon class="h-6 w-6"/>
+        <span>Sauvegarder l'adresse pour plus tard</span>
       </button>
     </div>
   </div>
