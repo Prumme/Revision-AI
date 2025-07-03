@@ -20,7 +20,7 @@ export interface SubscriptionProvider {
     tier: SubscriptionTier,
     paymentMethodId: string,
   ): Promise<true | Error>;
-  getStripeProductPrices(): Promise<SubscriptionInfo[] | Error>;
+  getProductsPrices(): Promise<SubscriptionInfo[] | Error>;
 }
 
 export const SubscriptionPrvProvider = {

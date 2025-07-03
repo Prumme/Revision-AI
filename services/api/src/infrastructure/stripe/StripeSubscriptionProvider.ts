@@ -20,7 +20,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
 
   private async initStripeMappings() {
     if (this.mappingInitialized) return;
-    const productsOrError = await this.getStripeProductPrices();
+    const productsOrError = await this.getProductsPrices();
     if (productsOrError instanceof Error) {
       console.error('Failed to initialize Stripe mappings:', productsOrError);
       return;
@@ -70,7 +70,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     return this.tierToStripeProductId[tier];
   }
 
-  async getStripeProductPrices(): Promise<SubscriptionInfo[] | Error> {
+  async getProductsPrices(): Promise<SubscriptionInfo[] | Error> {
     try {
       // Add conditions to filter only product and prices that are for RevisionAI
       const products = await this.stripe.products.list({
