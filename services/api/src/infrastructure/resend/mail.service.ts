@@ -25,8 +25,8 @@ export class MailService {
     html: string,
   ): Promise<CreateEmailResponseSuccess> {
     const { data, error } = await resend.emails.send({
-      from: 'onboarding@resend.dev', // TODO: Change to the correct email
-      to: ['aurelien23.p@gmail.com'], // TODO: Change to the correct email [to]
+      from: 'Contact <contact@revision-ai.com>',
+      to: [to],
       subject: subject,
       html: html,
     });
