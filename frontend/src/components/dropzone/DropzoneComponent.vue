@@ -195,7 +195,7 @@ const isDropzoneBlocked = computed(() => {
 
     <!-- File Preview -->
     <div v-if="files.length > 0" class="bg-gray-50 p-4 rounded-lg border border-gray-300">
-      <Label>Uploaded files</Label>
+      <Label>Fichiers renseignés</Label>
       <ul class="divide-y divide-gray-200 mt-2">
         <li
           v-for="(file, index) in files"

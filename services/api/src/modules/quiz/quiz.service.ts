@@ -138,6 +138,17 @@ export class QuizService {
     this.logger.log(`Mise à jour du quiz ${id} avec les données suivantes:`, JSON.stringify(quiz));
 
     if (quiz.questions && quiz.questions.length > 0) {
+      quiz.questions = quiz.questions.map(q => ({
+        ...q,
+        answers: (q.answers || []).map(a => {
+          let cValue = a.c;
+          if (typeof a.correct === 'boolean') cValue = a.correct;
+          return {
+            ...a,
+            c: typeof cValue === 'boolean' ? cValue : false
+          };
+        })
+      }));
       this.logger.log(`Quiz ${id} mis à jour avec ${quiz.questions.length} questions`);
       this.logger.log(`Première question: ${quiz.questions[0].q}`);
       this.logger.log(`Nombre de réponses: ${quiz.questions[0].answers.length}`);
@@ -160,10 +171,14 @@ export class QuizService {
     // Normalisation du champ c pour chaque réponse, accepte aussi 'correct' (Mongo schema)
     const normalizedQuestions = (questions || []).map(q => ({
       ...q,
-      answers: (q.answers || []).map(a => ({
-        ...a,
-        correct: typeof a.c === 'boolean' ? a.c : (typeof a.correct === 'boolean' ? a.correct : false)
-      }))
+      answers: (q.answers || []).map(a => {
+        let cValue = a.c;
+        if (typeof a.correct === 'boolean') cValue = a.correct;
+        return {
+          ...a,
+          c: typeof cValue === 'boolean' ? cValue : false
+        };
+      })
     }));
     quiz.questions = normalizedQuestions;
     quiz.status = 'completed';
