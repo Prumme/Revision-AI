@@ -85,6 +85,7 @@ onMounted(async () => {
 
     card = elements.create("card", {
       style: createCardStyles(),
+      hidePostalCode: true,
     });
 
     if (cardElement.value) {
@@ -132,14 +133,16 @@ const createPaymentMethod = async () => {
       card: card,
     });
     if (error) {
-      errorMessage.value = error.message || "Une erreur est survenue lors du traitement du paiement";
+      errorMessage.value =
+        error.message || "Une erreur est survenue lors du traitement du paiement";
       return { error: errorMessage.value };
     } else {
       emit("paymentMethodCreated", paymentMethod);
       return { paymentMethod };
     }
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
+    errorMessage.value =
+      error instanceof Error ? error.message : "Une erreur inattendue est survenue.";
     return { error: errorMessage.value };
   } finally {
     isProcessing.value = false;
