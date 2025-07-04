@@ -22,5 +22,4 @@ import LandingFooter from "@/components/landing/LandingFooter.vue";
   <LandingFAQ />
   <LandingCTA />
   <LandingFooter />
-  <!-- ...autres sections de la landing page à venir... -->
 </template>

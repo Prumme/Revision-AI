@@ -13,6 +13,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showCorrection: {
+    type: Boolean,
+    default: false,
+  },
   userSelection: {
     type: Object,
     default: undefined,
@@ -42,22 +46,40 @@ watch(
   { deep: true }
 );
 
-const isCorrectionActive = computed(() => props.showAllAnswers || props.mode === 'quiz' && props.showCorrection);
+watch(
+  () => props.userSelection,
+  (newVal) => {
+    if (newVal) {
+      selectedAnswers.value = { ...newVal };
+    }
+  },
+  { deep: true, immediate: true }
+);
+
+const isCorrectionActive = computed(() => props.showAllAnswers || (props.mode === 'quiz' && props.showCorrection));
 
 const selectAnswer = (questionIdx: number, answerIdx: number) => {
   if (props.mode === 'config') return;
   if (isCorrectionActive.value) return;
+
   const question = props.questions[questionIdx];
   if (!question) return;
-    const correctCount = question.answers.filter((a) => a.c).length;
+
   if (!selectedAnswers.value[questionIdx]) selectedAnswers.value[questionIdx] = [];
-  if (correctCount > 1) {
+
+  if (isMultipleChoice(question)) {
     const idx = selectedAnswers.value[questionIdx].indexOf(answerIdx);
-    if (idx === -1) selectedAnswers.value[questionIdx].push(answerIdx);
-    else selectedAnswers.value[questionIdx].splice(idx, 1);
+    console.log("SELECTED ANSWERS", selectedAnswers.value);
+    if (idx === -1) {
+      selectedAnswers.value[questionIdx].push(answerIdx);
+    } else {
+      selectedAnswers.value[questionIdx].splice(idx, 1);
+    }
   } else {
+    // Question à choix unique
     selectedAnswers.value[questionIdx] = [answerIdx];
   }
+
   emit("update:selection", { ...selectedAnswers.value });
 };
 
@@ -66,6 +88,10 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
     return props.userSelection[questionIdx].includes(answerIdx);
   }
   return selectedAnswers.value[questionIdx]?.includes(answerIdx);
+};
+
+const isMultipleChoice = (question) => {
+  return question.answers.filter((a) => a.c).length > 1;
 };
 </script>
 
@@ -122,7 +148,6 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
                   (mode === 'config' && showAllAnswers && !!item.c) ? 'bg-success text-white' : '',
                   (mode !== 'config' && showAllAnswers && !!item.c) ? 'bg-success text-white' : 'border border-gray-400 text-gray-600',
                   isSelected(index, idx) && mode === 'quiz' ? 'text-primary' : ''
-
                 ]"
               >
                 {{ String.fromCharCode(65 + idx) }}
@@ -140,6 +165,7 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
   </draggable>
 
   <template v-else>
+    {{selectedAnswers}}
     <div v-for="(question, index) in questions" :key="question.id || index" class="mb-6 relative flex items-start gap-2 group">
       <section
         class="flex flex-col p-5 bg-white border border-gray-extralight rounded-lg shadow-sm w-full flex-wrap"
@@ -147,7 +173,7 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
         <div class="flex flex-col gap-1">
           <div class="flex justify-between items-center">
             <p class="font-outfit text-lg text-black">{{ question.question }}</p>
-            <span v-if="question.answers.filter(a => a.c).length > 1" class="ml-2 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold">Choix multiple</span>
+            <span v-if="isMultipleChoice(question)" class="ml-2 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold">Choix multiple</span>
           </div>
           <p class="font-outfit text-lg text-black">{{ question.q }}</p>
         </div>
@@ -168,7 +194,7 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
             <span
               class="w-6 h-6 flex items-center justify-center text-xs font-bold rounded-md transition-colors duration-200"
               :class="[
-                isCorrectionActive && item.c ? 'border-success text-success bg-success' : '',
+                isCorrectionActive && item.c ? 'bg-success text-success border-success py-2' : '',
                 isCorrectionActive && isSelected(index, idx) && !item.c ? 'bg-red-500 text-red-500 border-red-500' : '',
                 isSelected(index, idx) && !isCorrectionActive ? 'bg-primary text-white' : 'border border-gray-400 text-gray-600 bg-white'
               ]"
@@ -183,7 +209,7 @@ const isSelected = (questionIdx: number, answerIdx: number) => {
               ]">{{ item.a }}</span>
               <template v-if="isCorrectionActive">
                 <CheckCircle2 v-if="item.c" class="w-5 h-5 text-success ml-2" />
-                <XCircle v-else-if="isSelected(index, idx) && !item.c" class="w-5 h-5 text-red-500   ml-2" />
+                <XCircle v-else-if="isSelected(index, idx) && !item.c" class="w-5 h-5 text-red-500 ml-2" />
               </template>
             </div>
           </li>

@@ -17,17 +17,6 @@ export interface BackendQuestion {
     }>;
 }
 
-// Helper function to convert backend question format to frontend format
-function convertBackendQuestions(backendQuestions: BackendQuestion[] = []): QuizQuestion[] {
-    return backendQuestions.map(q => ({
-        question: q.q,
-        answers: q.answers.map(a => ({
-            a: a.a,
-            c: a.c
-        }))
-    }));
-}
-
 export interface PaginationParams {
     page?: number;
     limit?: number;
@@ -147,15 +136,6 @@ export class QuizService {
         const response = await ApiService.get<Quiz>(`/quizzes/${quizId}`);
         const quiz = response.data;
 
-        // Si le quiz contient des questions au format backend, les convertir au format frontend
-        if (quiz.questions && Array.isArray(quiz.questions)) {
-            const backendQuestions = quiz.questions as unknown as BackendQuestion[];
-            if (backendQuestions.length > 0 && 'q' in backendQuestions[0]) {
-                console.log('Converting backend questions to frontend format');
-                quiz.questions = convertBackendQuestions(backendQuestions);
-            }
-        }
-
         return quiz;
     }
 
@@ -255,4 +235,3 @@ export class QuizService {
         return response.data;
     }
 }
-

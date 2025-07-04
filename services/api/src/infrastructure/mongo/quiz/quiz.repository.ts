@@ -71,7 +71,7 @@ export class MongoQuizRepository implements QuizRepository {
         q: q.q,
         answers: q.answers.map((a) => ({
           a: a.a,
-          c: a.correct,
+          c: a.c,
         })),
       })),
       questionsNumbers: document.questionsNumbers,

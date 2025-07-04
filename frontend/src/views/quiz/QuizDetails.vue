@@ -59,12 +59,10 @@ onMounted(async () => {
 const saveOrder = async () => {
   if (!quiz.value) return;
   try {
+    console.log(quiz.value.questions);
     const questions = quiz.value.questions.map(q => ({
       ...q,
-      answers: q.answers.map(a => ({
-        ...a,
-        c: typeof a.c === "boolean" ? a.c : a.c === "true"
-      }))
+      answers: q.answers.map(a => ({ ...a }))
     }));
 
     await QuizService.updateQuiz(quiz.value.id, { questions });
@@ -90,7 +88,6 @@ const nextStep = () => {
 
 const finishQuiz = () => {
   quizFinished.value = true;
-  showConfetti.value = true;
   let score = 0;
   quiz.value?.questions.forEach((q, idx) => {
     const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);

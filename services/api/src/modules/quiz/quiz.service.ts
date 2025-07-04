@@ -23,7 +23,20 @@ export class QuizService {
   ) { }
 
   async findById(id: string): Promise<Quiz | null> {
-    return this.quizRepository.findById(id);
+    const quiz = await this.quizRepository.findById(id);
+    if (!quiz) return null;
+    // Normalisation du format des questions pour le frontend
+    return {
+      ...quiz,
+      questions: (quiz.questions || []).map(q => ({
+        q: q.q || q.question,
+        answers: (q.answers || []).map(a => ({
+          a: a.a,
+          c: typeof a.c === 'boolean' ? a.c : false,
+          _id: a._id
+        }))
+      }))
+    };
   }
 
   async findAll(): Promise<Quiz[]> {

@@ -10,7 +10,7 @@ export const QuizSchema = new Schema({
       answers: [
         {
           a: { type: String, required: true },
-          correct: { type: Boolean, required: true },
+          c: { type: Boolean, required: true },
         },
       ],
     },
@@ -37,7 +37,7 @@ export interface QuizDocument extends Document {
     q: string;
     answers: {
       a: string;
-      correct: boolean;
+      c: boolean;
     }[];
   }[];
   questionsNumbers: number;

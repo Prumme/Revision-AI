@@ -87,14 +87,16 @@ async function fetchQuizzes() {
   if (!user?.id) return;
   loading.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 900)); // Faux temps de chargement
+    await new Promise((resolve) => setTimeout(resolve, 600))
     const filters: Record<string, unknown> = {};
     if (search.value) filters.search = search.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
     if (isPublic.value !== null) filters.isPublic = isPublic.value;
     const pagination = { page: page.value, limit: limit.value };
     const res = await QuizService.getUserQuizzes(user.id, filters, pagination);
-    console.log("res from getUserQuizzes", res);
+
+    console.log("RESPONSE", res);
+
     if (Array.isArray(res)) {
       quizzes.value = res;
       total.value = res.length;
@@ -108,6 +110,7 @@ async function fetchQuizzes() {
       total.value = 0;
       totalPages.value = 1;
     }
+
   } catch {
     error.value = "Impossible de charger les quiz. Veuillez réessayer plus tard.";
   } finally {
@@ -219,6 +222,7 @@ onMounted(async () => {
 
       <div v-else>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
+          {{console.log("QUIZZ", quizzes)}}
           <div
             v-for="quiz in quizzes"
             :key="quiz.id"
