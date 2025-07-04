@@ -5,14 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="25-billing-et-abbonement">
-      <change afterPath="$PROJECT_DIR$/frontend/src/assets/images/confetti.avif" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/draggables/QuestionDraggable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/draggables/QuestionDraggable.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/dropzone/DropzoneComponent.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/dropzone/DropzoneComponent.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/LandingPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/LandingPage.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/quiz/QuizList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/quiz/QuizList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
