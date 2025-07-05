@@ -1,0 +1,53 @@
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: mongodb
+  namespace: mongodb
+spec:
+  members: 3
+  type: ReplicaSet
+  version: "8.0.10"
+  users:
+    - name: admin
+      db: admin
+      passwordSecretRef:
+        name: admin-user
+      roles:
+        - name: root
+          db: admin
+      scramCredentialsSecretName: my-scram
+  security:
+#    tls:
+#      enabled: true
+#      certificateKeySecretRef:
+#        name: mongodb-cert
+#      caCertificateSecretRef:
+#        name: mongodb-cert
+#      # optional: true
+    authentication:
+      modes:
+        - SCRAM
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+  statefulSet:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mongod
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 2Gi
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+      volumeClaimTemplates:
+        - metadata:
+            name: data-volume
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 5G
