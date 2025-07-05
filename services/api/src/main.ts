@@ -3,7 +3,15 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { raw, json, urlencoded } from 'body-parser';
-import { QuizService } from './modules/quiz/quiz.service';
+import { z } from 'zod';
+import {
+  HandleParsedFileUseCaseFactory,
+  HandleQuizGenerationCompletedUseCaseFactory,
+} from './domain/usecases/QuizGenerationUseCase';
+import { QueueProvider } from '@services/QueueProvider';
+import { QuizGenerationDTO } from './types/QuizGenerationDTO';
+import { QuizRepository } from '@repositories/quiz.repository';
+import { createQueueConsumer } from '@infrastructure/queue/createQueueConsumer';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,9 +53,69 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  const { quizGeneratedConsumer } = await import('./infrastructure/queue/quizGeneratedConsumer');
-  const quizService = app.get(QuizService);
-  quizGeneratedConsumer(quizService);
+  const quizRepository = app.get<QuizRepository>('QuizRepository');
+  const jobRepository = app.get('QuizGenerationJobRepository');
+  const cachedFileRepository = app.get('CachedFileParsedRepository');
+  const quizQueueProvider = app.get<QueueProvider<QuizGenerationDTO>>(
+    'QuizGenerationQueueProvider',
+  );
+  const handleParsedFileUseCase = HandleParsedFileUseCaseFactory(
+    quizRepository,
+    jobRepository,
+    cachedFileRepository,
+    quizQueueProvider,
+  );
+  const handleQuizCompletedUseCase =
+    HandleQuizGenerationCompletedUseCaseFactory(quizRepository, jobRepository);
+
+  const fileParsedEventSchema = z
+    .object({
+      checksum: z.string(),
+      fileName: z.string(),
+      objectKey: z.string(),
+    })
+    .catchall(z.any());
+
+  /**
+   * Handle event from the file parser
+   */
+  await createQueueConsumer(
+    'file-parsed',
+    fileParsedEventSchema,
+    // @ts-ignore
+    handleParsedFileUseCase,
+  );
+
+  /**
+   * Handle message from the quiz generator
+   */
+  const quizGeneratedEventSchema = z.object({
+    identifier: z.string().optional(),
+    success: z.boolean(),
+    error: z.string().optional(),
+    questions: z
+      .array(
+        z.object({
+          q: z.string(),
+          answers: z.array(
+            z.object({
+              a: z.string(),
+              c: z.boolean().optional(),
+              _id: z.string().optional(),
+            }),
+          ),
+        }),
+      )
+      .optional(),
+    t: z.string().optional(),
+  });
+
+  await createQueueConsumer(
+    'quiz-generated',
+    quizGeneratedEventSchema,
+    // @ts-ignore
+    handleQuizCompletedUseCase,
+  );
 
   await app.listen(process.env.PORT || 3000);
 }

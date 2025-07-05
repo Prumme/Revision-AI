@@ -32,7 +32,7 @@ import { QuizService } from './quiz.service';
 @Controller('quizzes')
 @ApiBearerAuth('JWT-auth')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) { }
+  constructor(private readonly quizService: QuizService) {}
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les quiz' })
@@ -63,7 +63,9 @@ export class QuizController {
   }
 
   @Get('user/:id')
-  @ApiOperation({ summary: "Récupérer tous les quiz d'un utilisateur par son ID avec filtres" })
+  @ApiOperation({
+    summary: "Récupérer tous les quiz d'un utilisateur par son ID avec filtres",
+  })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
   @ApiResponse({
     status: 200,
@@ -72,9 +74,12 @@ export class QuizController {
   })
   async findAllByUserId(
     @Param('id') id: string,
-    @Query() filters: QuizFiltersDto
+    @Query() filters: QuizFiltersDto,
   ): Promise<Quiz[]> {
-    return this.quizService.findAllByUserId(id, filters);
+    return this.quizService.findAllByUserId(id, {
+      ...filters,
+      ready: true,
+    });
   }
 
   @Post()
@@ -92,15 +97,16 @@ export class QuizController {
   ): Promise<Quiz> {
     // S'assurer que files est un tableau
     const fileArray = Array.isArray(files) ? files : files ? [files] : [];
-
     if (fileArray.length > 0) {
-      console.log('File details:', fileArray.map(f => ({
-        name: f.originalname,
-        size: f.size,
-        mimetype: f.mimetype
-      })));
+      console.log(
+        'File details:',
+        fileArray.map((f) => ({
+          name: f.originalname,
+          size: f.size,
+          mimetype: f.mimetype,
+        })),
+      );
     }
-
     return this.quizService.create(
       { ...createQuizDto, userId: user.sub },
       fileArray,

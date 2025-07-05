@@ -13,6 +13,7 @@ interface StorageFile {
   stream: Readable;
   metadata: { [key: string]: string };
   contentType?: string;
+  checksum: string;
 }
 
 @Injectable()
@@ -205,6 +206,8 @@ export class MinioService implements OnModuleInit {
         stream,
         metadata: headResult.Metadata || {},
         contentType: headResult.ContentType,
+        checksum:
+          headResult?.ChecksumSHA256 || headResult.ETag.replace(/"/g, ''),
       };
     } catch (error) {
       if (error.statusCode === 404) {

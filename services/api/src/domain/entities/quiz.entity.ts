@@ -28,15 +28,57 @@ export class Quiz {
   @ApiProperty({ description: 'Médias associés au quiz', type: [String] })
   media: string[];
 
-  @ApiProperty({
-    description: 'Statut du quiz',
-    enum: ['pending', 'processing', 'completed', 'failed'],
-  })
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  // @ApiProperty({
+  //   description: 'Statut du quiz',
+  //   enum: ['pending', 'processing', 'completed', 'failed'],
+  // })
+  // status: 'pending' | 'processing' | 'completed' | 'failed';
 
   @ApiProperty({ description: 'Date de création' })
   createdAt: Date;
 
   @ApiProperty({ description: 'Date de mise à jour' })
   updatedAt: Date;
+}
+
+export function createQuiz(
+  title: string,
+  description: string,
+  category: string,
+  questionsNumbers: number,
+  isPublic: boolean,
+  userId: string,
+  media: string[] = [],
+): Quiz {
+  return {
+    id: '',
+    userId,
+    title,
+    category,
+    questions: [],
+    questionsNumbers,
+    description,
+    isPublic,
+    media,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+export function putQuestions(quiz: Quiz, questions: Question[]): Quiz {
+  return {
+    ...quiz,
+    questions: questions.map((q) => ({
+      ...q,
+      answers: (q.answers || []).map((a) => {
+        let cValue = a.c;
+        if (typeof a.c === 'boolean') cValue = a.c;
+        return {
+          ...a,
+          c: typeof cValue === 'boolean' ? cValue : false,
+        };
+      }),
+    })),
+    updatedAt: new Date(),
+  };
 }

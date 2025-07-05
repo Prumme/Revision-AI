@@ -1,0 +1,296 @@
+import { UseCase, UseCaseFactory } from './IUseCase';
+import { QuizGeneratedDTO } from '../../types/QuizGeneratedDTO';
+import { FileContentDTO } from '../../types/FileContentDTO';
+import { CreateQuizDto } from '@modules/quiz/dto/create-quiz.dto';
+import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
+import * as QuizJobEntity from '@entities/quiz-generation-job.entity';
+import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
+import { MinioService } from '@modules/minio/minio.service';
+import { QueueProvider } from '@services/QueueProvider';
+import { FileToParseDTO } from '../../types/FileToParseDTO';
+import * as QuizEntity from '@entities/quiz.entity';
+import { QuizRepository } from '@repositories/quiz.repository';
+import { CachedFileParsed } from '@entities/cached-file-parsed.entity';
+import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
+import { Quiz } from '@entities/quiz.entity';
+
+async function generateQuizGenerationDTO(
+  identifier: string,
+  questionsNumbers: number,
+  filesIdentifiers: string[],
+  _cachedFileParsedRepository: CachedFileParsedRepository,
+): Promise<QuizGenerationDTO> {
+  const files = await Promise.all(
+    filesIdentifiers.map((fileIdentifier) =>
+      _cachedFileParsedRepository.getParsedFileByIdentifier(fileIdentifier),
+    ),
+  );
+
+  const parsedFiles = files.filter(Boolean);
+  if (parsedFiles.length !== filesIdentifiers.length) {
+    throw new Error('Not all files have been parsed');
+  }
+
+  return {
+    identifier,
+    questionsNumbers,
+    filesContents: parsedFiles.map((file) => file.fileContent),
+  };
+}
+
+export interface JobIdentifier {
+  jobId: string;
+}
+
+export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error>>;
+export const CreateQuizUseCaseFactory: UseCaseFactory<
+  CreateQuizUseCase,
+  [
+    QuizRepository,
+    QuizGenerationJobRepository,
+    CachedFileParsedRepository,
+    MinioService, // @todo abstration is better but to complex with the current implemetentation
+    QueueProvider<FileToParseDTO>,
+    QueueProvider<QuizGenerationDTO>,
+  ]
+> = (
+  _quizRepository,
+  _quizGenerationJobRepository,
+  _cachedFileParsedRepository,
+  _fileService,
+  _fileToParseQueueProvider,
+  _quizGenerationQueueProvider,
+) => {
+  return async (createQuizDto) => {
+    type FileIdentifierWithChecksum = {
+      fileIdentifier: string;
+      checksum: string;
+    };
+
+    /** Obtenir les checksum des fichiers */
+    const checksumsJobs = createQuizDto.medias.map(async (fileIdentifier) => {
+      try {
+        const file = await _fileService.getFile(fileIdentifier);
+        return {
+          fileIdentifier,
+          checksum: file.checksum,
+        };
+      } catch (e) {
+        console.error('Error fetching file:', e);
+        return null;
+      }
+    });
+
+    const files = (await Promise.all(checksumsJobs)).filter(
+      (checksum) => checksum !== null,
+    ) as FileIdentifierWithChecksum[];
+
+    /** Verifier que les fichiers non pas déjà été parsés */
+    const parsedFiles = (
+      await Promise.all(
+        files.map(({ checksum }) =>
+          _cachedFileParsedRepository.getParsedFileByChecksum(checksum),
+        ),
+      )
+    ).filter(Boolean);
+
+    if (parsedFiles.length !== files.length) {
+      //si il y a des fichiers à parser on les parse
+      const alreadyParsedChecksums = parsedFiles.map((file) => file.checksum);
+      const filesToParse: FileToParseDTO[] = files
+        .filter((file) => !alreadyParsedChecksums.includes(file.checksum))
+        .map(({ fileIdentifier, checksum }) => ({
+          bucketName: _fileService.bucketName,
+          objectKey: fileIdentifier,
+          fileName: fileIdentifier,
+          checksum,
+        }));
+
+      for (const file of filesToParse)
+        await _fileToParseQueueProvider.send(file);
+    }
+
+    const quiz = QuizEntity.createQuiz(
+      createQuizDto.title,
+      createQuizDto.description,
+      createQuizDto.category,
+      createQuizDto.questionsNumbers,
+      createQuizDto.isPublic,
+      createQuizDto.userId,
+      createQuizDto.medias,
+    );
+
+    const createdQuiz = await _quizRepository.create(quiz);
+    if (!createdQuiz) return new Error('Failed to create quiz');
+
+    let job = QuizJobEntity.createQuizGenerationJob(
+      createQuizDto.userId,
+      createdQuiz.id,
+      createQuizDto.medias,
+    );
+    for (const parsedFile of parsedFiles)
+      job = QuizJobEntity.markFileAsParsed(job, parsedFile.identifier);
+
+    const inserted = await _quizGenerationJobRepository.putJob(job);
+    if (!inserted) return new Error('Failed to create quiz generation job');
+
+    if (QuizJobEntity.isReadyForGeneration(job)) {
+      await _quizGenerationQueueProvider.send(
+        await generateQuizGenerationDTO(
+          createdQuiz.id,
+          createQuizDto.questionsNumbers,
+          createQuizDto.medias,
+          _cachedFileParsedRepository,
+        ),
+      );
+    }
+
+    return createdQuiz;
+  };
+};
+
+export type HandleParsedFileUseCase = UseCase<
+  FileContentDTO,
+  Promise<void | Error>
+>;
+
+export const HandleParsedFileUseCaseFactory: UseCaseFactory<
+  HandleParsedFileUseCase,
+  [
+    QuizRepository,
+    QuizGenerationJobRepository,
+    CachedFileParsedRepository,
+    QueueProvider<QuizGenerationDTO>,
+  ]
+> = (
+  _quizRepository,
+  _quizGenerationJobRepository,
+  _cachedFileParsedRepository,
+  _quizGenerationQueueProvider,
+) => {
+  return async (fileContent) => {
+    // Sauvegarder le fichier parsé dans la base de données pour éviter de le parser à nouveau plus tard
+    const cachedFile: CachedFileParsed = {
+      fileContent,
+      identifier: fileContent.objectKey,
+      checksum: fileContent.checksum,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const inserted = await _cachedFileParsedRepository.putFile(cachedFile);
+    if (!inserted) {
+      throw new Error('Failed to save parsed file');
+    }
+
+    let error = null;
+
+    // Changer l'état du job de génération de quiz en cours pour indiquer que le fichier a été parsé si le job avait ce fichier
+    const processingJob = await _quizGenerationJobRepository.findProcessingJobs(
+      { files: [fileContent.objectKey] },
+    );
+
+    for (let job of processingJob) {
+      job = QuizJobEntity.markFileAsParsed(job, fileContent.objectKey);
+      await _quizGenerationJobRepository.putJob(job, job.id);
+      if (QuizJobEntity.isReadyForGeneration(job)) {
+        const quiz = await _quizRepository.findById(job.quizId);
+        if (!quiz) {
+          error = new Error('Quiz not found for the job');
+          console.error(error);
+          continue;
+        }
+        const quizGenerationDTO = await generateQuizGenerationDTO(
+          quiz.id,
+          quiz.questionsNumbers,
+          job.files.map((file) => file.identifier),
+          _cachedFileParsedRepository,
+        );
+        await _quizGenerationQueueProvider.send(quizGenerationDTO);
+      }
+    }
+    if (error) return error;
+    return;
+  };
+};
+
+export type HandleQuizGenerationCompletedUseCase = UseCase<
+  QuizGeneratedDTO,
+  Promise<void | Error>
+>;
+export const HandleQuizGenerationCompletedUseCaseFactory: UseCaseFactory<
+  HandleQuizGenerationCompletedUseCase,
+  [QuizRepository, QuizGenerationJobRepository]
+> = (_quizRepository, _quizGenerationJobRepository) => {
+  return async (quizGeneratedDTO) => {
+    const quiz = await _quizRepository.findById(quizGeneratedDTO.identifier);
+    if (!quiz) {
+      console.error('Quiz Not found', quizGeneratedDTO.identifier);
+      return new Error('Quiz not found');
+    }
+
+    let job = await _quizGenerationJobRepository.findByQuizId(
+      quizGeneratedDTO.identifier,
+    );
+    if (!job) {
+      console.error('Job Not found', quizGeneratedDTO.identifier);
+      return new Error('Job not found');
+    }
+
+    if (quizGeneratedDTO.success == true) {
+      try {
+        const quizUpdated = QuizEntity.putQuestions(
+          quiz,
+          quizGeneratedDTO.questions,
+        );
+        await _quizRepository.update(quiz.id, quizUpdated);
+
+        job = QuizJobEntity.completeJob(job);
+        await _quizGenerationJobRepository.putJob(job, job.id);
+
+        return;
+      } catch (e) {
+        return e;
+      }
+    } else if (quizGeneratedDTO.success == false) {
+      console.error(
+        'Error during the generation of the quiz:',
+        quizGeneratedDTO.identifier,
+      );
+      job = QuizJobEntity.addEventJob(job, {
+        error: true,
+        message: quizGeneratedDTO.error,
+      });
+      job.status = QuizJobEntity.QuizGenerationJobStatus.FAILED;
+      await _quizGenerationJobRepository.putJob(job, job.id);
+
+      return new Error(quizGeneratedDTO.error);
+    }
+  };
+};
+
+export type GetJobProgressDTO = {
+  progress: number;
+  status: QuizJobEntity.QuizGenerationJobStatus;
+};
+export type GetJobProgressUseCase = UseCase<
+  JobIdentifier,
+  Promise<GetJobProgressDTO | Error>
+>;
+export const GetJobProgressUseCaseFactory: UseCaseFactory<
+  GetJobProgressUseCase,
+  [QuizGenerationJobRepository]
+> = (_quizGenerationJobRepository) => {
+  return async (jobIdentifier) => {
+    const job = await _quizGenerationJobRepository.findById(
+      jobIdentifier.jobId,
+    );
+    if (!job) {
+      return Error('Job not found');
+    }
+    return {
+      progress:
+        job.files.filter((file) => file.parsed).length / job.files.length,
+      status: job.status,
+    };
+  };
+};
