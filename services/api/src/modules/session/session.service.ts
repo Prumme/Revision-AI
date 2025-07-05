@@ -64,6 +64,7 @@ export class SessionService {
       startedAt: new Date(),
       finishedAt: null,
       answers: [],
+      status: 'active',
       score: 0,
     };
     return this.sessionRepository.create(sessionData);
@@ -125,5 +126,21 @@ export class SessionService {
         ];
     await this.sessionRepository.updateAnswers(sessionId, updatedAnswers);
     return await this.sessionRepository.findById(sessionId);
+  }
+
+  async pauseSession(id: string): Promise<Session> {
+    const session = await this.sessionRepository.pauseSession(id);
+    if (!session) {
+      throw new NotFoundException(`Session with id ${id} not found`);
+    }
+    return session;
+  }
+
+  async resumeSession(id: string): Promise<Session> {
+    const session = await this.sessionRepository.resumeSession(id);
+    if (!session) {
+      throw new NotFoundException(`Session with id ${id} not found`);
+    }
+    return session;
   }
 }

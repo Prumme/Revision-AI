@@ -5,6 +5,8 @@ export interface SessionAnswer {
   a: string;
 }
 
+export type SessionStatus = 'pending' | 'active' | 'paused' | 'finished';
+
 export class Session {
   id: string;
 
@@ -25,4 +27,7 @@ export class Session {
 
   @ApiProperty({ description: 'Réponses fournies par l’utilisateur', type: [Object] })
   answers: SessionAnswer[];
+
+  @ApiProperty({ description: 'Statut de la session', enum: ['pending', 'active', 'paused', 'finished'], default: 'pending' })
+  status: SessionStatus;
 }

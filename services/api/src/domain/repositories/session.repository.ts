@@ -8,6 +8,8 @@ export interface SessionRepository {
   startSession(id: string): Promise<Session | null>;
   endSession(id: string, finishedAt: Date, score: number, answers: SessionAnswer[]): Promise<Session | null>;
   updateAnswers(sessionId: string, answers: SessionAnswer[]): Promise<Session | null>;
+  pauseSession(id: string): Promise<Session | null>;
+  resumeSession(id: string): Promise<Session | null>;
 }
 
 export const SessionRepositoryProvider = {

@@ -31,4 +31,14 @@ export const sessionService = {
     const { data } = await ApiService.post<Session>(`/sessions/${sessionId}/answer`, answer);
     return data;
   },
+
+  async pauseSession(sessionId: string): Promise<Session> {
+    const { data } = await ApiService.post<Session>(`/sessions/${sessionId}/pause`, {});
+    return data;
+  },
+
+  async resumeSession(sessionId: string): Promise<Session> {
+    const { data } = await ApiService.post<Session>(`/sessions/${sessionId}/resume`, {});
+    return data;
+  },
 };

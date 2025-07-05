@@ -3,79 +3,49 @@ import QuestionDraggable from "@/components/draggables/QuestionDraggable.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
-import { Quiz, QuizService } from "@/services/quiz.service";
-import { useToastStore } from "@/stores/toast";
-import { ArrowLeftIcon } from "lucide-vue-next";
-import { onMounted, ref, computed, watch } from "vue";
+import { QuizService } from "@/services/quiz.service";
+import { onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { Motion } from '@motionone/vue';
-import { useSessionStore } from "@/stores/session";
-import {useUserStore} from "@/stores/user.ts";
-import { sessionService } from "@/services/session.service";
-import DataTable from '@/components/tables/DataTable.vue';
-import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
+import { useQuizDetails } from '@/composables/useQuizDetails';
+import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
+import { useSessionStore } from '@/stores/session';
+import DataTable from "@/components/tables/DataTable.vue";
 
 const route = useRoute();
-const toast = useToastStore();
-const sessionStore = useSessionStore();
 const quizId = route.params.id as string;
-const quiz = ref<Quiz | null>(null);
-const loading = ref(true);
-const error = ref<string | null>(null);
-const orderChanged = ref(false);
-const showAllAnswers = ref(false);
-const activeTab = ref("config");
+const quizDetails = useQuizDetails(quizId);
+const sessionStore = useSessionStore();
 
-const currentStep = ref(0);
-const userAnswers = ref<Record<number, number[]>>({});
-const quizFinished = ref(false);
-const quizScore = ref(0);
-const showCorrection = ref(false);
-const isStarted = ref(false);
-const showLoader = ref(false);
-
-const user = useUserStore();
-const userId = ref<string>(user.user.id);
-
-const isQuizOwner = computed(() => {
-  return quiz.value && quiz.value.userId === userId.value;
-});
-
-const quizTabs = [
-  { key: "quiz", label: "Quiz" },
-  { key: 'sessions', label: 'Sessions' },
-  { key: "config", label: "Configuration" },
-];
-
-const sessionColumns = [
-  {
-    key: 'startedAt',
-    label: 'Date de début',
-    sortable: true,
-    formatter: (value: string) => value ? new Date(value).toLocaleString('fr-FR') : '-',
-  },
-  {
-    key: 'finishedAt',
-    label: 'Date de fin',
-    sortable: true,
-    formatter: (value: string) => value ? new Date(value).toLocaleString('fr-FR') : '-',
-  },
-  {
-    key: 'score',
-    label: 'Score',
-    sortable: true,
-  },
-];
-
-const onQuestionsOrderChange = (newQuestions: Quiz["questions"]) => {
-  orderChanged.value = true;
-  if (quiz.value) quiz.value.questions = newQuestions;
-};
-
-const toggleAllAnswers = () => {
-  showAllAnswers.value = !showAllAnswers.value;
-};
+const {
+  quiz,
+  loading,
+  error,
+  orderChanged,
+  showAllAnswers,
+  activeTab,
+  currentStep,
+  userAnswers,
+  quizFinished,
+  quizScore,
+  showCorrection,
+  isStarted,
+  showLoader,
+  isQuizOwner,
+  quizTabs,
+  sessionColumns,
+  actions,
+  onQuestionsOrderChange,
+  toggleAllAnswers,
+  saveOrder,
+  startQuizSession,
+  nextStep,
+  endSession,
+  userSessions,
+  fetchUserSessions,
+  shuffleQuestions
+} = quizDetails;
 
 onMounted(async () => {
   try {
@@ -88,156 +58,15 @@ onMounted(async () => {
   }
 });
 
-const saveOrder = async () => {
-  if (!quiz.value) return;
-  try {
-    console.log(quiz.value.questions);
-    const questions = quiz.value.questions.map(q => ({
-      ...q,
-      answers: q.answers.map(a => ({ ...a }))
-    }));
-
-    await QuizService.updateQuiz(quiz.value.id, { questions });
-    orderChanged.value = false;
-    toast.showToast("success", "Ordre des questions sauvegardé !");
-  } catch  {
-    toast.showToast("error", "Erreur lors de la sauvegarde.");
-  }
-};
-
-const startQuizSession = async () => {
-  if (!quiz.value || !userId.value) return;
-  try {
-    showLoader.value = true;
-    loading.value = true;
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    const session = await sessionStore.startSession(quiz.value.id, userId.value);
-    if (!session || !session.id) {
-      toast.showToast("error", "Erreur lors de la création de la session.");
-      return;
-    }
-    sessionStore.sessionId = session.id;
-    isStarted.value = true;
-    activeTab.value = "quiz";
-  } catch  {
-    toast.showToast("error",  "Erreur lors du démarrage de la session.");
-  } finally {
-    showLoader.value = false;
-    loading.value = false;
-  }
-};
-
-// Utilitaire pour construire la structure attendue par l'API
-function buildSessionAnswers(): { a: string; c: boolean }[] {
-  if (!quiz.value) return [];
-  return quiz.value.questions.map((q, idx) => {
-    const selected = userAnswers.value[idx] || [];
-    // On considère la réponse correcte si tous les index corrects sont sélectionnés et rien d'autre
-    const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
-    const isCorrect =
-      correctIndexes.length === selected.length &&
-      correctIndexes.every(i => selected.includes(i));
-    return {
-      a: q.id || q._id || idx.toString(), // id de la question (à adapter selon structure)
-      c: isCorrect,
-    };
-  });
-}
-
-const nextStep = async () => {
-  if (!showCorrection.value) {
-    // Suppression de la variable inutilisée 'answer'
-    if (sessionStore.sessionId) {
-      try {
-        const q = quiz.value?.questions[currentStep.value];
-        const selected = userAnswers.value[currentStep.value] || [];
-        const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
-        const isCorrect = correctIndexes.length === selected.length && correctIndexes.every(i => selected.includes(i));
-        await sessionService.addAnswer(sessionStore.sessionId, {
-          a: q.id || q._id || currentStep.value.toString(),
-          c: isCorrect,
-        });
-      } catch  {
-        toast.showToast("error", "Erreur lors de l'enregistrement de la réponse.");
-      }
-    }
-    showCorrection.value = true;
-    return;
-  }
-  showCorrection.value = false;
-  if (currentStep.value < (quiz.value?.questions.length || 0) - 1) {
-    currentStep.value++;
-  } else {
-    await finishQuiz();
-  }
-};
-
-const finishQuiz = async () => {
-  quizFinished.value = true;
-  let score = 0;
-  quiz.value?.questions.forEach((q, idx) => {
-    const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
-    const selected = userAnswers.value[idx] || [];
-    if (
-      correctIndexes.length === selected.length &&
-      correctIndexes.every(i => selected.includes(i))
-    ) {
-      score++;
-    }
-  });
-  quizScore.value = score;
-  if (sessionStore.sessionId) {
-    await sessionStore.endSession(score, buildSessionAnswers());
-  }
-};
-
-const endSession = async () => {
-  if (!sessionStore.sessionId) return;
-  try {
-    loading.value = true;
-    await sessionStore.endSession(quizScore.value, Object.values(userAnswers.value));
-    isStarted.value = false;
-    quizFinished.value = false;
-    currentStep.value = 0;
-    userAnswers.value = {};
-    quizScore.value = 0;
-    showCorrection.value = false;
-    toast.showToast("success", "Session terminée.");
-  } catch {
-    toast.showToast("error", "Erreur lors de l'arrêt de la session.");
-  } finally {
-    loading.value = false;
-  }
-};
-
-const userSessions = ref<Session[]>([]);
-
-const fetchUserSessions = async () => {
-  if (!quiz.value || !userId.value) return;
-  userSessions.value = await sessionStore.listUserSessions(userId.value);
-  userSessions.value = userSessions.value.filter(s => s.quizId === quiz.value?.id);
-};
-
 watch([activeTab, quiz], async ([tab]) => {
   if (tab === 'sessions') {
     await fetchUserSessions();
   }
 });
 
-function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function shuffleQuestions() {
-  if (quiz.value && quiz.value.questions) {
-    quiz.value.questions = shuffleArray(quiz.value.questions);
-    orderChanged.value = true;
-  }
+function handlePauseSession() {
+  sessionStore.pauseSession();
+  activeTab.value = 'sessions';
 }
 </script>
 
@@ -435,7 +264,7 @@ function shuffleQuestions() {
             mode="quiz"
           />
         </div>
-        <div class="flex gap-4 justify-center">
+        <div class="flex gap-4 justify-center items-center">
           <Button
             class="mt-4"
             :disabled="!userAnswers[currentStep] || userAnswers[currentStep].length === 0"
@@ -444,6 +273,7 @@ function shuffleQuestions() {
             {{ showCorrection ? (currentStep === quiz.questions.length - 1 ? 'Voir le résultat' : 'Question suivante') : 'Valider' }}
           </Button>
           <Button class="mt-4" color="danger" @click="endSession">Arrêter la session</Button>
+          <Button class="mt-4" color="secondary" @click="handlePauseSession">Mettre en pause</Button>
         </div>
       </div>
       <div v-else class="text-center py-10">
@@ -455,11 +285,12 @@ function shuffleQuestions() {
       </div>
     </section>
 
-    <!-- Onglet Sessions -->
+    <!-- Sessions -->
     <section v-if="quiz && activeTab === 'sessions'">
       <h2 class="text-2xl font-bold mb-4">Vos sessions sur ce quiz</h2>
       <DataTable
         :data="userSessions"
+        :actions="actions"
         :columns="sessionColumns"
         :loading="loading"
         :rowKey="'id'"

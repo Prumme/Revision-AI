@@ -91,4 +91,18 @@ export class SessionController {
   ): Promise<Session> {
     return this.sessionService.addAnswer(id, answer);
   }
+
+  @Post(':id/pause')
+  @ApiOperation({ summary: 'Mettre une session en pause' })
+  @ApiResponse({ status: 200, description: 'Session mise en pause', type: Session })
+  async pauseSession(@Param('id') id: string): Promise<Session> {
+    return this.sessionService.pauseSession(id);
+  }
+
+  @Post(':id/resume')
+  @ApiOperation({ summary: 'Reprendre une session en pause' })
+  @ApiResponse({ status: 200, description: 'Session reprise', type: Session })
+  async resumeSession(@Param('id') id: string): Promise<Session> {
+    return this.sessionService.resumeSession(id);
+  }
 }

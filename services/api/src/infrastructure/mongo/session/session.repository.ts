@@ -54,6 +54,26 @@ export class MongoSessionRepository implements SessionRepository {
     return this.documentToSession(session);
   }
 
+  async pauseSession(id: string): Promise<Session | null> {
+    const session = await this.sessionModel.findByIdAndUpdate(
+      id,
+      { status: 'paused' },
+      { new: true }
+    ).exec();
+    if (!session) return null;
+    return this.documentToSession(session);
+  }
+
+  async resumeSession(id: string): Promise<Session | null> {
+    const session = await this.sessionModel.findByIdAndUpdate(
+      id,
+      { status: 'active' },
+      { new: true }
+    ).exec();
+    if (!session) return null;
+    return this.documentToSession(session);
+  }
+
   private documentToSession(document: SessionDocument): Session {
     return {
       id: document._id.toString(),
@@ -66,6 +86,7 @@ export class MongoSessionRepository implements SessionRepository {
         c: a.c ?? a.correct,
         a: a.a,
       })),
+      status: document.status,
     };
   }
 }

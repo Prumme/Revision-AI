@@ -79,5 +79,15 @@ export const useSessionStore = defineStore('session', {
       this.session = session;
       return session;
     },
+    async pauseSession() {
+      if (!this.sessionId) return;
+      await sessionService.pauseSession(this.sessionId);
+      this.session = await sessionService.findById(this.sessionId);
+    },
+    async resumeSession() {
+      if (!this.sessionId) return;
+      await sessionService.resumeSession(this.sessionId);
+      this.session = await sessionService.findById(this.sessionId);
+    },
   },
 });
