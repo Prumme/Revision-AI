@@ -93,8 +93,6 @@ export class QuizController {
     // S'assurer que files est un tableau
     const fileArray = Array.isArray(files) ? files : files ? [files] : [];
 
-    console.log('------ CRÉATION DE QUIZ ------');
-    console.log('Files received:', fileArray?.length || 0);
     if (fileArray.length > 0) {
       console.log('File details:', fileArray.map(f => ({
         name: f.originalname,
