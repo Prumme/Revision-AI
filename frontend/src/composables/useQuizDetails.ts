@@ -206,6 +206,8 @@ export function useQuizDetails(quizId: string) {
     quizScore.value = score;
     if (sessionStore.sessionId) {
       await sessionStore.endSession(score, buildSessionAnswers());
+      const session = userSessions.value.find(s => s.id === sessionStore.sessionId);
+      if (session) session.status = 'finished';
     }
   };
 

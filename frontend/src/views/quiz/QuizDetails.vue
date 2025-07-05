@@ -12,7 +12,10 @@ import { useQuizDetails } from '@/composables/useQuizDetails';
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 import { useSessionStore } from '@/stores/session';
 import DataTable from "@/components/tables/DataTable.vue";
+import {PauseIcon} from "lucide-vue-next";
+import {useToastStore} from "@/stores/toast.ts";
 
+const toast = useToastStore();
 const route = useRoute();
 const quizId = route.params.id as string;
 const quizDetails = useQuizDetails(quizId);
@@ -67,6 +70,7 @@ watch([activeTab, quiz], async ([tab]) => {
 function handlePauseSession() {
   sessionStore.pauseSession();
   activeTab.value = 'sessions';
+  toast.showToast("success", "Session mise en pause. Vous pouvez reprendre plus tard.");
 }
 </script>
 
@@ -265,6 +269,10 @@ function handlePauseSession() {
           />
         </div>
         <div class="flex gap-4 justify-center items-center">
+          <Button class="mt-4" color="danger" @click="endSession">Arrêter la session</Button>
+          <Button size="icon" class="mt-4" color="secondary" @click="handlePauseSession">
+            <PauseIcon class="w-6 h-6" />
+          </Button>
           <Button
             class="mt-4"
             :disabled="!userAnswers[currentStep] || userAnswers[currentStep].length === 0"
@@ -272,8 +280,6 @@ function handlePauseSession() {
           >
             {{ showCorrection ? (currentStep === quiz.questions.length - 1 ? 'Voir le résultat' : 'Question suivante') : 'Valider' }}
           </Button>
-          <Button class="mt-4" color="danger" @click="endSession">Arrêter la session</Button>
-          <Button class="mt-4" color="secondary" @click="handlePauseSession">Mettre en pause</Button>
         </div>
       </div>
       <div v-else class="text-center py-10">
