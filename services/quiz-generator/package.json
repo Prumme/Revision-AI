@@ -1,7 +1,7 @@
 {
-  "name": "file-parser",
+  "name": "quiz-generator",
   "version": "1.0.0",
-  "description": "Service qui permet de parser des fichiers media (pdf, audio, video, image) et de les convertir en json.",
+  "description": "Service qui permet de généré quiz via un contexte d'entrée.",
   "main": "index.js",
   "scripts": {
     "test": "jest",
