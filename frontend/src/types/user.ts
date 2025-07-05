@@ -13,14 +13,13 @@ export interface User {
   emailVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  subscriptionTier?: string;
-  customerId?: string;
   firstName?: string;
   lastName?: string;
   address?: {
-    street?: string;
+    line1?: string;
+    line2?: string;
     city?: string;
-    postalCode?: string;
+    postal_code?: string;
     country?: string;
   };
 }

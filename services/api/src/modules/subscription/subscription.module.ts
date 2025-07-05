@@ -9,12 +9,14 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
 import { MailerServiceProvider } from '@services/MailerService';
 import { StripeSubscriptionProvider } from '@infrastructure/stripe/StripeSubscriptionProvider';
+import { UserModule } from '@modules/user/user.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     AuthModule,
     MailModule,
+    UserModule,
   ],
   controllers: [SubscriptionController, StripeController],
   providers: [

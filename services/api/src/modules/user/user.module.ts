@@ -6,6 +6,8 @@ import { UserSchema } from '@mongo/user/user.schema';
 import { UserRepositoryProvider } from '@repositories/user.repository';
 import { MinioModule } from '@modules/minio/minio.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
+import { CustomerRepositoryProvider } from '@repositories/customer.repository';
+import { MongoCustomerRepository } from '@mongo/user/customer.repository';
 
 @Module({
   imports: [
@@ -14,7 +16,12 @@ import { MailModule } from '@infrastructure/resend/mail.module';
     MailModule,
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepositoryProvider],
+  providers: [
+    UserService,
+    UserRepositoryProvider,
+    CustomerRepositoryProvider,
+    MongoCustomerRepository,
+  ],
   exports: [UserService],
 })
 export class UserModule {}

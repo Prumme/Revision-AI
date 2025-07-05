@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, h } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useToastStore } from "@/stores/toast";
 import { AdminService } from "@/services/admin.service";
 
-import CardComponent from "@/components/cards/CardComponent.vue";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import StatusBadge from "@/components/badges/StatusBadge.vue";
-import DataTable from "@/components/tables/DataTable.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import { User, CreditCard, FileText, UserX, Mail, Send } from "lucide-vue-next";
+import { UserX, Send } from "lucide-vue-next";
+
+import UserPersonalInfo from "@/components/admin/UserPersonalInfo.vue";
+import UserBillingInfo from "@/components/admin/UserBillingInfo.vue";
+import UserQuizzes from "@/components/admin/UserQuizzes.vue";
+import UserDocuments from "@/components/admin/UserDocuments.vue";
+
 import type { User as UserType } from "@/types/user";
 import type { Quiz } from "@/types/quiz";
 import type { Document } from "@/types/document";
-import type { TableColumn } from "@/types/datatable";
+import type { Invoice } from "@/types/invoice";
 
 const route = useRoute();
 const toast = useToastStore();
@@ -23,77 +27,10 @@ const user = ref<UserType | null>(null);
 const loading = ref(false);
 const userQuizzes = ref<Quiz[]>([]);
 const userDocuments = ref<Document[]>([]);
+const userInvoices = ref<Invoice[]>([]);
 const showBlockDialog = ref(false);
 const showPasswordResetDialog = ref(false);
 const actionLoading = ref(false);
-
-// Configuration des colonnes pour les quiz
-const quizColumns: TableColumn[] = [
-  {
-    key: "title",
-    label: "Titre du Quiz",
-    sortable: true,
-  },
-  {
-    key: "questionsCount",
-    label: "Nb. Questions",
-    sortable: true,
-  },
-  {
-    key: "status",
-    label: "Statut",
-    render: (value: string) =>
-      h(
-        StatusBadge,
-        {
-          variant: value === "published" ? "success" : value === "draft" ? "warning" : "secondary",
-        },
-        () => (value === "published" ? "Publié" : value === "draft" ? "Brouillon" : "Archivé"),
-      ),
-  },
-  {
-    key: "createdAt",
-    label: "Date de création",
-    sortable: true,
-    formatter: (value: string) => (value ? new Date(value).toLocaleDateString("fr-FR") : "-"),
-  },
-];
-
-// Configuration des colonnes pour les documents
-const documentColumns: TableColumn[] = [
-  {
-    key: "filename",
-    label: "Nom du fichier",
-    sortable: true,
-  },
-  {
-    key: "fileSize",
-    label: "Taille",
-    formatter: (value: number) => {
-      if (!value) return "-";
-      const mb = value / (1024 * 1024);
-      return `${mb.toFixed(2)} MB`;
-    },
-  },
-  {
-    key: "fileType",
-    label: "Type",
-    render: (value: string) =>
-      h(
-        StatusBadge,
-        {
-          variant: value === "pdf" ? "info" : value === "image" ? "secondary" : "warning",
-        },
-        () => value.toUpperCase(),
-      ),
-  },
-  {
-    key: "uploadedAt",
-    label: "Date d'upload",
-    sortable: true,
-    formatter: (value: string) => (value ? new Date(value).toLocaleDateString("fr-FR") : "-"),
-  },
-];
 
 // Computed
 const userId = computed(() => route.params.id as string);
@@ -133,20 +70,19 @@ const fetchUserDetails = async () => {
     // Traiter les résultats
     if (userResponse.status === "fulfilled") {
       user.value = userResponse.value;
-      console.log(user.value);
+      if (user.value.customerId) {
+        const invoicesResponse = await AdminService.getUserInvoices(user.value.customerId);
+        userInvoices.value = invoicesResponse;
+      }
     } else {
       throw new Error("Utilisateur non trouvé");
     }
 
-    userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value : [];
-    userDocuments.value = documentsData.status === "fulfilled" ? documentsData.value : [];
+    // userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value : [];
+    // userDocuments.value = documentsData.status === "fulfilled" ? documentsData.value : [];
   } catch (error) {
     console.error("Erreur lors du chargement des détails utilisateur:", error);
-    toast.addToast({
-      type: "error",
-      title: "Erreur",
-      message: "Impossible de charger les détails de l'utilisateur",
-    });
+    toast.showToast("error", "Impossible de charger les détails de l'utilisateur");
   } finally {
     loading.value = false;
   }
@@ -160,28 +96,16 @@ const handleBlockUser = async () => {
 
     if (user.value.blocked) {
       await AdminService.unblockUser(user.value.id);
-      toast.addToast({
-        type: "success",
-        title: "Succès",
-        message: "Utilisateur débloqué avec succès",
-      });
+      toast.showToast("success", "Utilisateur débloqué avec succès");
     } else {
       await AdminService.blockUser(user.value.id);
-      toast.addToast({
-        type: "success",
-        title: "Succès",
-        message: "Utilisateur bloqué avec succès",
-      });
+      toast.showToast("success", "Utilisateur bloqué avec succès");
     }
 
     await fetchUserDetails();
   } catch (error) {
     console.error("Erreur lors du blocage/déblocage:", error);
-    toast.addToast({
-      type: "error",
-      title: "Erreur",
-      message: "Impossible de modifier le statut de l'utilisateur",
-    });
+    toast.showToast("error", "Impossible de modifier le statut de l'utilisateur");
   } finally {
     actionLoading.value = false;
     showBlockDialog.value = false;
@@ -196,21 +120,19 @@ const handlePasswordReset = async () => {
 
     await AdminService.requestPasswordReset(user.value.id);
 
-    toast.addToast({
-      type: "success",
-      title: "Succès",
-      message: "Demande de réinitialisation de mot de passe envoyée",
-    });
+    toast.showToast("success", "Demande de réinitialisation de mot de passe envoyée");
   } catch (error) {
     console.error("Erreur lors de la demande de réinitialisation:", error);
-    toast.addToast({
-      type: "error",
-      title: "Erreur",
-      message: "Impossible d'envoyer la demande de réinitialisation",
-    });
+    toast.showToast("error", "Impossible d'envoyer la demande de réinitialisation");
   } finally {
     actionLoading.value = false;
     showPasswordResetDialog.value = false;
+  }
+};
+
+const handleSubscriptionUpdate = (newTier: string) => {
+  if (user.value) {
+    user.value.subscriptionTier = newTier;
   }
 };
 
@@ -257,7 +179,7 @@ onMounted(() => {
           <StatusBadge :variant="userStatusVariant">
             {{ userStatusText }}
           </StatusBadge>
-          <span class="text-sm text-gray-500"> ID: {{ user.id }} </span>
+          <span class="text-sm text-gray-500"> ID: {{ user._id }} </span>
         </div>
       </div>
 
@@ -267,169 +189,15 @@ onMounted(() => {
       </div>
 
       <!-- Content -->
-      <div v-else-if="user" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        <!-- Actions Administrateur -->
-
-        <!-- Informations Personnelles -->
-        <CardComponent>
-          <template #header>
-            <div class="flex items-center gap-2 mb-4">
-              <User class="w-5 h-5 text-primary" />
-              <h2 class="text-xl font-semibold text-gray-900">Informations Personnelles</h2>
-            </div>
-          </template>
-          <template #content>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-x-10 gap-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1"
-                  >Nom d'utilisateur</label
-                >
-                <p class="text-gray-900">{{ user.username }}</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Email</label>
-                <p class="text-gray-900">{{ user.email }}</p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Rôle</label>
-                <StatusBadge :variant="user.role === 'admin' ? 'info' : 'secondary'">
-                  {{ user.role === "admin" ? "Administrateur" : "Utilisateur" }}
-                </StatusBadge>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Email vérifié</label>
-                <StatusBadge :variant="user.emailVerified ? 'success' : 'warning'">
-                  {{ user.emailVerified ? "Vérifié" : "Non vérifié" }}
-                </StatusBadge>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1">Date de création</label>
-                <p class="text-gray-900">
-                  {{ user.createdAt ? new Date(user.createdAt).toLocaleDateString("fr-FR") : "-" }}
-                </p>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1"
-                  >Dernière mise à jour</label
-                >
-                <p class="text-gray-900">
-                  {{ user.updatedAt ? new Date(user.updatedAt).toLocaleDateString("fr-FR") : "-" }}
-                </p>
-              </div>
-              <div v-if="user.bio" class="md:col-span-2 lg:col-span-3">
-                <label class="block text-sm font-medium text-gray-500 mb-1">Biographie</label>
-                <p class="text-gray-900">{{ user.bio }}</p>
-              </div>
-            </div>
-          </template>
-        </CardComponent>
-
-        <!-- Informations de Facturation -->
-        <CardComponent>
-          <template #header>
-            <div class="flex items-center gap-2 mb-4">
-              <CreditCard class="w-5 h-5 text-primary" />
-              <h2 class="text-xl font-semibold text-gray-900">Informations de Facturation</h2>
-            </div>
-          </template>
-          <template #content>
-            <div
-              v-if="user.subscriptionTier || user.customerId || user.firstName || user.address"
-              class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              <div>
-                <label class="block text-sm font-medium text-gray-500 mb-1"
-                  >Plan d'abonnement</label
-                >
-                <StatusBadge
-                  :variant="user.subscriptionTier === 'premium' ? 'success' : 'secondary'"
-                >
-                  {{ user.subscriptionTier === "premium" ? "Premium" : "Gratuit" }}
-                </StatusBadge>
-              </div>
-              <div v-if="user.customerId">
-                <label class="block text-sm font-medium text-gray-500 mb-1">ID Client Stripe</label>
-                <p class="text-gray-900 font-mono text-sm">{{ user.customerId }}</p>
-              </div>
-              <div v-if="user.firstName || user.lastName">
-                <label class="block text-sm font-medium text-gray-500 mb-1">Nom complet</label>
-                <p class="text-gray-900">
-                  {{ [user.firstName, user.lastName].filter(Boolean).join(" ") || "-" }}
-                </p>
-              </div>
-              <div v-if="user.address" class="md:col-span-2 lg:col-span-3">
-                <label class="block text-sm font-medium text-gray-500 mb-1"
-                  >Adresse de facturation</label
-                >
-                <div class="text-gray-900">
-                  <p v-if="user.address.street">{{ user.address.street }}</p>
-                  <p v-if="user.address.city || user.address.postalCode">
-                    {{ [user.address.postalCode, user.address.city].filter(Boolean).join(" ") }}
-                  </p>
-                  <p v-if="user.address.country">{{ user.address.country }}</p>
-                </div>
-              </div>
-            </div>
-            <div v-else class="text-center py-8 text-gray-500">
-              <CreditCard class="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>Aucune information de facturation disponible</p>
-            </div>
-          </template>
-        </CardComponent>
-
-        <!-- Quiz Générés -->
-        <CardComponent>
-          <template #header>
-            <div class="flex items-center gap-2 mb-4">
-              <FileText class="w-5 h-5 text-primary" />
-              <h2 class="text-xl font-semibold text-gray-900">
-                Quiz Générés ({{ userQuizzes.length }})
-              </h2>
-            </div>
-          </template>
-          <template #content>
-            <DataTable
-              v-if="userQuizzes.length > 0"
-              :data="userQuizzes"
-              :columns="quizColumns"
-              :searchable="true"
-              search-placeholder="Rechercher un quiz..."
-              empty-message="Aucun quiz trouvé"
-              row-key="id"
-            />
-            <div v-else class="text-center py-8 text-gray-500">
-              <FileText class="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>Aucun quiz généré par cet utilisateur</p>
-            </div>
-          </template>
-        </CardComponent>
-
-        <!-- Documents Uploadés -->
-        <CardComponent>
-          <template #header>
-            <div class="flex items-center gap-2 mb-4">
-              <Mail class="w-5 h-5 text-primary" />
-              <h2 class="text-xl font-semibold text-gray-900">
-                Documents Uploadés ({{ userDocuments.length }})
-              </h2>
-            </div>
-          </template>
-          <template #content>
-            <DataTable
-              v-if="userDocuments.length > 0"
-              :data="userDocuments"
-              :columns="documentColumns"
-              :searchable="true"
-              search-placeholder="Rechercher un document..."
-              empty-message="Aucun document trouvé"
-              row-key="id"
-            />
-            <div v-else class="text-center py-8 text-gray-500">
-              <Mail class="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>Aucun document uploadé par cet utilisateur</p>
-            </div>
-          </template>
-        </CardComponent>
+      <div v-else-if="user" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
+        <UserPersonalInfo :user="user" />
+        <UserBillingInfo
+          :user="user"
+          :invoices="userInvoices"
+          @refresh="handleSubscriptionUpdate"
+        />
+        <UserQuizzes :quizzes="userQuizzes" />
+        <UserDocuments :documents="userDocuments" />
       </div>
 
       <!-- Error State -->

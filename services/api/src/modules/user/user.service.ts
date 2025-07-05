@@ -172,4 +172,20 @@ export class UserService {
 
     return updatedUser;
   }
+
+  async updateSubscription(userId: string, tier: string): Promise<User> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    if (!['free', 'basic', 'pro'].includes(tier)) {
+      throw new Error("Type d'abonnement invalide");
+    }
+
+    return this.userRepository.update(userId, {
+      subscriptionTier: tier,
+      updatedAt: new Date(),
+    });
+  }
 }

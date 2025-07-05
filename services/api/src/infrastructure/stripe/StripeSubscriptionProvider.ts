@@ -6,6 +6,9 @@ import { Injectable } from '@nestjs/common';
 import { CustomerIdentifier } from '@entities/customer.entity';
 import { CustomerNotFoundError } from '../../domain/errors/SubscriptionError';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
+import { Invoice } from '@common/types/invoice';
+import { ReqUser } from '@common/types/request';
+import { UserService } from '@modules/user/user.service';
 
 @Injectable()
 export class StripeSubscriptionProvider implements SubscriptionProvider {
@@ -14,7 +17,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
   private tierToStripeProductId: Partial<Record<SubscriptionTier, string>> = {};
   private mappingInitialized = false;
 
-  constructor() {
+  constructor(private userService: UserService) {
     this.initStripeMappings();
   }
 
@@ -282,5 +285,22 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     }
 
     return true;
+  }
+
+  async getInvoices(
+    customerId: string,
+    reqUser: ReqUser,
+  ): Promise<Invoice[] | Error> {
+    const user = await this.userService.findById(reqUser.sub);
+    if (!user) return new Error('User not found');
+
+    if (user.role !== 'admin' && user.customerId !== customerId) {
+      return new Error('Unauthorized');
+    }
+
+    const invoices = await this.stripe.invoices.list({
+      customer: customerId,
+    });
+    return invoices.data as Invoice[];
   }
 }
