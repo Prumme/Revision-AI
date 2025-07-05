@@ -116,11 +116,13 @@ export class SessionService {
     if (!session) {
       throw new NotFoundException(`Session with id ${sessionId} not found`);
     }
-    const formattedAnswer: SessionAnswer = {
-      a: answer.a,
-      c: answer.c,
-    };
-    const updatedAnswers = [...(session.answers || []), formattedAnswer];
+    const updatedAnswers: SessionAnswer[] = [
+        ...session.answers,
+        {
+            c: answer.c ?? answer.correct,
+            a: answer.a,
+        },
+        ];
     await this.sessionRepository.updateAnswers(sessionId, updatedAnswers);
     return await this.sessionRepository.findById(sessionId);
   }

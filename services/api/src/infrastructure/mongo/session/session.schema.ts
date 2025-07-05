@@ -1,6 +1,7 @@
 import { Document, Schema, Types } from 'mongoose';
 
 export const SessionSchema = new Schema({
+  id: { type: String, unique: true, required: true },
   quizId: { type: Types.ObjectId, ref: 'Quiz', required: true },
   userId: { type: Types.ObjectId, ref: 'User', required: true },
   score: { type: Number, required: true },
