@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { fetchSubscriptionProducts } from "@/services/subscription.service";
-import type { SubscriptionInfo } from "@/types/subscriptionInfo";
+import { computed, onMounted } from "vue";
+import { useSubscriptionStore } from "@/stores/subscription";
+import { unsubscribe } from "@/services/subscription.service";
+import { useDialogStore } from "@/stores/dialog";
+import { useToastStore } from "@/stores/toast";
+//import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { User } from "@/types/user";
 import { useRouter } from "vue-router";
 import {
@@ -17,8 +20,9 @@ interface Props {
 
 const props = defineProps<Props>();
 const router = useRouter();
-const products = ref<SubscriptionInfo[]>([]);
-const loading = ref(true);
+const subscriptionStore = useSubscriptionStore();
+const dialog = useDialogStore();
+const toast = useToastStore();
 
 const currentPlan = computed(() => {
   if (props.user?.subscriptionTier === "free") {
@@ -29,12 +33,9 @@ const currentPlan = computed(() => {
       isFree: true,
     };
   }
-
-  // Trouver le produit correspondant au tier actuel
-  const product = products.value.find(
+  const product = (subscriptionStore.products || []).find(
     (p) => p.productName.toLowerCase() === props.user?.subscriptionTier,
   );
-
   if (product) {
     return {
       name: product.productName.toUpperCase(),
@@ -43,8 +44,6 @@ const currentPlan = computed(() => {
       isFree: false,
     };
   }
-
-  // Fallback
   return {
     name: SUBSCRIPTION_LABELS.free,
     price: "0€",
@@ -64,26 +63,34 @@ const handleUpgrade = () => {
   router.push("/subscription/checkout");
 };
 
-const handleCancelSubscription = () => {
-  // TODO: Implémenter la logique de suppression d'abonnement
-  console.log("Suppression d'abonnement à implémenter");
+const handleCancelSubscription = async () => {
+  const confirmed = await dialog.show({
+    title: "Résilier l'abonnement",
+    message: "Êtes-vous sûr de vouloir résilier votre abonnement ? Cette action est irréversible.",
+    confirmText: "Oui, résilier",
+    cancelText: "Annuler",
+    type: "error",
+  });
+  if (!confirmed) return;
+  try {
+    subscriptionStore.loading = true;
+    await unsubscribe();
+    toast.showToast("success", "Votre abonnement a bien été résilié. Il restera actif jusqu'à la fin de la période en cours.");
+  } catch {
+    toast.showToast("error", "Erreur lors de la résiliation de l'abonnement.");
+  } finally {
+    subscriptionStore.loading = false;
+  }
 };
 
-onMounted(async () => {
-  try {
-    const data = await fetchSubscriptionProducts();
-    products.value = data.products || [];
-  } catch (error) {
-    console.error("Erreur lors de la récupération des produits:", error);
-  } finally {
-    loading.value = false;
-  }
+onMounted(() => {
+  subscriptionStore.fetchProducts();
 });
 </script>
 
 <template>
   <div class="bg-white rounded-lg shadow p-6">
-    <div v-if="loading" class="animate-pulse">
+    <div v-if="subscriptionStore.loading" class="animate-pulse">
       <div class="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
       <div class="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
       <div class="h-4 bg-gray-200 rounded w-1/3"></div>
@@ -97,9 +104,7 @@ onMounted(async () => {
             <div class="flex items-center gap-2 mb-2">
               <span
                 class="px-3 py-1 text-xs font-outfit font-semibold rounded-full"
-                :class="
-                  currentPlan.isFree ? 'bg-gray-100 text-gray-700' : 'bg-primary/10 text-primary'
-                "
+                :class="currentPlan.isFree ? 'bg-gray-100 text-gray-700' : 'bg-primary/10 text-primary'"
               >
                 {{ currentPlan.name }}
               </span>

@@ -8,8 +8,11 @@ import BillingAddressStep from "@/components/checkout/BillingAddressStep.vue";
 import PaymentMethodStep from "@/components/checkout/PaymentMethodStep.vue";
 import OrderSummaryStep from "@/components/checkout/OrderSummaryStep.vue";
 import { useUserStore } from "@/stores/user";
+import { subscribe } from "@/services/subscription.service";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
+import type { SubscribePayload } from "@/types/subscribe";
+import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 
 const router = useRouter();
 const checkout = useCheckoutFlow();
@@ -18,11 +21,27 @@ const userStore = useUserStore();
 const isOrderLoading = ref(false);
 const orderError = ref<string | null>(null);
 
+// Ref pour la step PaymentMethodStep
+const paymentStepRef = ref<{ validateAndCreatePaymentMethod: () => Promise<boolean> } | null>(null);
+const isPaymentStepLoading = ref(false);
+
 const handleStepNavigation = (stepIndex: number) => {
   checkout.goToStep(stepIndex);
 };
 
-const handleNext = () => {
+const handleNext = async () => {
+  // Si on est sur la step payment-method, on déclenche la validation Stripe
+  if (checkout.currentStep.value.id === "payment-method") {
+    if (paymentStepRef.value && paymentStepRef.value.validateAndCreatePaymentMethod) {
+      isPaymentStepLoading.value = true;
+      const result = await paymentStepRef.value.validateAndCreatePaymentMethod();
+      isPaymentStepLoading.value = false;
+      if (!result) {
+        // Erreur Stripe déjà affichée dans la step, on ne passe pas à la suite
+        return;
+      }
+    }
+  }
   checkout.goToNextStep();
 };
 
@@ -47,10 +66,21 @@ const handleOrderConfirm = async () => {
   isOrderLoading.value = true;
   orderError.value = null;
   try {
-    console.log("Confirmation de la commande avec les données :", checkout.state.data);
-    // TODO: Appel API pour finaliser l'abonnement
-    // await api.subscribe({ ... });
-    // Rediriger ou afficher un message de succès
+    await userStore.fetchCurrentUser();
+    const customerId = userStore.user?.customerId;
+    const paymentMethodId = checkout.state.data.paymentMethod.paymentMethodId || "";
+    const tier = checkout.state.data.selectedPlan?.productName || "";
+    
+    if (!customerId || !paymentMethodId || !tier) {
+      throw new Error("Informations de souscription incomplètes.");
+    }
+    const payload: SubscribePayload = {
+      customerId,
+      paymentMethodId,
+      tier,
+    };
+    await subscribe(payload);
+    router.push("/subscription");
   } catch (e) {
     orderError.value =
       e instanceof Error ? e.message : "Erreur lors de la validation de l'abonnement.";
@@ -92,6 +122,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <LoaderOverlay v-if="isOrderLoading" message="Traitement en cours..." />
   <section class="flex flex-col gap-6 w-full max-w-4xl mx-auto">
     <!-- Header -->
     <div class="flex flex-col gap-2">
@@ -164,6 +195,7 @@ onUnmounted(() => {
         <!-- Payment Method Step -->
         <PaymentMethodStep
           v-else-if="checkout.currentStep.value.id === 'payment-method'"
+          ref="paymentStepRef"
           :payment-method="checkout.state.data.paymentMethod"
           @update-payment-method="checkout.updatePaymentMethod"
         />
@@ -207,7 +239,7 @@ onUnmounted(() => {
         <button
           v-if="!checkout.isLastStep.value"
           @click="handleNext"
-          :disabled="!checkout.canGoNext.value"
+          :disabled="!checkout.canGoNext.value || isPaymentStepLoading"
           class="bg-primary hover:bg-primary/90 text-black font-outfit font-medium px-6 py-2 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
         >
           Suivant

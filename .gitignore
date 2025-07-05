@@ -49,3 +49,5 @@ k8s/secrets/.gitignore
 **/.vscode/tasks.json
 **/.vscode/launch.json
 **/.vscode/extensions.json
+
+.idea

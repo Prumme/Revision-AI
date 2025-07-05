@@ -3,7 +3,14 @@ import NavLink from "@/components/buttons/NavLink.vue";
 import Dropdown from "@/components/dropdowns/DropdownInput.vue";
 import ProfileComponent from "@/components/profile/ProfileComponent.vue";
 import { useUserStore } from "@/stores/user";
-import { ChevronsRightIcon, LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
+import {
+  ChevronsRightIcon,
+  LogOutIcon,
+  MenuIcon,
+  XIcon,
+  ExternalLinkIcon,
+  HandCoinsIcon,
+} from "lucide-vue-next";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import ToastContainer from "./toasts/ToastContainer.vue";
@@ -110,6 +117,18 @@ const handleLogout = () => {
               :active="false"
               :showText="isSidebarOpen"
             />
+
+            <a
+              href="https://dashboard.stripe.com/test/customers"
+              target="_blank"
+              class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200"
+            >
+              <HandCoinsIcon class="h-5 w-5" />
+              <span v-if="isSidebarOpen" class="flex items-center gap-2">
+                Clients
+                <ExternalLinkIcon class="h-4 w-4" />
+              </span>
+            </a>
           </div>
         </div>
 

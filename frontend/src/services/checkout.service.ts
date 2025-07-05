@@ -49,31 +49,5 @@ export const CheckoutService = {
       console.error("Error updating billing address:", error);
       throw error;
     }
-  },
-
-  // Créer un Payment Intent (à implémenter côté backend si nécessaire)
-  async createPaymentIntent(amount: number, currency = "eur"): Promise<CheckoutPaymentIntent> {
-    try {
-      const response = await ApiService.post<CheckoutPaymentIntent>(
-        "/subscription/create-payment-intent",
-        { amount, currency },
-        true,
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error creating payment intent:", error);
-      throw error;
-    }
-  },
-
-  // Finaliser l'abonnement
-  async subscribeUser(subscriptionData: CheckoutSubscriptionRequest) {
-    try {
-      const response = await ApiService.post("/subscription/subscribe", subscriptionData, true);
-      return response.data;
-    } catch (error) {
-      console.error("Error subscribing user:", error);
-      throw error;
-    }
-  },
+  }
 };

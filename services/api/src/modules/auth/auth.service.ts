@@ -85,6 +85,7 @@ export class AuthService {
         role: user.role,
         bio: user.bio,
         subscriptionTier: user.subscriptionTier,
+        customerId: user.customerId,
       },
     };
   }

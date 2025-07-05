@@ -2,17 +2,14 @@
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { RouterLink } from "vue-router";
 import { CheckIcon } from "lucide-vue-next";
-import { ref, onMounted } from "vue";
-import { fetchSubscriptionProducts } from "@/services/subscription.service";
-import type { SubscriptionInfo } from "@/types/subscriptionInfo";
+import { onMounted } from "vue";
+import { useSubscriptionStore } from "@/stores/subscription";
 import { SUBSCRIPTION_FEATURES, type SubscriptionTier } from "@/config/subscription.config";
 
-const products = ref<SubscriptionInfo[]>([]);
+const subscriptionStore = useSubscriptionStore();
 
-onMounted(async () => {
-  const response = await fetchSubscriptionProducts();
-  products.value = response.products;
-  //console.log("Products fetched:", products.value);
+onMounted(() => {
+  subscriptionStore.fetchProducts();
 });
 </script>
 
@@ -43,7 +40,7 @@ onMounted(async () => {
 
         <!-- Boucle sur les produits Stripe -->
         <div
-          v-for="product in products"
+          v-for="product in subscriptionStore.products || []"
           :key="product.productId"
           class="relative rounded-2xl shadow p-8 flex flex-col h-full"
           :class="product.productName === 'basic' ? 'bg-primary' : ''"
