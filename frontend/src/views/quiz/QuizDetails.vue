@@ -127,15 +127,36 @@ const startQuizSession = async () => {
   }
 };
 
+// Utilitaire pour construire la structure attendue par l'API
+function buildSessionAnswers(): { a: string; c: boolean }[] {
+  if (!quiz.value) return [];
+  return quiz.value.questions.map((q, idx) => {
+    const selected = userAnswers.value[idx] || [];
+    // On considère la réponse correcte si tous les index corrects sont sélectionnés et rien d'autre
+    const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
+    const isCorrect =
+      correctIndexes.length === selected.length &&
+      correctIndexes.every(i => selected.includes(i));
+    return {
+      a: q.id || q._id || idx.toString(), // id de la question (à adapter selon structure)
+      c: isCorrect,
+    };
+  });
+}
+
 const nextStep = async () => {
   if (!showCorrection.value) {
-    const answer = {
-      questionIndex: currentStep.value,
-      selected: userAnswers.value[currentStep.value] || [],
-    };
+    // Suppression de la variable inutilisée 'answer'
     if (sessionStore.sessionId) {
       try {
-        await sessionService.addAnswer(sessionStore.sessionId, answer);
+        const q = quiz.value?.questions[currentStep.value];
+        const selected = userAnswers.value[currentStep.value] || [];
+        const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
+        const isCorrect = correctIndexes.length === selected.length && correctIndexes.every(i => selected.includes(i));
+        await sessionService.addAnswer(sessionStore.sessionId, {
+          a: q.id || q._id || currentStep.value.toString(),
+          c: isCorrect,
+        });
       } catch  {
         toast.showToast("error", "Erreur lors de l'enregistrement de la réponse.");
       }
@@ -147,7 +168,7 @@ const nextStep = async () => {
   if (currentStep.value < (quiz.value?.questions.length || 0) - 1) {
     currentStep.value++;
   } else {
-    finishQuiz();
+    await finishQuiz();
   }
 };
 
@@ -166,7 +187,7 @@ const finishQuiz = async () => {
   });
   quizScore.value = score;
   if (sessionStore.sessionId) {
-    await sessionStore.endSession(score, Object.values(userAnswers.value));
+    await sessionStore.endSession(score, buildSessionAnswers());
   }
 };
 
@@ -266,11 +287,6 @@ function shuffleQuestions() {
         {{ tab.label }}
       </button>
     </div>
-
-    <section v-if="loading" class="text-center py-10 text-lg font-semibold">
-      Chargement du quiz...
-    </section>
-    <section v-else-if="error" class="text-center py-10 text-red-600">{{ error }}</section>
 
     <!-- Start Quiz  -->
     <section v-if="quiz && activeTab === 'quiz' && !isStarted" class="max-w-2xl mx-auto w-full text-center py-10">
