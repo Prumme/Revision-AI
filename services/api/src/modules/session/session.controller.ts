@@ -1,65 +1,94 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SessionService } from './session.service';
-import { Session } from '../../entities/session.entity';
-import { UseGuards, Req } from '@nestjs/common';
+import { StartSessionDto } from './dto/start-session.dto';
+import { EndSessionDto } from './dto/end-session.dto';
+import { Session } from '@entities/session.entity';
+import { ReqUser } from "@common/types/request";
+import { CreateSessionDto } from "@modules/session/dto/create-session.dto";
 
+@ApiTags('Sessions')
 @Controller('sessions')
+@ApiBearerAuth('JWT-auth')
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
-  @Post()
-  async create(@Body() data: Partial<Session>) {
-    const session = await this.sessionService.create(data);
-    const { userId, ...rest } = session.toObject ? session.toObject() : session;
-    return rest;
-  }
-
-  @Get()
-  async findAll() {
-    const sessions = await this.sessionService.findAll();
-    return sessions.map(s => {
-      const { userId, ...rest } = s.toObject ? s.toObject() : s;
-      return rest;
-    });
-  }
-
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const session = await this.sessionService.findOne(id);
-    const { userId, ...rest } = session.toObject ? session.toObject() : session;
-    return rest;
+  @ApiOperation({ summary: 'Récupérer une session par son ID' })
+  @ApiParam({ name: 'id', description: 'ID de la session' })
+  @ApiResponse({
+    status: 200,
+    description: 'Session trouvée avec succès',
+    type: Session,
+  })
+  @ApiResponse({ status: 404, description: 'Session non trouvée' })
+  async findById(@Param('id') id: string): Promise<Session> {
+    const session = await this.sessionService.findById(id);
+    if (!session) {
+      throw new HttpException('Session non trouvée', HttpStatus.NOT_FOUND);
+    }
+    return session;
   }
 
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() data: Partial<Session>) {
-    const session = await this.sessionService.update(id, data);
-    const { userId, ...rest } = session.toObject ? session.toObject() : session;
-    return rest;
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Récupérer toutes les sessions d\'un utilisateur' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des sessions récupérée avec succès',
+    type: [Session],
+  })
+  async findAllByUserId(@Param('userId') userId: string): Promise<Session[]> {
+    return this.sessionService.findAllByUserId(userId);
   }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    await this.sessionService.remove(id);
-    return { deleted: true };
+  @Post('create')
+  @ApiOperation({ summary: 'Créer une nouvelle session' })
+  @ApiResponse({
+    status: 201,
+    description: 'Session créée avec succès',
+    type: Session,
+  })
+  async createSession(
+    @Body() createSessionDto: CreateSessionDto,
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Session> {
+    const userId = user.sub;
+    if (!userId) throw new HttpException('Utilisateur non authentifié', HttpStatus.UNAUTHORIZED);
+    return this.sessionService.createSession({ ...createSessionDto, userId });
   }
 
-  // Démarrer une session (utilise l'utilisateur authentifié)
   @Post('start')
-  @UseGuards() // Remplace par ton guard JWT si besoin, ex: AuthGuard('jwt')
-  async startSession(@Body() body: { quizId: string }, @Req() req: Request) {
-    // @ts-ignore
-    const userId = req.user?.id || req.user?._id;
-    return this.sessionService.startSession(body.quizId, userId);
+  @ApiOperation({ summary: 'Démarrer une session existante' })
+  @ApiResponse({
+    status: 201,
+    description: 'Session démarrée avec succès',
+    type: Session,
+  })
+  async startSession(
+    @Body() startSessionDto: StartSessionDto,
+  ): Promise<Session> {
+    return this.sessionService.startSession(startSessionDto.sessionId);
   }
 
-  // Terminer une session
-  @Post('finish/:id')
-  async finishSession(
+  @Post('end')
+  @ApiOperation({ summary: 'Terminer une session' })
+  @ApiResponse({
+    status: 200,
+    description: 'Session terminée avec succès',
+    type: Session,
+  })
+  async endSession(@Body() endSessionDto: EndSessionDto): Promise<Session> {
+    return this.sessionService.endSession(endSessionDto.sessionId, endSessionDto);
+  }
+
+  @Post(':id/answer')
+  @ApiOperation({ summary: 'Ajouter une réponse à la session' })
+  @ApiResponse({ status: 200, description: 'Réponse ajoutée', type: Session })
+  async addAnswer(
     @Param('id') id: string,
-    @Body() body: { score: number; answers: { correct: boolean; a: string }[] },
-  ) {
-    const session = await this.sessionService.finishSession(id, body.score, body.answers);
-    const { userId, ...rest } = session.toObject ? session.toObject() : session;
-    return rest;
+    @Body() answer: any
+  ): Promise<Session> {
+    return this.sessionService.addAnswer(id, answer);
   }
 }

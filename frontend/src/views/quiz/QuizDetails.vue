@@ -2,7 +2,6 @@
 import QuestionDraggable from "@/components/draggables/QuestionDraggable.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
-import Select from "@/components/inputs/SelectComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import { Quiz, QuizService } from "@/services/quiz.service";
 import { useToastStore } from "@/stores/toast";
@@ -11,9 +10,13 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { Motion } from '@motionone/vue';
+import { useSessionStore } from "@/stores/session";
+import {useUserStore} from "@/stores/user.ts";
+import { sessionService } from "@/services/session.service";
 
 const route = useRoute();
 const toast = useToastStore();
+const sessionStore = useSessionStore();
 const quizId = route.params.id as string;
 const quiz = ref<Quiz | null>(null);
 const loading = ref(true);
@@ -27,9 +30,10 @@ const userAnswers = ref<Record<number, number[]>>({});
 const quizFinished = ref(false);
 const quizScore = ref(0);
 const showCorrection = ref(false);
+const isStarted = ref(false);
 
-// Animation state for confetti
-const showConfetti = ref(false);
+const user = useUserStore();
+const userId = ref<string>(user.user.id);
 
 const quizTabs = [
   { key: "quiz", label: "Quiz" },
@@ -49,8 +53,8 @@ onMounted(async () => {
   try {
     loading.value = true;
     quiz.value = await QuizService.getQuizById(quizId);
-  } catch (e) {
-    error.value = (e instanceof Error ? e.message : String(e)) || "Erreur lors du chargement du quiz.";
+  } catch {
+    error.value = "Erreur lors du chargement du quiz.";
   } finally {
     loading.value = false;
   }
@@ -68,13 +72,44 @@ const saveOrder = async () => {
     await QuizService.updateQuiz(quiz.value.id, { questions });
     orderChanged.value = false;
     toast.showToast("success", "Ordre des questions sauvegardé !");
-  } catch (e) {
-    toast.showToast("error", (e instanceof Error ? e.message : String(e)) || "Erreur lors de la sauvegarde.");
+  } catch  {
+    toast.showToast("error", "Erreur lors de la sauvegarde.");
   }
 };
 
-const nextStep = () => {
+const startQuizSession = async () => {
+  if (!quiz.value || !userId.value) return;
+  try {
+    loading.value = true;
+    const session = await sessionStore.startSession(quiz.value.id, userId.value);
+    if (!session || !session.id) {
+      toast.showToast("error", "Erreur lors de la création de la session.");
+      return;
+    }
+    sessionStore.sessionId = session.id;
+    console.log(sessionStore.sessionId);
+    isStarted.value = true;
+    activeTab.value = "quiz";
+  } catch  {
+    toast.showToast("error",  "Erreur lors du démarrage de la session.");
+  } finally {
+    loading.value = false;
+  }
+};
+
+const nextStep = async () => {
   if (!showCorrection.value) {
+    const answer = {
+      questionIndex: currentStep.value,
+      selected: userAnswers.value[currentStep.value] || [],
+    };
+    if (sessionStore.sessionId) {
+      try {
+        await sessionService.addAnswer(sessionStore.sessionId, answer);
+      } catch  {
+        toast.showToast("error", "Erreur lors de l'enregistrement de la réponse.");
+      }
+    }
     showCorrection.value = true;
     return;
   }
@@ -100,7 +135,25 @@ const finishQuiz = () => {
     }
   });
   quizScore.value = score;
-  setTimeout(() => showConfetti.value = false, 3000);
+};
+
+const endSession = async () => {
+  if (!sessionStore.sessionId) return;
+  try {
+    loading.value = true;
+    await sessionStore.endSession(quizScore.value, Object.values(userAnswers.value));
+    isStarted.value = false;
+    quizFinished.value = false;
+    currentStep.value = 0;
+    userAnswers.value = {};
+    quizScore.value = 0;
+    showCorrection.value = false;
+    toast.showToast("success", "Session terminée.");
+  } catch {
+    toast.showToast("error", "Erreur lors de l'arrêt de la session.");
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 
@@ -151,6 +204,21 @@ const finishQuiz = () => {
     </section>
     <section v-else-if="error" class="text-center py-10 text-red-600">{{ error }}</section>
 
+    <!-- Start Quiz  -->
+    <section v-if="quiz && activeTab === 'quiz' && !isStarted" class="max-w-2xl mx-auto w-full text-center py-10">
+      <h2 class="text-3xl font-extrabold mb-4">Prêt à commencer le quiz ?</h2>
+      <p class="text-lg text-black-transparent mb-8">
+        Teste tes connaissances sur <span class="text-primary font-semibold">{{ quiz.title }}</span>
+      </p>
+      <Button
+        class="btn btn-primary"
+        :disabled="loading"
+        @click="startQuizSession"
+      >
+        {{ loading ? 'Chargement...' : 'Commencer le quiz' }}
+      </Button>
+    </section>
+
     <!-- Quiz Configuration -->
     <section v-if="quiz && activeTab === 'config'" class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start">
       <!-- Questions -->
@@ -194,7 +262,7 @@ const finishQuiz = () => {
               />
             </section>
             <section class="grid grid-cols-2 gap-2 space-y-5">
-              <Select
+              <Input
                 id="categorySelect"
                 v-model="quiz.category"
                 label="Catégorie"
@@ -263,7 +331,7 @@ const finishQuiz = () => {
     </section>
 
     <!-- Quiz -->
-    <section v-if="quiz && activeTab === 'quiz'" class="max-w-2xl mx-auto w-full">
+    <section v-if="quiz && activeTab === 'quiz' && isStarted" class="max-w-2xl mx-auto w-full">
       <div v-if="!quizFinished">
         <div class="mb-6">
           <QuestionDraggable
@@ -274,18 +342,21 @@ const finishQuiz = () => {
             mode="quiz"
           />
         </div>
-        <Button
-          class="mt-4"
-          :disabled="!userAnswers[currentStep] || userAnswers[currentStep].length === 0"
-          @click="nextStep"
-        >
-          {{ showCorrection ? (currentStep === quiz.questions.length - 1 ? 'Voir le résultat' : 'Question suivante') : 'Valider' }}
-        </Button>
+        <div class="flex gap-4 justify-center">
+          <Button
+            class="mt-4"
+            :disabled="!userAnswers[currentStep] || userAnswers[currentStep].length === 0"
+            @click="nextStep"
+          >
+            {{ showCorrection ? (currentStep === quiz.questions.length - 1 ? 'Voir le résultat' : 'Question suivante') : 'Valider' }}
+          </Button>
+          <Button class="mt-4" color="danger" @click="endSession">Arrêter la session</Button>
+        </div>
       </div>
       <div v-else class="text-center py-10">
         <div class="text-2xl font-bold mb-4">Résultat du quiz</div>
         <div class="text-lg mb-2">Score : {{ quizScore }} / {{ quiz.questions.length }}</div>
-        <Button class="mt-4" @click="() => { currentStep = 0; quizFinished = false; userAnswers = {}; quizScore = 0; showCorrection.value = false; }">
+        <Button class="mt-4" @click="() => { currentStep = 0; quizFinished = false; userAnswers = {}; quizScore = 0; showCorrection.value = false; isStarted = false; }">
           Recommencer le quiz
         </Button>
       </div>

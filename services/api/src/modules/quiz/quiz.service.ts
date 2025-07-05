@@ -25,15 +25,13 @@ export class QuizService {
   async findById(id: string): Promise<Quiz | null> {
     const quiz = await this.quizRepository.findById(id);
     if (!quiz) return null;
-    // Normalisation du format des questions pour le frontend
     return {
       ...quiz,
       questions: (quiz.questions || []).map(q => ({
-        q: q.q || q.question,
+        q: q.q,
         answers: (q.answers || []).map(a => ({
           a: a.a,
           c: typeof a.c === 'boolean' ? a.c : false,
-          _id: a._id
         }))
       }))
     };
@@ -155,7 +153,7 @@ export class QuizService {
         ...q,
         answers: (q.answers || []).map(a => {
           let cValue = a.c;
-          if (typeof a.correct === 'boolean') cValue = a.correct;
+          if (typeof a.c === 'boolean') cValue = a.c;
           return {
             ...a,
             c: typeof cValue === 'boolean' ? cValue : false
@@ -186,7 +184,7 @@ export class QuizService {
       ...q,
       answers: (q.answers || []).map(a => {
         let cValue = a.c;
-        if (typeof a.correct === 'boolean') cValue = a.correct;
+        if (typeof a.c === 'boolean') cValue = a.c;
         return {
           ...a,
           c: typeof cValue === 'boolean' ? cValue : false

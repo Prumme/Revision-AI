@@ -90,18 +90,7 @@ export class QuizController {
     @UploadedFiles() files: Express.Multer.File[],
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Quiz> {
-    // S'assurer que files est un tableau
     const fileArray = Array.isArray(files) ? files : files ? [files] : [];
-
-    if (fileArray.length > 0) {
-      console.log('File details:', fileArray.map(f => ({
-        name: f.originalname,
-        size: f.size,
-        mimetype: f.mimetype
-      })));
-    }
-    console.log('createQuizDto:', JSON.stringify(createQuizDto));
-    console.log('-----------------------------');
 
     return this.quizService.create(
       { ...createQuizDto, userId: user.sub },
