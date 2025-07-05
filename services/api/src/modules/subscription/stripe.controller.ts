@@ -6,8 +6,8 @@ import {
   ActiveSubscriptionUseCaseFactory,
   InactiveSubscriptionUseCaseFactory,
 } from '../../domain/usecases/SubscriptionUsecases';
-import { StripeSubscriptionDict } from '../../infrastructure/stripe/StripeSubscriptionDict';
 import { Public } from '@common/decorators/public.decorator';
+import { StripeSubscriptionProvider } from '../../infrastructure/stripe/StripeSubscriptionProvider';
 
 export type StripeEventHandler = (event: Stripe.Event) => Promise<true | Error>;
 
@@ -20,6 +20,8 @@ export class StripeController {
     private mailer: MailerService,
     @Inject('CustomerRepository')
     private customerRepository: CustomerRepository,
+    @Inject(StripeSubscriptionProvider)
+    private stripeSubscriptionProvider: StripeSubscriptionProvider,
   ) {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   }
@@ -77,9 +79,13 @@ export class StripeController {
       invoice.lines.data[0].id,
     );
 
+    const tier = await this.stripeSubscriptionProvider.getTierByProductId(
+      invoiceItem.pricing.price_details.product,
+    );
+
     const result = await useCase({
       customerId: event.data.object.customer as string,
-      tier: StripeSubscriptionDict[invoiceItem.pricing.price_details.product],
+      tier,
     });
 
     if (result instanceof Error) {

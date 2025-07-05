@@ -186,7 +186,9 @@ export class MongoUserRepository implements UserRepository {
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
       avatar: document.avatar,
+      customerId: document.customerId,
       bio: document.bio,
+      subscriptionTier: document.subscriptionTier,
       deleted: document.deleted,
       blocked: document.blocked,
     };

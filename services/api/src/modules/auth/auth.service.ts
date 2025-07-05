@@ -80,21 +80,20 @@ export class AuthService {
         avatar: user.avatar,
         role: user.role,
         bio: user.bio,
+        subscriptionTier: user.subscriptionTier,
+        customerId: user.customerId,
       },
     };
   }
 
   async getCurrentCustomer(
     reqUser: ReqUser,
-  ): Promise<Omit<CustomerAndUser, 'password' | 'lastUpdatedPassword'>> {
+  ): Promise<Omit<CustomerAndUser, 'password' | 'lastUpdatedPassword'> | null> {
     const customerAndUser = await this.customerRepository.findByUserId(
       reqUser.sub,
     );
-    if (!customerAndUser) {
-      throw new UnauthorizedException('Customer not found');
-    }
-    if (!customerAndUser.customerId) {
-      throw new UnauthorizedException('Customer ID not found');
+    if (!customerAndUser || !customerAndUser.customerId) {
+      return null;
     }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, lastUpdatedPassword, ...customer } =

@@ -2,6 +2,7 @@ import { SubscriptionTier } from '../value-objects/subscriptionTier';
 import { CustomerIdentifier } from '@entities/customer.entity';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { StripeSubscriptionProvider } from '../../infrastructure/stripe/StripeSubscriptionProvider';
+import { SubscriptionInfo } from 'domain/value-objects/subscriptionPrice';
 
 export interface SubscriptionProvider {
   upsertCustomer(
@@ -19,6 +20,7 @@ export interface SubscriptionProvider {
     tier: SubscriptionTier,
     paymentMethodId: string,
   ): Promise<true | Error>;
+  getProductsPrices(): Promise<SubscriptionInfo[] | Error>;
 }
 
 export const SubscriptionPrvProvider = {
