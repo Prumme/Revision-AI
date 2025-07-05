@@ -107,16 +107,6 @@ export class CreateQuizDto {
   media?: string;
 
   @ApiProperty({
-    description: 'Liste des questions du quiz',
-    type: [QuestionDto],
-  })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => QuestionDto)
-  questions: QuestionDto[];
-
-  @ApiProperty({
     description: 'Statut du quiz (par défaut "pending")',
     example: 'pending',
     required: false,

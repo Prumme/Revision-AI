@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export interface SessionAnswer {
+  c: boolean;
+  a: string;
+}
+
 export class Session {
   id: string;
 
@@ -19,5 +24,5 @@ export class Session {
   finishedAt?: Date;
 
   @ApiProperty({ description: 'Réponses fournies par l’utilisateur', type: [Object] })
-  answers: { correct: boolean; a: string }[];
+  answers: SessionAnswer[];
 }

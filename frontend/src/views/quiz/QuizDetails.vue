@@ -6,13 +6,15 @@ import Switch from "@/components/inputs/SwitchComponent.vue";
 import { Quiz, QuizService } from "@/services/quiz.service";
 import { useToastStore } from "@/stores/toast";
 import { ArrowLeftIcon } from "lucide-vue-next";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useRoute } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { Motion } from '@motionone/vue';
 import { useSessionStore } from "@/stores/session";
 import {useUserStore} from "@/stores/user.ts";
 import { sessionService } from "@/services/session.service";
+import DataTable from '@/components/tables/DataTable.vue';
+import LoaderOverlay from '@/components/common/LoaderOverlay.vue';
 
 const route = useRoute();
 const toast = useToastStore();
@@ -31,13 +33,39 @@ const quizFinished = ref(false);
 const quizScore = ref(0);
 const showCorrection = ref(false);
 const isStarted = ref(false);
+const showLoader = ref(false);
 
 const user = useUserStore();
 const userId = ref<string>(user.user.id);
 
+const isQuizOwner = computed(() => {
+  return quiz.value && quiz.value.userId === userId.value;
+});
+
 const quizTabs = [
   { key: "quiz", label: "Quiz" },
+  { key: 'sessions', label: 'Sessions' },
   { key: "config", label: "Configuration" },
+];
+
+const sessionColumns = [
+  {
+    key: 'startedAt',
+    label: 'Date de début',
+    sortable: true,
+    formatter: (value: string) => value ? new Date(value).toLocaleString('fr-FR') : '-',
+  },
+  {
+    key: 'finishedAt',
+    label: 'Date de fin',
+    sortable: true,
+    formatter: (value: string) => value ? new Date(value).toLocaleString('fr-FR') : '-',
+  },
+  {
+    key: 'score',
+    label: 'Score',
+    sortable: true,
+  },
 ];
 
 const onQuestionsOrderChange = (newQuestions: Quiz["questions"]) => {
@@ -80,19 +108,21 @@ const saveOrder = async () => {
 const startQuizSession = async () => {
   if (!quiz.value || !userId.value) return;
   try {
+    showLoader.value = true;
     loading.value = true;
+    await new Promise(resolve => setTimeout(resolve, 1200));
     const session = await sessionStore.startSession(quiz.value.id, userId.value);
     if (!session || !session.id) {
       toast.showToast("error", "Erreur lors de la création de la session.");
       return;
     }
     sessionStore.sessionId = session.id;
-    console.log(sessionStore.sessionId);
     isStarted.value = true;
     activeTab.value = "quiz";
   } catch  {
     toast.showToast("error",  "Erreur lors du démarrage de la session.");
   } finally {
+    showLoader.value = false;
     loading.value = false;
   }
 };
@@ -121,7 +151,7 @@ const nextStep = async () => {
   }
 };
 
-const finishQuiz = () => {
+const finishQuiz = async () => {
   quizFinished.value = true;
   let score = 0;
   quiz.value?.questions.forEach((q, idx) => {
@@ -135,6 +165,9 @@ const finishQuiz = () => {
     }
   });
   quizScore.value = score;
+  if (sessionStore.sessionId) {
+    await sessionStore.endSession(score, Object.values(userAnswers.value));
+  }
 };
 
 const endSession = async () => {
@@ -155,9 +188,40 @@ const endSession = async () => {
     loading.value = false;
   }
 };
+
+const userSessions = ref<Session[]>([]);
+
+const fetchUserSessions = async () => {
+  if (!quiz.value || !userId.value) return;
+  userSessions.value = await sessionStore.listUserSessions(userId.value);
+  userSessions.value = userSessions.value.filter(s => s.quizId === quiz.value?.id);
+};
+
+watch([activeTab, quiz], async ([tab]) => {
+  if (tab === 'sessions') {
+    await fetchUserSessions();
+  }
+});
+
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function shuffleQuestions() {
+  if (quiz.value && quiz.value.questions) {
+    quiz.value.questions = shuffleArray(quiz.value.questions);
+    orderChanged.value = true;
+  }
+}
 </script>
 
 <template>
+  <LoaderOverlay v-if="showLoader" message="Création de la session en cours..." />
   <Motion
     :initial="{ opacity: 0, y: 40 }"
     :animate="{ opacity: 1, y: 0 }"
@@ -186,14 +250,18 @@ const endSession = async () => {
       <button
         v-for="tab in quizTabs"
         :key="tab.key"
-        @click="activeTab = tab.key"
+        @click="() => {
+          if (tab.key !== 'config' || isQuizOwner) activeTab = tab.key;
+        }"
         class="font-outfit px-4 py-2 -mb-px text-lg transition-colors duration-150"
         :class="[
-        activeTab === tab.key
-          ? 'border-b-2 border-primary text-black font-semibold'
-          : 'text-black-transparent hover:text-black',
-      ]"
+          activeTab === tab.key
+            ? 'border-b-2 border-primary text-black font-semibold'
+            : 'text-black-transparent hover:text-black',
+          tab.key === 'config' && !isQuizOwner ? 'opacity-50 cursor-not-allowed' : ''
+        ]"
         style="background: none"
+        :disabled="tab.key === 'config' && !isQuizOwner"
       >
         {{ tab.label }}
       </button>
@@ -220,17 +288,26 @@ const endSession = async () => {
     </section>
 
     <!-- Quiz Configuration -->
-    <section v-if="quiz && activeTab === 'config'" class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start">
+    <section v-if="quiz && activeTab === 'config' && isQuizOwner" class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start">
       <!-- Questions -->
       <div>
-        <Button
-          class="mb-4"
-          @click="toggleAllAnswers"
-          type="button"
-          v-if="quiz.questions && quiz.questions.length"
-        >
-          {{ showAllAnswers ? 'Masquer toutes les réponses' : 'Afficher toutes les réponses' }}
-        </Button>
+        <div class="flex gap-2 mb-4">
+          <Button
+            @click="toggleAllAnswers"
+            type="button"
+            v-if="quiz.questions && quiz.questions.length"
+          >
+            {{ showAllAnswers ? 'Masquer toutes les réponses' : 'Afficher toutes les réponses' }}
+          </Button>
+          <Button
+            @click="shuffleQuestions"
+            type="button"
+            v-if="quiz.questions && quiz.questions.length"
+            color="secondary"
+          >
+            Mélanger l'ordre
+          </Button>
+        </div>
         <QuestionDraggable
           v-if="quiz.questions && quiz.questions.length"
           :questions="quiz.questions"
@@ -361,5 +438,19 @@ const endSession = async () => {
         </Button>
       </div>
     </section>
+
+    <!-- Onglet Sessions -->
+    <section v-if="quiz && activeTab === 'sessions'">
+      <h2 class="text-2xl font-bold mb-4">Vos sessions sur ce quiz</h2>
+      <DataTable
+        :data="userSessions"
+        :columns="sessionColumns"
+        :loading="loading"
+        :rowKey="'id'"
+        :searchable="false"
+        empty-message="Aucune session trouvée pour ce quiz."
+      />
+    </section>
+
   </Motion>
 </template>

@@ -3,7 +3,7 @@ import { SessionRepository } from "@repositories/session.repository";
 import { InjectModel } from "@nestjs/mongoose";
 import { SessionDocument } from "./session.schema";
 import { Model } from 'mongoose';
-import { Session } from "@entities/session.entity";
+import { Session, SessionAnswer } from "@entities/session.entity";
 
 @Injectable()
 export class MongoSessionRepository implements SessionRepository {
@@ -13,7 +13,6 @@ export class MongoSessionRepository implements SessionRepository {
   ) { }
 
   async findById(id: string): Promise<Session | null> {
-    // Use _id for MongoDB default id
     const document = await this.sessionModel.findById(id).exec();
     if (!document) return null;
     return this.documentToSession(document);
@@ -25,9 +24,8 @@ export class MongoSessionRepository implements SessionRepository {
   }
 
   async create(session: Omit<Session, 'id'>): Promise<Session> {
-    const sessionDocument = new this.sessionModel(session);
-    const savedSession = await sessionDocument.save();
-    return this.documentToSession(savedSession);
+    const document = await this.sessionModel.create(session);
+    return this.documentToSession(document);
   }
 
   async startSession(id: string): Promise<Session | null> {
@@ -36,7 +34,7 @@ export class MongoSessionRepository implements SessionRepository {
     return this.documentToSession(session);
   }
 
-  async endSession(id: string, finishedAt: Date, score: number, answers: { correct: boolean; a: string }[]): Promise<Session | null> {
+  async endSession(id: string, finishedAt: Date, score: number, answers: SessionAnswer[]): Promise<Session | null> {
     const session = await this.sessionModel.findByIdAndUpdate(
       id,
       { finishedAt, score, answers },
@@ -46,7 +44,7 @@ export class MongoSessionRepository implements SessionRepository {
     return this.documentToSession(session);
   }
 
-  async updateAnswers(sessionId: string, answers: any[]): Promise<Session | null> {
+  async updateAnswers(sessionId: string, answers: SessionAnswer[]): Promise<Session | null> {
     const session = await this.sessionModel.findByIdAndUpdate(
       sessionId,
       { answers },
@@ -64,7 +62,10 @@ export class MongoSessionRepository implements SessionRepository {
       score: document.score,
       startedAt: document.startedAt,
       finishedAt: document.finishedAt,
-      answers: document.answers,
+      answers: (document.answers || []).map((a: any) => ({
+        c: a.c ?? a.correct,
+        a: a.a,
+      })),
     };
   }
 }

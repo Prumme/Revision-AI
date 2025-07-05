@@ -6,6 +6,7 @@ import { UserRepository } from '@repositories/user.repository';
 import { QuizRepository } from '@repositories/quiz.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { EndSessionDto } from '@modules/session/dto/end-session.dto';
+import { SessionAnswer } from '@entities/session.entity';
 
 @Injectable()
 export class SessionService {
@@ -92,7 +93,11 @@ export class SessionService {
   async endSession(id: string, endSessionDto: EndSessionDto): Promise<Session> {
     const { score, answers } = endSessionDto;
     const finishedAt = new Date();
-    const session = await this.sessionRepository.endSession(id, finishedAt, score, answers);
+    const formattedAnswers = (answers || []).map((a: any) => ({
+      c: a.c ?? a.correct,
+      a: a.a,
+    }));
+    const session = await this.sessionRepository.endSession(id, finishedAt, score, formattedAnswers);
     if (!session) {
       throw new NotFoundException(`Session with id ${id} not found`);
     }
@@ -106,12 +111,16 @@ export class SessionService {
    * @returns The updated session.
    * @throws NotFoundException if the session does not exist.
    */
-  async addAnswer(sessionId: string, answer: []): Promise<Session> {
+  async addAnswer(sessionId: string, answer: any): Promise<Session> {
     const session = await this.sessionRepository.findById(sessionId);
     if (!session) {
       throw new NotFoundException(`Session with id ${sessionId} not found`);
     }
-    const updatedAnswers = [...(session.answers || []), answer];
+    const formattedAnswer: SessionAnswer = {
+      a: answer.a,
+      c: answer.c,
+    };
+    const updatedAnswers = [...(session.answers || []), formattedAnswer];
     await this.sessionRepository.updateAnswers(sessionId, updatedAnswers);
     return await this.sessionRepository.findById(sessionId);
   }

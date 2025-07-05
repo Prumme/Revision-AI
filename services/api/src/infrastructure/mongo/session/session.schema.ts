@@ -8,8 +8,9 @@ export const SessionSchema = new Schema({
   finishedAt: { type: Date, default: null },
   answers: [
     {
-      correct: { type: Boolean, required: true },
+      c: { type: Boolean, required: true },
       a: { type: String, required: true },
+      _id: false,
     },
   ],
 });
