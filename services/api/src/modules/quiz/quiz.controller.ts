@@ -100,8 +100,6 @@ export class QuizController {
         mimetype: f.mimetype
       })));
     }
-    console.log('createQuizDto:', JSON.stringify(createQuizDto));
-    console.log('-----------------------------');
 
     return this.quizService.create(
       { ...createQuizDto, userId: user.sub },
