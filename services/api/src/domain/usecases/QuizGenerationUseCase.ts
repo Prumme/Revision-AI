@@ -5,7 +5,6 @@ import { CreateQuizDto } from '@modules/quiz/dto/create-quiz.dto';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import * as QuizJobEntity from '@entities/quiz-generation-job.entity';
 import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
-import { MinioService } from '@modules/minio/minio.service';
 import { QueueProvider } from '@services/QueueProvider';
 import { FileToParseDTO } from '../../types/FileToParseDTO';
 import * as QuizEntity from '@entities/quiz.entity';
@@ -13,6 +12,7 @@ import { QuizRepository } from '@repositories/quiz.repository';
 import { CachedFileParsed } from '@entities/cached-file-parsed.entity';
 import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import { Quiz } from '@entities/quiz.entity';
+import { FileService } from '@services/FileService';
 
 async function generateQuizGenerationDTO(
   identifier: string,
@@ -49,9 +49,10 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     QuizRepository,
     QuizGenerationJobRepository,
     CachedFileParsedRepository,
-    MinioService, // @todo abstration is better but to complex with the current implemetentation
+    FileService, // @todo abstration is better but to complex with the current implemetentation
     QueueProvider<FileToParseDTO>,
     QueueProvider<QuizGenerationDTO>,
+    typeof generateQuizGenerationDTO,
   ]
 > = (
   _quizRepository,
@@ -60,6 +61,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
   _fileService,
   _fileToParseQueueProvider,
   _quizGenerationQueueProvider,
+  _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
 ) => {
   return async (createQuizDto) => {
     type FileIdentifierWithChecksum = {
@@ -100,7 +102,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       const filesToParse: FileToParseDTO[] = files
         .filter((file) => !alreadyParsedChecksums.includes(file.checksum))
         .map(({ fileIdentifier, checksum }) => ({
-          bucketName: _fileService.bucketName,
+          bucketName: _fileService.getBucketName(),
           objectKey: fileIdentifier,
           fileName: fileIdentifier,
           checksum,
@@ -136,7 +138,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
     if (QuizJobEntity.isReadyForGeneration(job)) {
       await _quizGenerationQueueProvider.send(
-        await generateQuizGenerationDTO(
+        await _generateQuizGenerationDTO(
           createdQuiz.id,
           createQuizDto.questionsNumbers,
           createQuizDto.medias,
@@ -161,12 +163,14 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
     QuizGenerationJobRepository,
     CachedFileParsedRepository,
     QueueProvider<QuizGenerationDTO>,
+    typeof generateQuizGenerationDTO, // Injected for testing purposes
   ]
 > = (
   _quizRepository,
   _quizGenerationJobRepository,
   _cachedFileParsedRepository,
   _quizGenerationQueueProvider,
+  _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
 ) => {
   return async (fileContent) => {
     // Sauvegarder le fichier parsé dans la base de données pour éviter de le parser à nouveau plus tard
@@ -199,7 +203,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           console.error(error);
           continue;
         }
-        const quizGenerationDTO = await generateQuizGenerationDTO(
+        const quizGenerationDTO = await _generateQuizGenerationDTO(
           quiz.id,
           quiz.questionsNumbers,
           job.files.map((file) => file.identifier),
