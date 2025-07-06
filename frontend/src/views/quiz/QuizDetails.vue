@@ -11,7 +11,7 @@ import { Motion } from '@motionone/vue';
 import { useQuizDetails } from '@/composables/useQuizDetails';
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 import { useSessionStore } from '@/stores/session';
-import DataTable from "@/components/tables/DataTable.vue";
+import SessionDatatable from '@/components/tables/SessionDatatable.vue';
 import {PauseIcon} from "lucide-vue-next";
 import {useToastStore} from "@/stores/toast.ts";
 
@@ -45,9 +45,13 @@ const {
   startQuizSession,
   nextStep,
   endSession,
-  userSessions,
-  fetchUserSessions,
-  shuffleQuestions
+  shuffleQuestions,
+  fetchSessionsForTable,
+  sessionTableLoading,
+  filteredSessions,
+  sessionFilters,
+  sessionTableFilters,
+  handleSessionTableFilters,
 } = quizDetails;
 
 onMounted(async () => {
@@ -63,7 +67,7 @@ onMounted(async () => {
 
 watch([activeTab, quiz], async ([tab]) => {
   if (tab === 'sessions') {
-    await fetchUserSessions();
+    await fetchSessionsForTable;
   }
 });
 
@@ -294,16 +298,17 @@ function handlePauseSession() {
     <!-- Sessions -->
     <section v-if="quiz && activeTab === 'sessions'">
       <h2 class="text-2xl font-bold mb-4">Vos sessions sur ce quiz</h2>
-      <DataTable
-        :data="userSessions"
+      <SessionDatatable
+        :data="filteredSessions"
         :actions="actions"
         :columns="sessionColumns"
-        :loading="loading"
+        :loading="sessionTableLoading"
         :rowKey="'id'"
-        :searchable="false"
+        :filters="sessionFilters"
+        :initial-filters="sessionTableFilters"
         empty-message="Aucune session trouvée pour ce quiz."
+        @update:filters="handleSessionTableFilters"
       />
     </section>
-
   </Motion>
 </template>

@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Req } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
 import { SessionService } from './session.service';
 import { StartSessionDto } from './dto/start-session.dto';
 import { EndSessionDto } from './dto/end-session.dto';
 import { Session } from '@entities/session.entity';
 import { ReqUser } from "@common/types/request";
 import { CreateSessionDto } from "@modules/session/dto/create-session.dto";
+import {SessionFiltersDto} from "@modules/session/dto/filter-session.dto";
 
 @ApiTags('Sessions')
 @Controller('sessions')
@@ -31,15 +32,37 @@ export class SessionController {
   }
 
   @Get('user/:userId')
-  @ApiOperation({ summary: 'Récupérer toutes les sessions d\'un utilisateur' })
+  @ApiOperation({ summary: "Récupérer toutes les sessions d'un utilisateur" })
   @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
   @ApiResponse({
     status: 200,
     description: 'Liste des sessions récupérée avec succès',
     type: [Session],
   })
-  async findAllByUserId(@Param('userId') userId: string): Promise<Session[]> {
-    return this.sessionService.findAllByUserId(userId);
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['pending', 'active', 'paused', 'finished'],
+    description: 'Filtrer par statut de session',
+  })
+  @ApiQuery({
+    name: 'scoreMin',
+    required: false,
+    type: Number,
+    description: 'Filtrer par score minimum',
+  })
+  @ApiQuery({
+    name: 'scoreMax',
+    required: false,
+    type: Number,
+    description: 'Filtrer par score maximum',
+  })
+  async findAllByUserId(
+    @Param('userId') userId: string,
+    @Query() filters: SessionFiltersDto
+  ): Promise<Session[]> {
+    const { scoreMin, scoreMax, status } = filters;
+    return this.sessionService.findAllByUserId(userId, { scoreMin, scoreMax, status });
   }
 
   @Post('create')

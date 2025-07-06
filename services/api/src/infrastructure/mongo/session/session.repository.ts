@@ -3,7 +3,8 @@ import { SessionRepository } from "@repositories/session.repository";
 import { InjectModel } from "@nestjs/mongoose";
 import { SessionDocument } from "./session.schema";
 import { Model } from 'mongoose';
-import { Session, SessionAnswer } from "@entities/session.entity";
+import {Session, SessionAnswer, SessionStatus} from "@entities/session.entity";
+import {SessionFiltersDto} from "@modules/session/dto/filter-session.dto";
 
 @Injectable()
 export class MongoSessionRepository implements SessionRepository {
@@ -18,8 +19,14 @@ export class MongoSessionRepository implements SessionRepository {
     return this.documentToSession(document);
   }
 
-  async findAllByUserId(userId: string): Promise<Session[]> {
-    const documents = await this.sessionModel.find({ userId }).exec();
+  async findAllByUserId(userId: string, filters?: SessionFiltersDto): Promise<Session[]> {
+    const query: any = { userId };
+    if (filters) {
+      if (filters.status) query.status = filters.status;
+      if (typeof filters.scoreMin === 'number') query.score = { ...query.score, $gte: filters.scoreMin };
+      if (typeof filters.scoreMax === 'number') query.score = { ...query.score, $lte: filters.scoreMax };
+    }
+    const documents = await this.sessionModel.find(query).exec();
     return documents.map(this.documentToSession);
   }
 
@@ -86,7 +93,7 @@ export class MongoSessionRepository implements SessionRepository {
         c: a.c ?? a.correct,
         a: a.a,
       })),
-      status: document.status,
+      status: document.status as SessionStatus,
     };
   }
 }
