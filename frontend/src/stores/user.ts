@@ -197,5 +197,9 @@ export const useUserStore = defineStore("user", () => {
     fetchCustomerInfo,
     updateUser,
     setAvatar,
+    quizCount: 0,
+    setQuizCount(count: number) {
+      this.quizCount = count;
+    },
   };
 });

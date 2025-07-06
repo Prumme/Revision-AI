@@ -35,14 +35,15 @@ export class QuizController {
   constructor(private readonly quizService: QuizService) { }
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les quiz' })
+  @ApiOperation({ summary: 'Récupérer tous les quiz (avec filtres)' })
   @ApiResponse({
     status: 200,
     description: 'Liste des quiz récupérée avec succès',
     type: [Quiz],
   })
-  async findAll(): Promise<Quiz[]> {
-    return this.quizService.findAll();
+  async findAll(@Query() filters: QuizFiltersDto, @Req() req: Request & { user?: ReqUser }): Promise<Quiz[]> {
+    const userId = req.user?.sub;
+    return this.quizService.findAll(filters, userId);
   }
 
   @Get(':id')

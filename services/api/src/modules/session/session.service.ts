@@ -1,4 +1,4 @@
-import {Injectable, Inject, NotFoundException} from '@nestjs/common';
+import {Injectable, Inject, ForbiddenException} from '@nestjs/common';
 import {Session} from '@entities/session.entity';
 import {CreateSessionDto} from '@modules/session/dto/create-session.dto';
 import {SessionRepository} from '@repositories/session.repository';
@@ -7,6 +7,8 @@ import {QuizRepository} from '@repositories/quiz.repository';
 import {v4 as uuidv4} from 'uuid';
 import {EndSessionDto} from '@modules/session/dto/end-session.dto';
 import {SessionAnswer, SessionStatus} from '@entities/session.entity';
+import { SessionAlreadyFinishedException } from './exceptions/session-already-finished.exception';
+import { SessionNotFoundException } from './exceptions/session-not-found.exception';
 
 @Injectable()
 export class SessionService {
@@ -29,7 +31,7 @@ export class SessionService {
     async findById(id: string): Promise<Session> {
         const session = await this.sessionRepository.findById(id);
         if (!session) {
-            throw new NotFoundException(`Session with id ${id} not found`);
+            throw new SessionNotFoundException();
         }
         return session;
     }
@@ -41,6 +43,15 @@ export class SessionService {
      */
     async findAllByUserId(userId: string): Promise<Session[]> {
         return this.sessionRepository.findAllByUserId(userId);
+    }
+
+    /**
+     * Retrieves all sessions for a specific quiz.
+     * @param quizId - The ID of the quiz whose sessions are to be retrieved.
+     * @returns An array of sessions associated with the quiz.
+     */
+    async findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]> {
+        return this.sessionRepository.findAllByQuizId(quizId, excludeUserId);
     }
 
     /**
@@ -80,7 +91,7 @@ export class SessionService {
     async startSession(id: string): Promise<Session> {
         const session = await this.sessionRepository.startSession(id);
         if (!session) {
-            throw new NotFoundException(`Session with id ${id} not found`);
+            throw new SessionNotFoundException();
         }
         return session;
     }
@@ -92,19 +103,26 @@ export class SessionService {
      * @returns The ended session.
      * @throws NotFoundException if the session does not exist.
      */
-    async endSession(id: string, endSessionDto: EndSessionDto): Promise<Session> {
+    async endSession(id: string, endSessionDto: EndSessionDto, userId: string): Promise<Session> {
         const {score, answers} = endSessionDto;
         const finishedAt = new Date();
         const formattedAnswers = (answers || []).map((a: any) => ({
             c: a.c ?? a.correct,
             a: a.a,
         }));
-        await this.sessionRepository.updateStatus(id, SessionStatus.FINISHED);
-        const session = await this.sessionRepository.endSession(id, finishedAt, score, formattedAnswers);
+        const session = await this.sessionRepository.findById(id);
         if (!session) {
-            throw new NotFoundException(`Session with id ${id} not found`);
+            throw new SessionNotFoundException();
         }
-        return session;
+        if (session.userId !== userId) {
+            throw new ForbiddenException('Vous ne pouvez pas modifier cette session');
+        }
+        await this.sessionRepository.updateStatus(id, SessionStatus.FINISHED);
+        const endedSession = await this.sessionRepository.endSession(id, finishedAt, score, formattedAnswers);
+        if (!endedSession) {
+            throw new SessionNotFoundException();
+        }
+        return endedSession;
     }
 
     /**
@@ -114,10 +132,16 @@ export class SessionService {
      * @returns The updated session.
      * @throws NotFoundException if the session does not exist.
      */
-    async addAnswer(sessionId: string, answer: any): Promise<Session> {
+    async addAnswer(sessionId: string, answer: any, userId: string): Promise<Session> {
         const session = await this.sessionRepository.findById(sessionId);
         if (!session) {
-            throw new NotFoundException(`Session with id ${sessionId} not found`);
+            throw new SessionNotFoundException();
+        }
+        if (session.userId !== userId) {
+            throw new ForbiddenException('Vous ne pouvez pas modifier cette session');
+        }
+        if (session.status === SessionStatus.FINISHED) {
+            throw new SessionAlreadyFinishedException();
         }
         const updatedAnswers: SessionAnswer[] = [
             ...session.answers,
@@ -127,7 +151,11 @@ export class SessionService {
             },
         ];
         await this.sessionRepository.updateAnswers(sessionId, updatedAnswers);
-        return await this.sessionRepository.findById(sessionId);
+        const updatedSession = await this.sessionRepository.findById(sessionId);
+        if (!updatedSession) {
+            throw new SessionNotFoundException();
+        }
+        return updatedSession;
     }
 
     /**
@@ -136,14 +164,21 @@ export class SessionService {
      * @param id
      * @return The paused session.
      */
-    async pauseSession(id: string): Promise<Session> {
-        const session = await this.sessionRepository.pauseSession(id);
+    async pauseSession(id: string, userId: string): Promise<Session> {
+        const session = await this.sessionRepository.findById(id);
         if (!session) {
-            throw new NotFoundException(`Session with id ${id} not found`);
+            throw new SessionNotFoundException();
         }
-        session.status = SessionStatus.PAUSED;
+        if (session.userId !== userId) {
+            throw new ForbiddenException('Vous ne pouvez pas modifier cette session');
+        }
+        if (session.status === SessionStatus.FINISHED) {
+            throw new SessionAlreadyFinishedException();
+        }
+        const pausedSession = await this.sessionRepository.pauseSession(id);
+        pausedSession.status = SessionStatus.PAUSED;
         await this.sessionRepository.updateStatus(id, SessionStatus.PAUSED);
-        return session;
+        return pausedSession;
     }
 
     /**
@@ -152,13 +187,20 @@ export class SessionService {
      * @param id
      * @return The resumed session.
      */
-    async resumeSession(id: string): Promise<Session> {
-        const session = await this.sessionRepository.resumeSession(id);
+    async resumeSession(id: string, userId: string): Promise<Session> {
+        const session = await this.sessionRepository.findById(id);
         if (!session) {
-            throw new NotFoundException(`Session with id ${id} not found`);
+            throw new SessionNotFoundException();
         }
-        session.status = SessionStatus.ACTIVE;
+        if (session.userId !== userId) {
+            throw new ForbiddenException('Vous ne pouvez pas modifier cette session');
+        }
+        if (session.status === SessionStatus.FINISHED) {
+            throw new SessionAlreadyFinishedException();
+        }
+        const resumedSession = await this.sessionRepository.resumeSession(id);
+        resumedSession.status = SessionStatus.ACTIVE;
         await this.sessionRepository.updateStatus(id, SessionStatus.ACTIVE);
-        return session;
+        return resumedSession;
     }
 }

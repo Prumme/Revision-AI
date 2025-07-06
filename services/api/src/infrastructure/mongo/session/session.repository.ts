@@ -44,6 +44,21 @@ export class MongoSessionRepository implements SessionRepository {
     }
 
     /**
+     * Finds all sessions for a specific quiz.
+     * @param quizId - The ID of the quiz whose sessions are to be retrieved.
+     * @param excludeUserId
+     * @returns An array of sessions associated with the quiz.
+     */
+    async findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]> {
+        const query: any = { quizId };
+        if (excludeUserId) {
+            query.userId = { $ne: excludeUserId };
+        }
+        const documents = await this.sessionModel.find(query).exec();
+        return documents.map(this.documentToSession);
+    }
+
+    /**
      * Creates a new session.
      * @param session - The session data to create.
      * @returns The created session.

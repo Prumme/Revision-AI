@@ -34,6 +34,15 @@ export function useQuizDetails(quizId: string) {
   const sessionTablePagination = ref<PaginationData>({ currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: 10 });
   const sessionTableLoading = ref(false);
 
+  const showAllSessions = ref(false);
+  const allQuizSessions = ref<[]>([]);
+  const totalUniqueParticipants = computed(() => {
+    if (!showAllSessions.value) return 0;
+    const sessions = allQuizSessions.value as Array<{ userId: string }>;
+    const uniqueUserIds = new Set(sessions.map(s => s.userId));
+    return uniqueUserIds.size;
+  });
+
   const isQuizOwner = computed(() => {
     return quiz.value && quiz.value.userId === userId.value;
   });
@@ -253,10 +262,30 @@ export function useQuizDetails(quizId: string) {
     }
   }
 
+  // Fetch toutes les sessions du quiz (pour owner)
+  async function fetchAllQuizSessions() {
+    if (!quiz.value) return;
+    sessionTableLoading.value = true;
+    try {
+      // On suppose que sessionService.findAllByQuizId existe côté backend
+      const allSessions = await sessionService.findAllByQuizId(quiz.value.id);
+      allQuizSessions.value = allSessions;
+    } catch {
+      allQuizSessions.value = [];
+    } finally {
+      sessionTableLoading.value = false;
+    }
+  }
+
   // Filtering logic (client-side)
-  const filteredSessions = computed(() => getFilteredSessions());
-  function getFilteredSessions() {
-    let result = userSessions.value as Array<{ status: string; score?: number }>;
+  const filteredSessions = computed(() => {
+    if (showAllSessions.value && isQuizOwner.value) {
+      return getFilteredSessions(allQuizSessions.value);
+    }
+    return getFilteredSessions(userSessions.value);
+  });
+  function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
+    let result = sessions;
     const { status, scoreMin, scoreMax } = sessionTableFilters.value;
     if (status && status !== 'all') {
       result = result.filter((s) => s.status === status);
@@ -286,9 +315,13 @@ export function useQuizDetails(quizId: string) {
   }
 
   // Fetch all user sessions on tab change
-  watch([activeTab, quiz], async ([tab]) => {
+  watch([activeTab, quiz, showAllSessions], async ([tab]) => {
     if (tab === "sessions") {
-      await fetchAllUserSessions();
+      if (showAllSessions.value && isQuizOwner.value) {
+        await fetchAllQuizSessions();
+      } else {
+        await fetchAllUserSessions();
+      }
     }
   });
 
@@ -369,10 +402,13 @@ export function useQuizDetails(quizId: string) {
     sessionTablePagination,
     sessionTableLoading,
     fetchAllUserSessions,
+    fetchAllQuizSessions,
     handleSessionTableFilters,
     handleSessionTableSort,
     handleSessionTablePage,
     handleSessionTableItemsPerPage,
     filteredSessions,
+    showAllSessions,
+    totalUniqueParticipants,
   };
 }

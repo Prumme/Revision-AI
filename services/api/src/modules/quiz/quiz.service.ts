@@ -37,8 +37,8 @@ export class QuizService {
     };
   }
 
-  async findAll(): Promise<Quiz[]> {
-    return this.quizRepository.findAll();
+  async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
+    return this.quizRepository.findAll(filters, userId);
   }
 
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {

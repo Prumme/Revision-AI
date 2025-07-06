@@ -18,8 +18,27 @@ export class MongoQuizRepository implements QuizRepository {
     return this.documentToQuiz(document);
   }
 
-  async findAll(): Promise<Quiz[]> {
-    const documents = await this.quizModel.find().exec();
+  async findAll(filters?: any, currentUserId?: string): Promise<Quiz[]> {
+    const query: any = { status: 'completed' };
+    if (filters) {
+      if (filters.search) {
+        const searchRegex = new RegExp(filters.search, 'i');
+        query.$or = [
+          { title: { $regex: searchRegex } },
+          { description: { $regex: searchRegex } },
+        ];
+      }
+      if (filters.category) {
+        query.category = filters.category;
+      }
+      if (filters.isPublic !== undefined) {
+        query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
+      }
+    }
+    if (currentUserId) {
+      query.userId = { $ne: currentUserId };
+    }
+    const documents = await this.quizModel.find(query).exec();
     return documents.map(this.documentToQuiz);
   }
 

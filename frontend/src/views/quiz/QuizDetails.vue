@@ -52,6 +52,10 @@ const {
   sessionFilters,
   sessionTableFilters,
   handleSessionTableFilters,
+  showAllSessions,
+  fetchAllQuizSessions,
+  fetchAllUserSessions,
+  totalUniqueParticipants,
 } = quizDetails;
 
 onMounted(async () => {
@@ -68,6 +72,16 @@ onMounted(async () => {
 watch([activeTab, quiz], async ([tab]) => {
   if (tab === 'sessions') {
     await fetchSessionsForTable;
+  }
+});
+
+watch(showAllSessions, async (val) => {
+  if (isQuizOwner.value) {
+    if (val) {
+      await fetchAllQuizSessions();
+    } else {
+      await fetchAllUserSessions();
+    }
   }
 });
 
@@ -123,7 +137,7 @@ function handlePauseSession() {
       >
         <span>{{ tab.label }}
           <template v-if="tab.key === 'sessions'">
-            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-white text-xs font-semibold align-middle">
+            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-white text-xs font-semibold">
               {{ filteredSessions.length }}
             </span>
           </template>
@@ -303,7 +317,27 @@ function handlePauseSession() {
 
     <!-- Sessions -->
     <section v-if="quiz && activeTab === 'sessions'">
-      <h2 class="text-2xl font-bold mb-4">Vos sessions sur ce quiz</h2>
+      <div class="flex items-center gap-6 mb-4">
+        <h2 class="text-2xl font-bold">Vos sessions sur ce quiz</h2>
+        <template v-if="isQuizOwner">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input
+                id="accept-terms"
+                v-model="showAllSessions"
+                type="checkbox"
+                class="w-4 h-4 rounded focus:ring-primary focus:ring-2"
+                style="accent-color: var(--color-primary)"
+                required
+            />
+            <span class="text-base">Afficher toutes les sessions du quiz</span>
+          </label>
+        </template>
+      </div>
+      <div v-if="isQuizOwner && showAllSessions" class="mb-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white text-sm font-semibold">
+          Compteur total de participations : {{ totalUniqueParticipants }} personne{{ totalUniqueParticipants > 1 ? 's' : '' }} ont fait ce quiz
+        </span>
+      </div>
       <SessionDatatable
         :data="filteredSessions"
         :actions="actions"

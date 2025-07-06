@@ -27,6 +27,7 @@ export interface SessionRepository {
   pauseSession(id: string): Promise<Session | null>;
   resumeSession(id: string): Promise<Session | null>;
   updateStatus(id: string, status: string): Promise<Session | null>;
+  findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
 }
 
 export const SessionRepositoryProvider = {

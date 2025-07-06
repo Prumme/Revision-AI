@@ -101,8 +101,11 @@ export class SessionController {
     description: 'Session terminée avec succès',
     type: Session,
   })
-  async endSession(@Body() endSessionDto: EndSessionDto): Promise<Session> {
-    return this.sessionService.endSession(endSessionDto.sessionId, endSessionDto);
+  async endSession(
+    @Body() endSessionDto: EndSessionDto,
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Session> {
+    return this.sessionService.endSession(endSessionDto.sessionId, endSessionDto, user.sub);
   }
 
   @Post(':id/answer')
@@ -110,22 +113,44 @@ export class SessionController {
   @ApiResponse({ status: 200, description: 'Réponse ajoutée', type: Session })
   async addAnswer(
     @Param('id') id: string,
-    @Body() answer: any
+    @Body() answer: any,
+    @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
-    return this.sessionService.addAnswer(id, answer);
+    return this.sessionService.addAnswer(id, answer, user.sub);
   }
 
   @Post(':id/pause')
   @ApiOperation({ summary: 'Mettre une session en pause' })
   @ApiResponse({ status: 200, description: 'Session mise en pause', type: Session })
-  async pauseSession(@Param('id') id: string): Promise<Session> {
-    return this.sessionService.pauseSession(id);
+  async pauseSession(
+    @Param('id') id: string,
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Session> {
+    return this.sessionService.pauseSession(id, user.sub);
   }
 
   @Post(':id/resume')
   @ApiOperation({ summary: 'Reprendre une session en pause' })
   @ApiResponse({ status: 200, description: 'Session reprise', type: Session })
-  async resumeSession(@Param('id') id: string): Promise<Session> {
-    return this.sessionService.resumeSession(id);
+  async resumeSession(
+    @Param('id') id: string,
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Session> {
+    return this.sessionService.resumeSession(id, user.sub);
+  }
+
+  @Get('quiz/:quizId')
+  @ApiOperation({ summary: "Récupérer toutes les sessions d'un quiz (tous utilisateurs sauf moi)" })
+  @ApiParam({ name: 'quizId', description: 'ID du quiz' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des sessions du quiz récupérée avec succès (hors moi)',
+    type: [Session],
+  })
+  async findAllByQuizId(
+    @Param('quizId') quizId: string,
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Session[]> {
+    return this.sessionService.findAllByQuizId(quizId, user.sub);
   }
 }
