@@ -18,7 +18,7 @@ export function useQuizDetails(quizId: string) {
   const error = ref<string | null>(null);
   const orderChanged = ref(false);
   const showAllAnswers = ref(false);
-  const activeTab = ref("config");
+  const activeTab = ref<string>("quiz");
   const userAnswers = ref<Record<number, number[]>>({});
   const quizFinished = ref(false);
   const quizScore = ref(0);
@@ -47,11 +47,16 @@ export function useQuizDetails(quizId: string) {
     return quiz.value && quiz.value.userId === userId.value;
   });
 
-  const quizTabs = [
-    { key: "quiz", label: "Quiz" },
-    { key: "sessions", label: "Sessions" },
-    { key: "config", label: "Configuration" },
-  ];
+  const quizTabs = computed(() => {
+    const tabs = [
+      { key: "quiz", label: "Quiz" },
+      { key: "sessions", label: "Sessions", badge: userSessions.value.length > 0 ? userSessions.value.length.toString() : undefined },
+    ];
+    if (quiz.value && quiz.value.userId === userId.value) {
+      tabs.push({ key: "config", label: "Configuration" });
+    }
+    return tabs;
+  });
 
   const sessionColumns: TableColumn[]= [
     {

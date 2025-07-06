@@ -216,7 +216,7 @@ const handleLogout = () => {
 
       <!-- Profile Section with Dropdown -->
       <div class="w-full mt-10">
-        <Dropdown>
+        <Dropdown trigger="">
           <template #trigger>
             <ProfileComponent :isSidebarOpen="isSidebarOpen" :icon="true" />
           </template>
@@ -244,7 +244,7 @@ const handleLogout = () => {
       </div>
     </div>
 
-    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8">
+    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 p-8">
       <router-view></router-view>
     </div>
   </main>

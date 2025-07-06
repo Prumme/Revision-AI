@@ -7,6 +7,7 @@ import ProfilePicture from "@/components/profile/ProfilePicture.vue";
 import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
+import MotionLayout from "@/components/layouts/MotionLayout.vue";
 
 const userStore = useUserStore();
 const { showToast } = useToastStore();
@@ -81,61 +82,63 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-1.5 w-full">
-    <p class="font-outfit text-lg text-black-transparent">
-      Modifiez vos informations personnelles et vos préférences de compte.
-    </p>
-    <h1 class="font-outfit text-4xl font-extrabold text-black">
-      Content de vous revoir <span class="text-primary">{{ userStore.user?.username }}</span> !
-    </h1>
+  <MotionLayout>
+    <section class="flex flex-col gap-1.5 w-full">
+      <p class="font-outfit text-lg text-black-transparent">
+        Modifiez vos informations personnelles et vos préférences de compte.
+      </p>
+      <h1 class="font-outfit text-4xl font-extrabold text-black">
+        Content de vous revoir <span class="text-primary">{{ userStore.user?.username }}</span> !
+      </h1>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
-      <FormCard>
-        <template #title> Vos informations personnelles </template>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-8">
+        <FormCard>
+          <template #title> Vos informations personnelles </template>
 
-        <template #content>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 space-y-5">
-            <div class="flex items-center justify-center">
-              <ProfilePicture />
+          <template #content>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 space-y-5">
+              <div class="flex items-center justify-center">
+                <ProfilePicture />
+              </div>
+
+              <div class="flex flex-col gap-4">
+                <Input
+                  v-model="username"
+                  label="Nom d'utilisateur"
+                  placeholder="Votre nom d'utilisateur"
+                />
+                <Input
+                  v-model="email"
+                  label="Email"
+                  placeholder="exemple@mail.com"
+                  type="email"
+                  disabled
+                />
+                <Input
+                  v-model="bio"
+                  label="Biographie"
+                  placeholder="Parlez un peu de vous..."
+                  type="textarea"
+                />
+                <button
+                  @click="handleSubmit"
+                  :disabled="isLoading || !isDirty"
+                  class="mt-4 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ isLoading ? "Mise à jour en cours..." : "Sauvegarder les modifications" }}
+                </button>
+                <p v-if="errorMessage" class="mt-2 text-red-500 text-sm">{{ errorMessage }}</p>
+              </div>
             </div>
+          </template>
+        </FormCard>
 
-            <div class="flex flex-col gap-4">
-              <Input
-                v-model="username"
-                label="Nom d'utilisateur"
-                placeholder="Votre nom d'utilisateur"
-              />
-              <Input
-                v-model="email"
-                label="Email"
-                placeholder="exemple@mail.com"
-                type="email"
-                disabled
-              />
-              <Input
-                v-model="bio"
-                label="Biographie"
-                placeholder="Parlez un peu de vous..."
-                type="textarea"
-              />
-              <button
-                @click="handleSubmit"
-                :disabled="isLoading || !isDirty"
-                class="mt-4 bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ isLoading ? "Mise à jour en cours..." : "Sauvegarder les modifications" }}
-              </button>
-              <p v-if="errorMessage" class="mt-2 text-red-500 text-sm">{{ errorMessage }}</p>
-            </div>
-          </div>
-        </template>
-      </FormCard>
+        <div class="flex flex-col gap-4">
+          <PasswordChangeCard />
+        </div>
 
-      <div class="flex flex-col gap-4">
-        <PasswordChangeCard />
+        <DeleteAccountCard />
       </div>
-
-      <DeleteAccountCard />
-    </div>
-  </section>
+    </section>
+  </MotionLayout>
 </template>

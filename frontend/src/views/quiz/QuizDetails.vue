@@ -7,13 +7,15 @@ import { QuizService } from "@/services/quiz.service";
 import { onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
-import { Motion } from '@motionone/vue';
 import { useQuizDetails } from '@/composables/useQuizDetails';
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 import { useSessionStore } from '@/stores/session';
 import SessionDatatable from '@/components/tables/SessionDatatable.vue';
 import {PauseIcon} from "lucide-vue-next";
 import {useToastStore} from "@/stores/toast.ts";
+import { ArrowLeftIcon } from "lucide-vue-next";
+import TabNavigation from '@/components/common/TabNavigation.vue';
+import MotionLayout from "@/components/layouts/MotionLayout.vue";
 
 const toast = useToastStore();
 const route = useRoute();
@@ -94,10 +96,7 @@ function handlePauseSession() {
 
 <template>
   <LoaderOverlay v-if="showLoader" message="Création de la session en cours..." />
-  <Motion
-    :initial="{ opacity: 0, y: 40 }"
-    :animate="{ opacity: 1, y: 0 }"
-    transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
+  <MotionLayout
   >
     <div class="flex items-center justify-between mb-8">
       <div class="flex flex-col gap-1.5">
@@ -118,32 +117,11 @@ function handlePauseSession() {
     </div>
 
     <!-- Tabs -->
-    <div class="flex border-b border-gray-200 mb-6">
-      <button
-        v-for="tab in quizTabs"
-        :key="tab.key"
-        @click="() => {
-          if (tab.key !== 'config' || isQuizOwner) activeTab = tab.key;
-        }"
-        class="font-outfit px-4 py-2 -mb-px text-lg transition-colors duration-150 relative"
-        :class="[
-          activeTab === tab.key
-            ? 'border-b-2 border-primary text-black font-semibold'
-            : 'text-black-transparent hover:text-black',
-          tab.key === 'config' && !isQuizOwner ? 'opacity-50 cursor-not-allowed' : ''
-        ]"
-        style="background: none"
-        :disabled="tab.key === 'config' && !isQuizOwner"
-      >
-        <span>{{ tab.label }}
-          <template v-if="tab.key === 'sessions'">
-            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-white text-xs font-semibold">
-              {{ filteredSessions.length }}
-            </span>
-          </template>
-        </span>
-      </button>
-    </div>
+    <TabNavigation
+      :tabs="quizTabs"
+      v-model:activeTab="activeTab"
+      class="mb-6"
+    />
 
     <!-- Start Quiz  -->
     <section v-if="quiz && activeTab === 'quiz' && !isStarted" class="max-w-2xl mx-auto w-full text-center py-10">
@@ -350,5 +328,5 @@ function handlePauseSession() {
         @update:filters="handleSessionTableFilters"
       />
     </section>
-  </Motion>
+  </MotionLayout>
 </template>
