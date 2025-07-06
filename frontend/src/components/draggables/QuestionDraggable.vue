@@ -26,6 +26,11 @@ const props = defineProps({
     default: 'quiz', // 'quiz' ou 'config'
     validator: (v: string) => ['quiz', 'config'].includes(v),
   },
+  totalQuestions: {
+    type: Number,
+    required: false,
+    default: null,
+  },
 });
 
 const emit = defineEmits(["update:questions", "update:selection"]);
@@ -171,6 +176,9 @@ const isMultipleChoice = (question) => {
       >
         <div class="flex flex-col gap-1">
           <div class="flex justify-between items-center">
+            <p class="font-outfit text-xs text-gray-light mb-1" v-if="mode === 'quiz'">
+              Question {{ index }}/{{ totalQuestions || questions.length }}
+            </p>
             <p class="font-outfit text-lg text-black">{{ question.question }}</p>
             <span v-if="isMultipleChoice(question)" class="ml-2 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-semibold">Choix multiple</span>
           </div>

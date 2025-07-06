@@ -90,8 +90,9 @@ export class SessionController {
   })
   async startSession(
     @Body() startSessionDto: StartSessionDto,
+    @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
-    return this.sessionService.startSession(startSessionDto.sessionId);
+    return this.sessionService.startSession(startSessionDto.sessionId, user.sub);
   }
 
   @Post('end')
