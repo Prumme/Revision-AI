@@ -6,15 +6,26 @@ import { UserSchema } from '@mongo/user/user.schema';
 import { UserRepositoryProvider } from '@repositories/user.repository';
 import { MinioModule } from '@modules/minio/minio.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
+import { CustomerRepositoryProvider } from '@repositories/customer.repository';
+import { QuizRepositoryProvider } from '@repositories/quiz.repository';
+import { QuizSchema } from '@mongo/quiz/quiz.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'User', schema: UserSchema },
+      { name: 'Quiz', schema: QuizSchema },
+    ]),
     MinioModule,
     MailModule,
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepositoryProvider],
+  providers: [
+    UserService,
+    UserRepositoryProvider,
+    CustomerRepositoryProvider,
+    QuizRepositoryProvider,
+  ],
   exports: [UserService],
 })
 export class UserModule {}
