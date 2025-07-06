@@ -63,8 +63,8 @@ export function useQuizDetails(quizId: string) {
       sortable: true,
       render: (value: string) => {
         if (value === 'paused') return h(StatusBadge, { variant: 'warning' }, () => 'En pause');
-        if (value === 'active') return h(StatusBadge, { variant: 'success' }, () => 'En cours');
-        if (value === 'finished') return h(StatusBadge, { variant: 'secondary' }, () => 'Terminée');
+        if (value === 'active') return h(StatusBadge, { variant: 'secondary' }, () => 'En cours');
+        if (value === 'finished') return h(StatusBadge, { variant: 'success' }, () => 'Terminée');
         if (value === 'pending') return h(StatusBadge, { variant: 'info' }, () => 'En attente');
         return h(StatusBadge, { variant: 'secondary' }, () => '-');
       },
@@ -109,6 +109,8 @@ export function useQuizDetails(quizId: string) {
     try {
       loading.value = true;
       quiz.value = await QuizService.getQuizById(quizId);
+      // Fetch sessions dès le chargement de la page
+      await fetchAllUserSessions();
     } catch {
       error.value = "Erreur lors du chargement du quiz.";
     } finally {
@@ -212,8 +214,7 @@ export function useQuizDetails(quizId: string) {
     quizScore.value = score;
     if (sessionStore.sessionId) {
       await sessionStore.endSession(score, buildSessionAnswers());
-      const session = userSessions.value.find(s => s.id === sessionStore.sessionId);
-      if (session) session.status = 'finished';
+      userSessions.value.find(s => s.id === sessionStore.sessionId);
     }
   };
 

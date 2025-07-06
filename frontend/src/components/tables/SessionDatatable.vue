@@ -20,10 +20,8 @@ const props = defineProps<{
   emptyMessage?: string,
 }>();
 
-// État local des filtres
 const filters = ref<SessionDatatableFilter>({});
 
-// Fonction de filtrage locale
 const filteredData = computed(() => {
   return props.data.filter((session) => {
     let match = true;

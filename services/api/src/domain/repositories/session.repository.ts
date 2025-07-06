@@ -26,6 +26,7 @@ export interface SessionRepository {
   updateAnswers(sessionId: string, answers: SessionAnswer[]): Promise<Session | null>;
   pauseSession(id: string): Promise<Session | null>;
   resumeSession(id: string): Promise<Session | null>;
+  updateStatus(id: string, status: string): Promise<Session | null>;
 }
 
 export const SessionRepositoryProvider = {

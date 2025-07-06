@@ -111,7 +111,7 @@ function handlePauseSession() {
         @click="() => {
           if (tab.key !== 'config' || isQuizOwner) activeTab = tab.key;
         }"
-        class="font-outfit px-4 py-2 -mb-px text-lg transition-colors duration-150"
+        class="font-outfit px-4 py-2 -mb-px text-lg transition-colors duration-150 relative"
         :class="[
           activeTab === tab.key
             ? 'border-b-2 border-primary text-black font-semibold'
@@ -121,7 +121,13 @@ function handlePauseSession() {
         style="background: none"
         :disabled="tab.key === 'config' && !isQuizOwner"
       >
-        {{ tab.label }}
+        <span>{{ tab.label }}
+          <template v-if="tab.key === 'sessions'">
+            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-primary text-white text-xs font-semibold align-middle">
+              {{ filteredSessions.length }}
+            </span>
+          </template>
+        </span>
       </button>
     </div>
 
