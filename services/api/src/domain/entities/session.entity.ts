@@ -1,11 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum SessionStatus {
+  PENDING = 'pending',
+  ACTIVE = 'active',
+  PAUSED = 'paused',
+  FINISHED = 'finished',
+}
+
 export interface SessionAnswer {
   c: boolean;
   a: string;
 }
-
-export type SessionStatus = 'pending' | 'active' | 'paused' | 'finished';
 
 export class Session {
   id: string;
@@ -28,6 +33,6 @@ export class Session {
   @ApiProperty({ description: 'Réponses fournies par l’utilisateur', type: [Object] })
   answers: SessionAnswer[];
 
-  @ApiProperty({ description: 'Statut de la session', enum: ['pending', 'active', 'paused', 'finished'], default: 'pending' })
+  @ApiProperty({ description: 'Statut de la session', enum: SessionStatus, default: SessionStatus.PENDING })
   status: SessionStatus;
 }

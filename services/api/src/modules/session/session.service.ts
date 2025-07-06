@@ -7,6 +7,7 @@ import { QuizRepository } from '@repositories/quiz.repository';
 import { v4 as uuidv4 } from 'uuid';
 import { EndSessionDto } from '@modules/session/dto/end-session.dto';
 import { SessionAnswer } from '@entities/session.entity';
+import { SessionStatus } from '@entities/session.entity';
 
 @Injectable()
 export class SessionService {
@@ -64,8 +65,8 @@ export class SessionService {
       startedAt: new Date(),
       finishedAt: null,
       answers: [],
-      status: 'active',
       score: 0,
+      status: SessionStatus.ACTIVE,
     };
     return this.sessionRepository.create(sessionData);
   }
