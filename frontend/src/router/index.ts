@@ -1,22 +1,23 @@
+import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 import UserSidenav from "@/components/UserSidenav.vue";
+import { useUserStore } from "@/stores/user";
+import AdminUserView from "@/views/admin/AdminUserView.vue";
+import EmailSend from "@/views/authentication/EmailSend.vue";
 import ForgotPassword from "@/views/authentication/ForgotPassword.vue";
 import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
+import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
+import CheckoutView from "@/views/CheckoutView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
 import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
-import QuizView from "@/views/QuizView.vue";
-import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
-import EmailSend from "@/views/authentication/EmailSend.vue";
-import AdminUserView from "@/views/admin/AdminUserView.vue";
+import QuizForm from "@/views/quiz/QuizForm.vue";
+import QuizList from "@/views/quiz/QuizList.vue";
+import QuizDetails from "@/views/quiz/QuizDetails.vue";
 import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
-import CheckoutView from "@/views/CheckoutView.vue";
 import { createRouter, createWebHistory } from "vue-router";
-import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
-
-import { useUserStore } from "@/stores/user";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,9 +43,24 @@ const router = createRouter({
           component: DashboardView,
         },
         {
-          path: "/quizz",
-          name: "quizz",
-          component: QuizView,
+          path: "/quiz/create",
+          name: "quiz-create",
+          component: QuizForm,
+        },
+        {
+          path: "/quiz",
+          name: "quiz",
+          component: QuizList,
+        },
+        {
+          path: "/quiz/:id",
+          name: "quiz-detail",
+          component: QuizDetails,
+        },
+        {
+          path: "/profile",
+          name: "profile",
+          component: ProfilePage,
         },
         {
           path: "/subscription",
@@ -55,11 +71,6 @@ const router = createRouter({
           path: "/subscription/checkout",
           name: "subscription-checkout",
           component: CheckoutView,
-        },
-        {
-          path: "/profile",
-          name: "profile",
-          component: ProfilePage,
         },
         {
           path: "/admin/user",
@@ -123,14 +134,8 @@ router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
   const token = localStorage.getItem("token");
 
-  // Si la route nécessite une authentification
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // Si pas de token, redirection vers login
-    if (!token) {
-      next({ name: "login" });
-      return;
-    }
-
+  // Tente de charger l'utilisateur s'il y a un token mais pas encore de user
+  if (token && !userStore.user) {
     try {
       // On essaie de récupérer les informations de l'utilisateur
       if (!userStore.user) {
@@ -147,23 +152,26 @@ router.beforeEach(async (to, from, next) => {
 
       next();
     } catch {
-      // En cas d'erreur (token invalide par exemple)
-      next({ name: "login" });
+      // Si token invalide, tu peux le supprimer et rediriger
+      localStorage.removeItem("token");
+      return next({ name: "login" });
     }
   }
-  // Si la route est pour les invités uniquement (login, register, etc.)
-  else if (to.matched.some((record) => record.meta.requiresGuest)) {
-    if (token) {
-      // Si l'utilisateur est déjà connecté, on le redirige vers la page d'accueil
-      next({ name: "Dashboard" });
-      return;
-    }
-    next();
+
+  // Auth required ?
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!token) return next({ name: "login" });
+    return next();
   }
-  // Pour toutes les autres routes
-  else {
-    next();
+
+  // Guest only ?
+  if (to.matched.some((record) => record.meta.requiresGuest)) {
+    if (token) return next({ name: "Dashboard" });
+    return next();
   }
+
+  next();
 });
+
 
 export default router;

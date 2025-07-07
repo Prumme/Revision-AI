@@ -8,6 +8,7 @@ const { modelValue, label, options, placeholder, id } = defineProps<{
   options: { label: string; value: string }[];
   placeholder?: string;
   id: string;
+  disabled?: boolean;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
@@ -37,7 +38,9 @@ const onSelect = (event: Event) => {
         :class="[
           'mt-2 p-2.5 w-full border rounded-md outline-none text-sm text-black placeholder-text-black',
           isFocused ? 'border-primary' : 'border-gray-300',
+          disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white',
         ]"
+        :disabled="disabled"
       >
         <option v-if="placeholder" value="" disabled>{{ placeholder }}</option>
         <option v-for="(option, index) in options" :key="index" :value="option.value">

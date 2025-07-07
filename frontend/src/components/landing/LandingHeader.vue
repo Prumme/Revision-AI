@@ -1,8 +1,17 @@
+s
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
-import { RouterLink } from "vue-router";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
+import Dropdown from "@/components/dropdowns/DropdownInput.vue";
+import ProfileComponent from "@/components/profile/ProfileComponent.vue";
+import { useUserStore } from "@/stores/user";
+import { LogOutIcon, MenuIcon, XIcon } from "lucide-vue-next";
+import { onMounted, onUnmounted, ref } from "vue";
+import { RouterLink, useRouter } from "vue-router";
+import AvatarComponent from "../../components/profile/avatar/AvatarComponent.vue";
 
+const router = useRouter();
+const userStore = useUserStore();
+const user = userStore?.user;
 const menuOpen = ref(false);
 function closeMenu() {
   menuOpen.value = false;
@@ -58,6 +67,11 @@ function handleScroll() {
   lastScrollY = currentScrollY;
 }
 
+const handleLogout = () => {
+  userStore.logout();
+  router.push("/login");
+};
+
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
 });
@@ -111,7 +125,7 @@ onUnmounted(() => {
       </ul>
 
       <!-- Desktop actions -->
-      <div class="hidden md:flex items-center gap-4">
+      <div v-if="!user" class="hidden md:flex items-center gap-4">
         <RouterLink to="/login" class="font-outfit font-medium hover:text-primary transition"
           >Connexion</RouterLink
         >
@@ -120,16 +134,38 @@ onUnmounted(() => {
         </RouterLink>
       </div>
 
+      <div v-else class="hidden md:flex items-center gap-4">
+        <Dropdown position="top-right">
+          <template #trigger>
+            <ProfileComponent :isSidebarOpen="menuOpen" :icon="true" />
+          </template>
+
+          <template #menus>
+            <ProfileComponent :isSidebarOpen="menuOpen" :icon="false" class="block px-4 py-4" />
+            <a href="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
+              >Mon profil</a
+            >
+            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
+            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
+            <span
+              class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
+              @click="handleLogout"
+            >
+              <LogOutIcon class="inline-block mr-2 h-4 w-4 text-gray-light" />
+              Se déconnecter
+            </span>
+          </template>
+        </Dropdown>
+      </div>
+
       <!-- Hamburger (mobile) -->
-      <button
-        class="md:hidden flex items-center justify-center p-2 rounded focus:outline-none"
-        @click="menuOpen = true"
-        aria-label="Ouvrir le menu"
-      >
-        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h20M4 16h20" />
-        </svg>
-      </button>
+      <nav class="md:hidden flex items-center justify-center p-2 rounded focus:outline-none">
+        <component
+          :is="menuOpen ? XIcon : MenuIcon"
+          class="h-6 w-6 text-foreground-alt hover:text-primary cursor-pointer"
+          @click="menuOpen = !menuOpen"
+        />
+      </nav>
     </nav>
 
     <!-- Mobile menu slide-in -->
@@ -164,12 +200,24 @@ onUnmounted(() => {
               <a href="#faq" @click.prevent="scrollTo('faq')">FAQ</a>
             </li>
           </ul>
-          <div class="flex flex-col gap-3 mt-4">
+          <div v-if="!user" class="flex flex-col gap-3 mt-4">
             <RouterLink to="/login" class="font-outfit font-medium" @click="closeMenu"
               >Connexion</RouterLink
             >
             <RouterLink to="/register" @click="closeMenu">
               <ButtonComponent variant="primary" class="w-full"> Créer un compte </ButtonComponent>
+            </RouterLink>
+          </div>
+
+          <div v-else class="flex flex-col justify-center items-center gap-4">
+            <RouterLink to="/profile" class="font-outfit font-medium hover:text-primary transition">
+              <AvatarComponent
+                :user="user"
+                class="w-8 h-8 rounded-full border border-gray-300 transition-all"
+              />
+            </RouterLink>
+            <RouterLink to="/logout">
+              <ButtonComponent variant="secondary"> Déconnexion </ButtonComponent>
             </RouterLink>
           </div>
         </aside>

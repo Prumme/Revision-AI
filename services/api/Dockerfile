@@ -4,6 +4,9 @@ FROM node:22-bullseye-slim as base
 # Set the working directory
 WORKDIR /app
 
+# Install PS
+RUN apt-get update && apt-get install -y procps
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 RUN npm install

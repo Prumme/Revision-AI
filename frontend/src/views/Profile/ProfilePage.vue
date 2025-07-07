@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
+import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import ProfilePicture from "@/components/profile/ProfilePicture.vue";
@@ -7,7 +9,8 @@ import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
 import DownloadDataCard from "@/components/cards/DownloadDataCard.vue";
 import { useUserStore } from "@/stores/user";
 import { useToastStore } from "@/stores/toast";
-import { ref, computed, watch } from "vue";
+import { useUserStore } from "@/stores/user";
+import { computed, ref, watch } from "vue";
 
 const userStore = useUserStore();
 const { showToast } = useToastStore();

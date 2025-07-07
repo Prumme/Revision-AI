@@ -1,17 +1,17 @@
+import { Public } from '@common/decorators/public.decorator';
+import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 import {
   Controller,
   Get,
+  Inject,
   Param,
   Res,
   StreamableFile,
-  Inject,
 } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Cache } from 'cache-manager';
 import { Response } from 'express';
 import { MinioService } from './minio.service';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { Public } from '@common/decorators/public.decorator';
-import { CACHE_MANAGER, CacheKey, CacheTTL } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 
 @ApiTags('Scaleway S3')
 @Controller('files')

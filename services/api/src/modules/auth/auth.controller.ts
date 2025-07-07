@@ -1,30 +1,30 @@
+import { Public } from '@common/decorators/public.decorator';
+import { ReqUser } from '@common/types/request';
 import {
   Body,
   Controller,
-  Post,
   Get,
   HttpCode,
   HttpStatus,
-  Req,
+  Post,
   Query,
+  Req,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import {
-  ApiTags,
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiBearerAuth,
+  ApiTags,
 } from '@nestjs/swagger';
-import { Public } from '@common/decorators/public.decorator';
+import { Request } from 'express';
+import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { Request } from 'express';
-import { ReqUser } from '@common/types/request';
 
 @ApiTags('Authentification')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Public()
   @HttpCode(HttpStatus.OK)
@@ -77,5 +77,16 @@ export class AuthController {
   })
   async getCurrentUser(@Req() req: Request & { user: ReqUser }) {
     return this.authService.getCurrentUser(req.user);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Déconnexion utilisateur' })
+  @ApiResponse({
+    status: 200,
+    description: 'Déconnexion réussie',
+  })
+  logout() {
+    return this.authService.logout();
   }
 }

@@ -1,10 +1,10 @@
 import amqp from 'amqplib';
-import { fileUploadedEvent } from "./messages/fileUploadedEvent";
+import fs from "node:fs";
 import { handleFileUploadedUseCaseFactory } from "../../app/usecases/HandleFileUploadedUseCase";
 import { FileReaderResolver } from "../services/FileReaderResolver";
-import { mqProvide } from "./mqProvider";
 import { S3FileDownloader, S3FileDownloaderArgs } from "../services/S3FileDownloader";
-import fs from "node:fs";
+import { fileUploadedEvent } from "./messages/fileUploadedEvent";
+import { mqProvide } from "./mqProvider";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
 const QUEUE_NAME = process.env.INPUT_QUEUE_NAME || 'file-uploaded';
@@ -12,21 +12,21 @@ const QUEUE_NAME = process.env.INPUT_QUEUE_NAME || 'file-uploaded';
 
 const fileDownloader = new S3FileDownloader()
 const fileReaderResolver = new FileReaderResolver()
-const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader,fileReaderResolver)
+const handleFileUploadedUseCase = handleFileUploadedUseCaseFactory(fileDownloader, fileReaderResolver)
 export const mqConsumer = async () => {
-  async function onMessage(msg : amqp.Message|null){
-    if(!msg) return;
+  async function onMessage(msg: amqp.Message | null) {
+    if (!msg) return;
     const content = msg.content.toString();
     const parsedContent = JSON.parse(content);
     const safeContentResult = fileUploadedEvent.safeParse(parsedContent);
 
-    if(!safeContentResult.success) {
+    if (!safeContentResult.success) {
       console.error("Invalid message format", safeContentResult.error);
       channel.nack(msg, false, false);
       return;
     }
     const fileUploaded = safeContentResult.data;
-    const payload: S3FileDownloaderArgs =  {
+    const payload: S3FileDownloaderArgs = {
       fileId: fileUploaded.objectKey, // Placeholder for actual ID
       objectKey: fileUploaded.objectKey,
       bucketName: fileUploaded.bucketName,
@@ -34,9 +34,9 @@ export const mqConsumer = async () => {
     }
     const fileContentResult = await handleFileUploadedUseCase(payload)
 
-    if(!fileContentResult.success) {
+    if (!fileContentResult.success) {
       console.error("Error processing file:", fileContentResult.error.message);
-      channel.nack(msg, false,false);
+      channel.nack(msg, false, false);
       return;
     }
 
@@ -46,7 +46,7 @@ export const mqConsumer = async () => {
     //@TODO save it to a database
     channel.ack(msg);
 
-    await mqProvide({fileContent}).catch(console.error)
+    await mqProvide({ fileContent, meta: fileUploaded?.meta ?? {} }).catch(console.error);
 
     try {
       fs.unlinkSync(payload.downloadPath);

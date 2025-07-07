@@ -2,10 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { raw } from 'body-parser';
+import { raw, json, urlencoded } from 'body-parser';
+import { QuizService } from './modules/quiz/quiz.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ limit: '10mb', extended: true }));
 
   app.use('/stripe/webhook', raw({ type: 'application/json' }));
   app.enableCors({
@@ -14,7 +18,6 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Configuration de la validation globale
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -42,6 +45,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  await app.listen(3000);
+  const { quizGeneratedConsumer } = await import('./infrastructure/queue/quizGeneratedConsumer');
+  const quizService = app.get(QuizService);
+  quizGeneratedConsumer(quizService);
+
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

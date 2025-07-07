@@ -2,6 +2,7 @@
 import NavLink from "@/components/buttons/NavLink.vue";
 import Dropdown from "@/components/dropdowns/DropdownInput.vue";
 import ProfileComponent from "@/components/profile/ProfileComponent.vue";
+import { useUserStore } from "@/stores/user";
 import {
   ChevronsRightIcon,
   LogOutIcon,
@@ -11,9 +12,8 @@ import {
   HandCoinsIcon,
 } from "lucide-vue-next";
 import { ref } from "vue";
-import ToastContainer from "./toasts/ToastContainer.vue";
-import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
+import ToastContainer from "./toasts/ToastContainer.vue";
 
 const isSidebarOpen = ref(false);
 const isSidebarCollapsed = ref(false);
@@ -80,7 +80,7 @@ const handleLogout = () => {
             :showText="isSidebarOpen"
           />
           <NavLink
-            to="/quizz"
+            to="/quiz"
             icon="FileQuestion"
             :text="isSidebarOpen ? 'Quiz' : ''"
             :active="false"
@@ -134,7 +134,7 @@ const handleLogout = () => {
 
         <!-- Profile Section avec Dropdown -->
         <div class="w-full">
-          <Dropdown ref="dropdownRef">
+          <Dropdown ref="dropdownRef" position="bottom-left">
             <template #trigger>
               <ProfileComponent :isSidebarOpen="isSidebarOpen" :icon="true" />
             </template>
@@ -196,7 +196,7 @@ const handleLogout = () => {
 
         <!-- Section principale -->
         <NavLink to="/dashboard" icon="Home" :text="'Accueil'" :active="true" :showText="true" />
-        <NavLink to="/quizz" icon="FileQuestion" :text="'Quiz'" :active="false" :showText="true" />
+        <NavLink to="/quiz" icon="FileQuestion" :text="'Quiz'" :active="false" :showText="true" />
         <NavLink to="/courses" icon="File" :text="'Cours'" :active="false" :showText="true" />
 
         <!-- Section Admin -->

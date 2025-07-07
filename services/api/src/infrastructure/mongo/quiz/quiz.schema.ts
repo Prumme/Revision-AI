@@ -1,22 +1,29 @@
-import { Answer } from '@common/types/answer';
-import { Question } from '@common/types/question';
-import { Schema, Document, Types } from 'mongoose';
+import { Document, Schema, Types } from 'mongoose';
 
 export const QuizSchema = new Schema({
   userId: { type: String, required: true },
-  name: { type: String, required: true },
-  description: { type: String },
+  title: { type: String, required: true },
+  category: { type: String, default: '' },
   questions: [
     {
-      label: { type: String, required: true },
-      choices: [
+      q: { type: String, required: true },
+      answers: [
         {
-          label: { type: String, required: true },
-          correct: { type: Boolean, required: true },
+          a: { type: String, required: true },
+          c: { type: Boolean, required: true },
         },
       ],
     },
   ],
+  questionsNumbers: { type: Number, default: 0 },
+  description: { type: String, default: '' },
+  isPublic: { type: Boolean, default: false },
+  media: [{ type: String }],
+  status: {
+    type: String,
+    enum: ['pending', 'processing', 'completed', 'failed'],
+    default: 'pending',
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -24,15 +31,20 @@ export const QuizSchema = new Schema({
 export interface QuizDocument extends Document {
   _id: Types.ObjectId;
   userId: string;
-  name: string;
+  title: string;
+  category: string;
+  questions: {
+    q: string;
+    answers: {
+      a: string;
+      c: boolean;
+    }[];
+  }[];
+  questionsNumbers: number;
   description: string;
-  questions: Question[];
-  tags: string[];
-  rigorScore: number;
-  public: boolean;
-  answers: Answer[];
-  context: string;
-  likes: string[];
+  isPublic: boolean;
+  media: string[];
+  status: 'pending' | 'processing' | 'completed' | 'failed';
   createdAt: Date;
   updatedAt: Date;
 }

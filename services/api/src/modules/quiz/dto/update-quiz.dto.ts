@@ -1,20 +1,26 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Question } from '@common/types/question';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
-  IsString,
   IsArray,
   IsBoolean,
+  IsEnum,
   IsNumber,
   IsOptional,
+  IsString,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class UpdateQuizDto {
-  @ApiProperty({ description: 'Nom du quiz', required: false })
+  @ApiProperty({ description: 'Titre du quiz', required: false })
   @IsString()
   @IsOptional()
-  name?: string;
+  title?: string;
+
+  @ApiProperty({ description: 'Catégorie du quiz', required: false })
+  @IsString()
+  @IsOptional()
+  category?: string;
 
   @ApiProperty({ description: 'Description du quiz', required: false })
   @IsString()
@@ -32,24 +38,28 @@ export class UpdateQuizDto {
   @IsOptional()
   questions?: Question[];
 
-  @ApiProperty({ description: 'Tags associés au quiz', required: false })
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  tags?: string[];
-
-  @ApiProperty({ description: 'Score de rigueur du quiz', required: false })
+  @ApiProperty({ description: 'Nombre de questions', required: false })
   @IsNumber()
   @IsOptional()
-  rigorScore?: number;
+  questionsNumbers?: number;
 
   @ApiProperty({ description: 'Visibilité publique du quiz', required: false })
   @IsBoolean()
   @IsOptional()
-  public?: boolean;
+  isPublic?: boolean;
 
-  @ApiProperty({ description: 'Contexte du quiz', required: false })
-  @IsString()
+  @ApiProperty({ description: 'Médias associés au quiz', required: false })
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  context?: string;
+  media?: string[];
+
+  @ApiProperty({
+    description: 'Statut du quiz',
+    enum: ['pending', 'processing', 'completed', 'failed'],
+    required: false,
+  })
+  @IsEnum(['pending', 'processing', 'completed', 'failed'])
+  @IsOptional()
+  status?: 'pending' | 'processing' | 'completed' | 'failed';
 }

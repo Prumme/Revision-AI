@@ -1,31 +1,38 @@
+import { ReqUser } from '@common/types/request';
+import { Quiz } from '@entities/quiz.entity';
 import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
   Body,
-  Param,
+  Controller,
+  Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiParam,
   ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
-import { QuizService } from './quiz.service';
-import { Quiz } from '@entities/quiz.entity';
 import { CreateQuizDto } from './dto/create-quiz.dto';
+import { QuizFiltersDto } from './dto/filters-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
+import { QuizService } from './quiz.service';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
 @ApiBearerAuth('JWT-auth')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) {}
+  constructor(private readonly quizService: QuizService) { }
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les quiz' })
@@ -55,15 +62,49 @@ export class QuizController {
     return quiz;
   }
 
+  @Get('user/:id')
+  @ApiOperation({ summary: "Récupérer tous les quiz d'un utilisateur par son ID avec filtres" })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Liste des quiz de l'utilisateur récupérée avec succès",
+    type: [Quiz],
+  })
+  async findAllByUserId(
+    @Param('id') id: string,
+    @Query() filters: QuizFiltersDto
+  ): Promise<Quiz[]> {
+    return this.quizService.findAllByUserId(id, filters);
+  }
+
   @Post()
+  @UseInterceptors(FilesInterceptor('files'))
   @ApiOperation({ summary: 'Créer un nouveau quiz' })
   @ApiResponse({
     status: 201,
-    description: 'Quiz créé avec succès',
+    description: 'Le quiz a été créé avec succès.',
     type: Quiz,
   })
-  async create(@Body() createQuizDto: CreateQuizDto): Promise<Quiz> {
-    return this.quizService.create(createQuizDto);
+  async create(
+    @Body() createQuizDto: CreateQuizDto,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() { user }: Request & { user: ReqUser },
+  ): Promise<Quiz> {
+    // S'assurer que files est un tableau
+    const fileArray = Array.isArray(files) ? files : files ? [files] : [];
+
+    if (fileArray.length > 0) {
+      console.log('File details:', fileArray.map(f => ({
+        name: f.originalname,
+        size: f.size,
+        mimetype: f.mimetype
+      })));
+    }
+
+    return this.quizService.create(
+      { ...createQuizDto, userId: user.sub },
+      fileArray,
+    );
   }
 
   @Put(':id')
