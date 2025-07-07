@@ -19,7 +19,8 @@
       "@controllers/*": ["controllers/*"],
       "@config/*": ["config/*"],
       "@common/*": ["common/*"],
-      "@infrastructure/*": ["infrastructure/*"]
+      "@infrastructure/*": ["infrastructure/*"],
+      "@domain/*": ["domain/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
