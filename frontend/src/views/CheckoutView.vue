@@ -72,7 +72,7 @@ const handleOrderConfirm = async () => {
     const customerId = userStore.user?.customerId;
     const paymentMethodId = checkout.state.data.paymentMethod.paymentMethodId || "";
     const tier = checkout.state.data.selectedPlan?.productName || "";
-    
+
     if (!customerId || !paymentMethodId || !tier) {
       throw new Error("Informations de souscription incomplètes.");
     }
@@ -82,6 +82,7 @@ const handleOrderConfirm = async () => {
       tier,
     };
     await subscribe(payload);
+    userStore.setSubscriptionTier(tier);
     router.push("/subscription");
   } catch (e) {
     orderError.value =
@@ -94,7 +95,7 @@ const handleOrderConfirm = async () => {
 // Chargement automatique des infos de facturation utilisateur
 onMounted(async () => {
   // Chargement des produits d'abonnement si nécessaire
-  if (checkout.currentStep.value.id === 'plan-selection' && !subscriptionStore.products) {
+  if (checkout.currentStep.value.id === "plan-selection" && !subscriptionStore.products) {
     await subscriptionStore.fetchProducts();
   }
   try {
