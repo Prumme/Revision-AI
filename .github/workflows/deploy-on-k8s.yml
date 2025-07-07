@@ -25,26 +25,26 @@ jobs:
           password: ${{ secrets.SCW_SECRET_KEY }}
 
       # Build and push images for each service
-      - name: Build and push API image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/api
-          push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/api:${{ github.sha }}
+      #- name: Build and push API image
+      #  uses: docker/build-push-action@v5
+      #  with:
+      #    context: ./services/api
+      #    push: true
+      #    tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/api:${{ github.sha }}
 
-      - name: Build and push File Parser image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/file-parser
-          push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/file-parser:${{ github.sha }}
+      #- name: Build and push File Parser image
+      #  uses: docker/build-push-action@v5
+      #  with:
+      #    context: ./services/file-parser
+      #    push: true
+      #    tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/file-parser:${{ github.sha }}
 
-      - name: Build and push Quiz Generator image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/quiz-generator
-          push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/quiz-generator:${{ github.sha }}
+      #- name: Build and push Quiz Generator image
+      #  uses: docker/build-push-action@v5
+      #  with:
+      #    context: ./services/quiz-generator
+      #    push: true
+      #    tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/quiz-generator:${{ github.sha }}
 
       - name: Set up Kubeconfig
         run: |
@@ -93,9 +93,9 @@ jobs:
 
           # Use sed or kustomize to update image tags in deployment files
           # Example using sed (requires GNU sed or equivalent)
-          sed -i "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:${{ github.sha }}|g" k8s/apps/api.deployement.yaml
-          sed -i "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:${{ github.sha }}|g" k8s/apps/file-parser.deployement.yml
-          sed -i "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:${{ github.sha }}|g" k8s/apps/quiz-generator.deployement.yml
+          sed -i "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/api.deployement.yaml
+          sed -i "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/file-parser.deployement.yml
+          sed -i "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/quiz-generator.deployement.yml
 
           # Apply updated deployments, services, and ingress
           kubectl apply -f k8s/apps/api.deployement.yaml
