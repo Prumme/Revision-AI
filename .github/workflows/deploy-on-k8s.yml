@@ -63,6 +63,7 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo "${{ vars.KUBECONFIG_CLEAR }}" > ~/.kube/config
+          yq eval . ~/.kube/config > /dev/null
 
       - name: Verify Kubeconfig
         run: kubectl config view
