@@ -16,11 +16,9 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  Query,
   Inject,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -37,22 +35,18 @@ import {
   InactiveSubscriptionUseCaseFactory,
 } from '../../domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
-import { User } from '@entities/user.entity';
 import { Request } from 'express';
-import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
-import { ReqUser } from '@common/types/request';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { AdminGuard } from '@common/guards/admin.guard';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
 import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
 import { UserData } from './dto/user-data.dto';
+import {UserService} from "@modules/user/user.service";
+
 
 
 @ApiTags('Utilisateurs')
