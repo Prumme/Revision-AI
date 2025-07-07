@@ -12,12 +12,20 @@ import * as bcrypt from 'bcryptjs';
 import { MinioService } from '@modules/minio/minio.service';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from '@infrastructure/resend/mail.service';
+import { CustomerRepository } from '@repositories/customer.repository';
+import { QuizRepository } from '@repositories/quiz.repository';
+import { UserData } from './dto/user-data.dto';
+import { Customer, CustomerAndUser } from '@entities/customer.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
+    @Inject('CustomerRepository')
+    private readonly customerRepository: CustomerRepository,
+    @Inject('QuizRepository')
+    private readonly quizRepository: QuizRepository,
     private readonly minioService: MinioService,
     private readonly mailService: MailService,
   ) {}
@@ -171,5 +179,37 @@ export class UserService {
     });
 
     return updatedUser;
+  }
+
+  async downloadData(userId: string): Promise<UserData> {
+    // Récupérer l'utilisateur
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    // Récupérer les données du customer si elles existent
+    const customerAndUser = await this.customerRepository.findByUserId(userId);
+    const customer =
+      customerAndUser && 'customerId' in customerAndUser
+        ? ({
+            customerId: customerAndUser.customerId,
+            firstName: (customerAndUser as CustomerAndUser).firstName,
+            lastName: (customerAndUser as CustomerAndUser).lastName,
+            subscriptionTier: (customerAndUser as CustomerAndUser)
+              .subscriptionTier,
+            address: (customerAndUser as CustomerAndUser).address,
+          } as Customer)
+        : undefined;
+
+    // Récupérer tous les quiz de l'utilisateur
+    const quizzes = await this.quizRepository.findAll();
+    const userQuizzes = quizzes.filter((quiz) => quiz.userId === userId);
+
+    return {
+      user,
+      customer,
+      quizzes: userQuizzes,
+    };
   }
 }

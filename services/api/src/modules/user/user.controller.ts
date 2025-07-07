@@ -34,6 +34,7 @@ import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { ReqUser } from '@common/types/request';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AdminGuard } from '@common/guards/admin.guard';
+import { UserData } from './dto/user-data.dto';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -320,5 +321,31 @@ export class UserController {
         avatar: updatedUser.avatar,
       },
     };
+  }
+
+  @Get('me/data')
+  @ApiOperation({ summary: "Télécharger les données de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Les données de l'utilisateur ont été récupérées avec succès",
+    type: UserData,
+  })
+  @ApiResponse({
+    status: 401,
+    description: "L'utilisateur n'est pas authentifié",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "L'utilisateur n'a pas les droits nécessaires",
+  })
+  async downloadData(@CurrentUser() user: ReqUser) {
+    try {
+      return await this.userService.downloadData(user.sub);
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de la récupération des données de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
