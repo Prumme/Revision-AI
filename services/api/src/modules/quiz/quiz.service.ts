@@ -39,7 +39,7 @@ export class QuizService {
     return {
       ...quiz,
       questions: (quiz.questions || []).map(q => ({
-        q: q.q || q.q,
+        q: q.q,
         answers: (q.answers || []).map(a => ({
           a: a.a,
           c: typeof a.c === 'boolean' ? a.c : false,
