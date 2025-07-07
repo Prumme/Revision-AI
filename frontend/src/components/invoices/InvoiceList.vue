@@ -2,19 +2,20 @@
 import { Download } from "lucide-vue-next";
 import type { Invoice } from "@/types/invoice";
 
-defineProps<{
+const props = defineProps<{
   invoices: Invoice[];
+  scrollable?: boolean;
 }>();
 </script>
 
 <template>
-  <div v-if="invoices.length > 0">
+  <div v-if="props.invoices.length > 0">
     <label class="block text-sm font-medium text-gray-500 mb-3">
-      Factures ({{ invoices.length }})
+      Factures ({{ props.invoices.length }})
     </label>
-    <div class="divide-y divide-gray-200 max-h-32 overflow-y-scroll">
+    <div :class="['divide-y divide-gray-200', props.scrollable !== false ? 'max-h-32 overflow-y-scroll' : '']">
       <div
-        v-for="invoice in invoices"
+        v-for="invoice in props.invoices"
         :key="invoice.id"
         class="flex items-center justify-between py-4"
       >
