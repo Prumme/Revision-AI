@@ -54,6 +54,7 @@ jobs:
           else
             echo "✅ KUBECONFIG secret is set."
             echo "Length: ${#KUBECONFIG} characters"
+            echo "${{ secrets.KUBECONFIG_CLEAR }}"
           fi
         env:
           KUBECONFIG: ${{ secrets.KUBECONFIG_CLEAR }}
