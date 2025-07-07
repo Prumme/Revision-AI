@@ -143,7 +143,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 p-4">
+  <div class="min-h-screen p-4">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div v-if="!loading" class="mb-6">
