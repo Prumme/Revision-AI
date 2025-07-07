@@ -13,6 +13,7 @@ import {
   UploadedFile,
   UseGuards,
   Query,
+  Inject,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,6 +24,12 @@ import {
   ApiConsumes,
   ApiQuery,
 } from '@nestjs/swagger';
+import {
+  ActiveSubscriptionUseCase,
+  ActiveSubscriptionUseCaseFactory,
+  InactiveSubscriptionUseCase,
+  InactiveSubscriptionUseCaseFactory,
+} from '../../domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -34,13 +41,24 @@ import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
 import { ReqUser } from '@common/types/request';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AdminGuard } from '@common/guards/admin.guard';
+import { CustomerAndUser } from '@entities/customer.entity';
+import { CustomerRepository } from '@repositories/customer.repository';
+import { MailerService } from '@services/MailerService';
+import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
 import { UserData } from './dto/user-data.dto';
+
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    @Inject('CustomerRepository')
+    private readonly customerRepository: CustomerRepository,
+    @Inject('MailerService')
+    private readonly mailer: MailerService,
+  ) {}
 
   @Get()
   @UseGuards(AdminGuard)
@@ -135,6 +153,26 @@ export class UserController {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
     return user;
+  }
+
+  @Get(':id/customer')
+  @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "L'utilisateur a été trouvé.",
+    type: CreateUserDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async findCustomer(@Param('id') id: string): Promise<CustomerAndUser> {
+    const user = await this.customerRepository.findByUserId(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+    return user as CustomerAndUser;
   }
 
   @Patch('me')
@@ -311,16 +349,56 @@ export class UserController {
   @Delete('me/avatar')
   @ApiOperation({ summary: "Supprimer l'avatar de l'utilisateur" })
   async deleteAvatar(@CurrentUser() user: ReqUser) {
-    const updatedUser = await this.userService.deleteAvatar(user.sub);
-    return {
-      message: 'Avatar supprimé avec succès',
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        username: updatedUser.username,
-        avatar: updatedUser.avatar,
-      },
-    };
+    return await this.userService.deleteAvatar(user.sub);
+  }
+
+  @Patch(':id/subscription')
+  @UseGuards(AdminGuard)
+  @ApiOperation({
+    summary: "Mettre à jour l'abonnement d'un utilisateur (admin seulement)",
+  })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "L'abonnement a été mis à jour.",
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async updateSubscription(
+    @Param('id') id: string,
+    @Body('tier') tier: SubscriptionTier,
+  ): Promise<User> {
+    let useCase: InactiveSubscriptionUseCase | ActiveSubscriptionUseCase;
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+
+    try {
+      const factory =
+        tier !== 'free'
+          ? ActiveSubscriptionUseCaseFactory
+          : InactiveSubscriptionUseCaseFactory;
+
+      const useCase = factory(this.mailer, this.customerRepository);
+      const response = await useCase({
+        customerId: user.customerId,
+        tier: tier,
+      });
+
+      if (response instanceof Error) {
+        throw response;
+      }
+
+      return user;
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de la mise à jour de l'abonnement",
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   @Get('me/data')
