@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, defineProps, defineEmits } from "vue";
+import { computed, defineProps, defineEmits } from "vue";
 import { useSubscriptionStore } from "@/stores/subscription";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import CheckoutPlanCard from "@/components/checkout/CheckoutPlanCard.vue";
@@ -21,10 +21,6 @@ const availablePlans = computed(() => {
 const handlePlanSelect = (plan: SubscriptionInfo) => {
   emit("select-plan", plan);
 };
-
-onMounted(() => {
-  subscriptionStore.fetchProducts();
-});
 </script>
 
 <template>
