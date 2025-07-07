@@ -9,10 +9,16 @@ import { MailModule } from '@infrastructure/resend/mail.module';
 import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongoCustomerRepository } from '@mongo/user/customer.repository';
 import { MailerServiceProvider } from '@services/MailerService';
+import { QuizRepositoryProvider } from '@repositories/quiz.repository';
+import { QuizSchema } from '@mongo/quiz/quiz.schema';
+
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: 'User', schema: UserSchema },
+      { name: 'Quiz', schema: QuizSchema },
+    ]),
     MinioModule,
     MailModule,
   ],
@@ -23,6 +29,7 @@ import { MailerServiceProvider } from '@services/MailerService';
     CustomerRepositoryProvider,
     MongoCustomerRepository,
     MailerServiceProvider,
+    QuizRepositoryProvider,
   ],
   exports: [UserService],
 })

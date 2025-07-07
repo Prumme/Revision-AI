@@ -45,6 +45,8 @@ import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
 import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
+import { UserData } from './dto/user-data.dto';
+
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -395,6 +397,32 @@ export class UserController {
       throw new HttpException(
         "Erreur lors de la mise à jour de l'abonnement",
         HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  @Get('me/data')
+  @ApiOperation({ summary: "Télécharger les données de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Les données de l'utilisateur ont été récupérées avec succès",
+    type: UserData,
+  })
+  @ApiResponse({
+    status: 401,
+    description: "L'utilisateur n'est pas authentifié",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "L'utilisateur n'a pas les droits nécessaires",
+  })
+  async downloadData(@CurrentUser() user: ReqUser) {
+    try {
+      return await this.userService.downloadData(user.sub);
+    } catch (error) {
+      throw new HttpException(
+        "Erreur lors de la récupération des données de l'utilisateur",
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

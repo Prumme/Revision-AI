@@ -45,7 +45,7 @@ const handleDeleteAccount = async () => {
 
 <template>
   <FormCard>
-    <template #title>Zone dangereuse</template>
+    <template #title>Supprimer mon compte</template>
 
     <template #content>
       <div class="flex flex-col gap-4">
@@ -55,7 +55,7 @@ const handleDeleteAccount = async () => {
         </p>
         <button
           @click="handleDeleteAccount"
-          class="w-fit bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors"
+          class="w-fit bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors cursor-pointer"
         >
           Supprimer mon compte
         </button>
