@@ -64,6 +64,9 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ vars.KUBECONFIG_CLEAR }}" > ~/.kube/config
 
+      - name: Verify Kubeconfig
+        run: kubectl config view
+
       - name: Apply Kubernetes ConfigMap
         run: kubectl apply -f k8s/configs/env-config-map.yml
 
