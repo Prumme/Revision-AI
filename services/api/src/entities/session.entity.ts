@@ -38,4 +38,3 @@ export class Session {
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);
-

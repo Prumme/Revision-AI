@@ -17,10 +17,7 @@ export interface QuizRepository {
     filters?: QuizFilters,
     pagination?: PaginationOptions,
   ): Promise<Quiz[]>;
-  findAllByUserId(
-    userId: string,
-    filters?: QuizFilters,
-  ): Promise<Quiz[]>;
+  findAllByUserId(userId: string, filters?: QuizFilters): Promise<Quiz[]>;
   create(quiz: Omit<Quiz, 'id'>): Promise<Quiz>;
   update(id: string, quiz: Partial<Quiz>): Promise<Quiz>;
   delete(id: string): Promise<boolean>;

@@ -3,7 +3,8 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { raw, json, urlencoded } from 'body-parser';
-import { QuizService } from './modules/quiz/quiz.service';
+import { fileParsedQueueConsumer } from '@infrastructure/queue/consumers/fileParsedQueueConsumer';
+import { quizGenerationQueueConsumer } from '@infrastructure/queue/consumers/quizGenerationQueueConsumer';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,9 +46,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  const { quizGeneratedConsumer } = await import('./infrastructure/queue/quizGeneratedConsumer');
-  const quizService = app.get(QuizService);
-  quizGeneratedConsumer(quizService);
+  fileParsedQueueConsumer(app);
+  quizGenerationQueueConsumer(app);
 
   await app.listen(process.env.PORT || 3000);
 }

@@ -10,7 +10,7 @@ export class MongoQuizRepository implements QuizRepository {
   constructor(
     @InjectModel('Quiz')
     private readonly quizModel: Model<QuizDocument>,
-  ) { }
+  ) {}
 
   async findById(id: string): Promise<Quiz | null> {
     const document = await this.quizModel.findById(id).exec();
@@ -24,8 +24,11 @@ export class MongoQuizRepository implements QuizRepository {
   }
 
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
-    const query: any = { userId, status: 'completed' };
+    const query: any = { userId };
     if (filters) {
+      if (filters.ready) {
+        query.questions = { $exists: true, $ne: [] };
+      }
       if (filters.search) {
         const searchRegex = new RegExp(filters.search, 'i');
         query.$or = [
@@ -37,7 +40,8 @@ export class MongoQuizRepository implements QuizRepository {
         query.category = filters.category;
       }
       if (filters.isPublic !== undefined) {
-        query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
+        query.isPublic =
+          filters.isPublic === 'true' || filters.isPublic === true;
       }
     }
     const documents = await this.quizModel.find(query).exec();
@@ -78,7 +82,7 @@ export class MongoQuizRepository implements QuizRepository {
       description: document.description,
       isPublic: document.isPublic,
       media: document.media,
-      status: document.status,
+      // status: document.status,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     };
