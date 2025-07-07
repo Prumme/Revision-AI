@@ -46,9 +46,23 @@ jobs:
       #    push: true
       #    tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/quiz-generator:${{ github.sha }}
 
+      - name: Check if KUBECONFIG_CLEAR is set and show length
+        run: |
+          if [ -z "${{ secrets.KUBECONFIG_CLEAR }}" ]; then
+            echo "❌ KUBECONFIG secret is not set."
+            exit 1
+          else
+            echo "✅ KUBECONFIG secret is set."
+            echo "Length: ${#KUBECONFIG} characters"
+          fi
+        env:
+          KUBECONFIG: ${{ secrets.KUBECONFIG_CLEAR }}
+
       - name: Set up Kubeconfig
         run: |
           mkdir -p ~/.kube
+          echo ${#${{ vars.KUBECONFIG_CLEAR }}} > ~/.kube/config
+          
           echo "${{ vars.KUBECONFIG_CLEAR }}" > ~/.kube/config
 
       - name: Apply Kubernetes ConfigMap
