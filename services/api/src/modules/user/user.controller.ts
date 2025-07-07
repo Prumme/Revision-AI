@@ -376,9 +376,9 @@ export class UserController {
 
     try {
       const factory =
-        tier === 'free'
-          ? InactiveSubscriptionUseCaseFactory
-          : ActiveSubscriptionUseCaseFactory;
+        tier !== 'free'
+          ? ActiveSubscriptionUseCaseFactory
+          : InactiveSubscriptionUseCaseFactory;
 
       const useCase = factory(this.mailer, this.customerRepository);
       const response = await useCase({
