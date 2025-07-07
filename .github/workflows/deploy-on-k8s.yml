@@ -61,8 +61,6 @@ jobs:
       - name: Set up Kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo ${#${{ vars.KUBECONFIG_CLEAR }}} > ~/.kube/config
-          
           echo "${{ vars.KUBECONFIG_CLEAR }}" > ~/.kube/config
 
       - name: Apply Kubernetes ConfigMap
