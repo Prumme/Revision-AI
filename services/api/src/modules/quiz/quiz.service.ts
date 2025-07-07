@@ -38,15 +38,13 @@ export class QuizService {
     // Normalisation du format des questions pour le frontend
     return {
       ...quiz,
-      questions: (quiz.questions || []).map((q) => ({
-        q: q.q || q.q,
-        answers: (q.answers || []).map((a) => ({
+      questions: (quiz.questions || []).map(q => ({
+        q: q.q,
+        answers: (q.answers || []).map(a => ({
           a: a.a,
           c: typeof a.c === 'boolean' ? a.c : false,
-          //@ts-ignore
-          _id: a._id,
-        })),
-      })),
+        }))
+      }))
     };
   }
 
