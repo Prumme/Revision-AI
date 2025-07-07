@@ -17,13 +17,13 @@ const maxInputTokens = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 30000;
 
 
 let defaultModel: BaseChatModel;
-if(!process.env.GOODLE_MODEL) {
+if(!process.env.GOOGLE_API_KEY) {
   console.warn(
-    "Environment variable GOODLE_MODEL is not set, using default model 'gemini-2.0-flash'.",
+    "Environment variable GOOGLE_API_KEY is not set, using default model",
   );
 }else {
   defaultModel = new ChatGoogleGenerativeAI({
-    model: process.env.GOODLE_MODEL,
+    model: process.env.GOOGLE_MODEL || "gemini-2.0-flash",
     temperature: 0.2,
     maxOutputTokens,
   });
@@ -31,7 +31,7 @@ if(!process.env.GOODLE_MODEL) {
 
 
 
-const quizGeneratePrompt = PromptTemplate.fromTemplate(`
+const _quizGeneratePrompt = PromptTemplate.fromTemplate(`
 Generate a quiz from the \"contents\" key of a JSON files, you receive an array of multiple file content.  
 Detect the language of the content and write the quiz in that language.
 Generate exactly {questionsCount} questions.
@@ -45,7 +45,7 @@ The content :
 {content}
 `);
 
-const quizEvaluatePrompt = PromptTemplate.fromTemplate(`
+const _quizEvaluatePrompt = PromptTemplate.fromTemplate(`
 You are a content safety evaluator for educational quizzes.
 Analyze the provided quiz and determine if any part of the content is offensive, insulting, inappropriate, or culturally insensitive.
 You also need to evaluate the educational value of the quiz with a score from 0 to 100.
@@ -65,8 +65,8 @@ export class LangChainQuizIAAgent implements IQuizIAAgent {
 
   constructor(
     private model: BaseChatModel = defaultModel, 
-    private quizGenerationPrompt: PromptTemplate = quizGeneratePrompt, 
-    private quizEvaluatePrompt: PromptTemplate = quizEvaluatePrompt
+    private quizGenerationPrompt: PromptTemplate = _quizGeneratePrompt, 
+    private quizEvaluatePrompt: PromptTemplate = _quizEvaluatePrompt
   ) {}
 
   async generateQuiz(
