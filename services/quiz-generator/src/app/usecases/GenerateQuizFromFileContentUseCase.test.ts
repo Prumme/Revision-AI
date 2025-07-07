@@ -23,6 +23,8 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     content: "Educational content here" ,
   };
 
+  const mockQuestionsNumbers = 5;
+
   const TRY_LIMIT = 3;
 
   const getMockIAAgent = ({
@@ -47,7 +49,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent }) as Success<typeof mockQuiz>;
+    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Success<typeof mockQuiz>;
 
     expect(result.success).toBe(true);
     expect(result.value).toEqual(mockQuiz);
@@ -63,7 +65,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent }) as Failure;
+    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers}) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(QuizGenerationError);
@@ -78,7 +80,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent }) as Failure;
+    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(QuizGenerationError);
@@ -94,7 +96,7 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent }) as Failure;
+    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(SafetyCheckError);
