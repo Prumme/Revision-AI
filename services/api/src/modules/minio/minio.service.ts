@@ -20,7 +20,7 @@ interface StorageFile {
 @Injectable()
 export class MinioService implements OnModuleInit, FileService {
   private s3Client: AWS.S3;
-  public readonly bucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     private configService: ConfigService,

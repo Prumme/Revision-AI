@@ -294,11 +294,7 @@ export const HandleQuizGenerationCompletedUseCaseFactory: UseCaseFactory<
         'Error during the generation of the quiz:',
         quizGeneratedDTO.identifier,
       );
-      job = QuizJobEntity.addEventJob(job, {
-        error: true,
-        message: quizGeneratedDTO.error,
-      });
-      job.status = QuizJobEntity.QuizGenerationJobStatus.FAILED;
+      job = QuizJobEntity.failJob(job, quizGeneratedDTO.error);
       await _quizGenerationJobRepository.putJob(job, job.id);
 
       return new Error(quizGeneratedDTO.error);
