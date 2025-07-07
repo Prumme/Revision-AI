@@ -8,6 +8,7 @@ import BillingAddressStep from "@/components/checkout/BillingAddressStep.vue";
 import PaymentMethodStep from "@/components/checkout/PaymentMethodStep.vue";
 import OrderSummaryStep from "@/components/checkout/OrderSummaryStep.vue";
 import { useUserStore } from "@/stores/user";
+import { useSubscriptionStore } from "@/stores/subscription";
 import { subscribe } from "@/services/subscription.service";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
@@ -17,6 +18,7 @@ import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 const router = useRouter();
 const checkout = useCheckoutFlow();
 const userStore = useUserStore();
+const subscriptionStore = useSubscriptionStore();
 
 const isOrderLoading = ref(false);
 const orderError = ref<string | null>(null);
@@ -70,7 +72,7 @@ const handleOrderConfirm = async () => {
     const customerId = userStore.user?.customerId;
     const paymentMethodId = checkout.state.data.paymentMethod.paymentMethodId || "";
     const tier = checkout.state.data.selectedPlan?.productName || "";
-    
+
     if (!customerId || !paymentMethodId || !tier) {
       throw new Error("Informations de souscription incomplètes.");
     }
@@ -80,6 +82,7 @@ const handleOrderConfirm = async () => {
       tier,
     };
     await subscribe(payload);
+    userStore.setSubscriptionTier(tier);
     router.push("/subscription");
   } catch (e) {
     orderError.value =
@@ -91,6 +94,10 @@ const handleOrderConfirm = async () => {
 
 // Chargement automatique des infos de facturation utilisateur
 onMounted(async () => {
+  // Chargement des produits d'abonnement si nécessaire
+  if (checkout.currentStep.value.id === "plan-selection" && !subscriptionStore.products) {
+    await subscriptionStore.fetchProducts();
+  }
   try {
     checkout.setLoading(true);
     const customerInfo = await userStore.fetchCustomerInfo();

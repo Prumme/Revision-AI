@@ -36,6 +36,10 @@ export const useUserStore = defineStore("user", () => {
     localStorage.setItem("token", newToken);
   }
 
+  function setSubscriptionTier(newSubscriptionTier: string) {
+    user.value!.subscriptionTier = newSubscriptionTier;
+  }
+
   function clearUser() {
     user.value = null;
     token.value = null;
@@ -201,5 +205,6 @@ export const useUserStore = defineStore("user", () => {
     setQuizCount(count: number) {
       this.quizCount = count;
     },
+    setSubscriptionTier,
   };
 });

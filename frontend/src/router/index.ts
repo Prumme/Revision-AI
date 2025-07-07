@@ -15,6 +15,10 @@ import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import QuizForm from "@/views/quiz/QuizForm.vue";
 import QuizList from "@/views/quiz/QuizList.vue";
 import QuizDetails from "@/views/quiz/QuizDetails.vue";
+import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
+import EmailSend from "@/views/authentication/EmailSend.vue";
+import AdminUserView from "@/views/admin/AdminUserView.vue";
+import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
@@ -75,6 +79,12 @@ const router = createRouter({
           path: "/admin/user",
           name: "admin-users",
           component: AdminUserView,
+          meta: { requiresAdmin: true },
+        },
+        {
+          path: "/admin/users/:id",
+          name: "admin-user",
+          component: AdminUserDetailView,
           meta: { requiresAdmin: true },
         },
       ],

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Inject, Post, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Post,
+  Put,
+  Req,
+  Param,
+} from '@nestjs/common';
 import {
   UpsertCustomerUseCaseFactory,
   SubscribeUseCaseFactory,
@@ -69,5 +78,18 @@ export class SubscriptionController {
     const products = await this.subscriptionProvider.getProductsPrices();
     if (products instanceof Error) throw products;
     return { products };
+  }
+
+  @Get('/invoices/:customerId')
+  async getInvoices(
+    @Param('customerId') customerId: string,
+    @Req() req: Request & { user: ReqUser },
+  ) {
+    const invoices = await this.subscriptionProvider.getInvoices(
+      customerId,
+      req.user,
+    );
+    if (invoices instanceof Error) throw invoices;
+    return { invoices };
   }
 }

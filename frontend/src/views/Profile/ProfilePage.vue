@@ -4,6 +4,9 @@ import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import ProfilePicture from "@/components/profile/ProfilePicture.vue";
+import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
+import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
+import DownloadDataCard from "@/components/cards/DownloadDataCard.vue";
 import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
@@ -139,6 +142,10 @@ const handleSubmit = async () => {
 
         <DeleteAccountCard />
       </div>
-    </section>
+
+      <DownloadDataCard />
+
+      <DeleteAccountCard />
+    </div>
   </MotionLayout>
 </template>
