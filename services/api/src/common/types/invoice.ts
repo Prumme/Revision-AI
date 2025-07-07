@@ -1,10 +1,8 @@
-import { Stripe } from 'stripe';
-
-export interface Invoice extends Partial<Stripe.Invoice> {
+export interface Invoice {
   id: string;
   invoice_pdf: string | null;
   number: string | null;
-  status: Stripe.Invoice.Status;
+  status: string;
   total: number;
   created: number;
   customer: string;

@@ -301,6 +301,6 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     const invoices = await this.stripe.invoices.list({
       customer: customerId,
     });
-    return invoices.data as Invoice[];
+    return invoices.data as Partial<Stripe.Invoice>[] as Invoice[];
   }
 }

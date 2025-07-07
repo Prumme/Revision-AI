@@ -24,6 +24,12 @@ import {
   ApiConsumes,
   ApiQuery,
 } from '@nestjs/swagger';
+import {
+  ActiveSubscriptionUseCase,
+  ActiveSubscriptionUseCaseFactory,
+  InactiveSubscriptionUseCase,
+  InactiveSubscriptionUseCaseFactory,
+} from '../../domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -37,6 +43,8 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { AdminGuard } from '@common/guards/admin.guard';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
+import { MailerService } from '@services/MailerService';
+import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -46,6 +54,8 @@ export class UserController {
     private readonly userService: UserService,
     @Inject('CustomerRepository')
     private readonly customerRepository: CustomerRepository,
+    @Inject('MailerService')
+    private readonly mailer: MailerService,
   ) {}
 
   @Get()
@@ -356,11 +366,31 @@ export class UserController {
   })
   async updateSubscription(
     @Param('id') id: string,
-    @Body('tier') tier: string,
+    @Body('tier') tier: SubscriptionTier,
   ): Promise<User> {
+    let useCase: InactiveSubscriptionUseCase | ActiveSubscriptionUseCase;
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+
     try {
-      const updatedUser = await this.userService.updateSubscription(id, tier);
-      return updatedUser;
+      const factory =
+        tier === 'free'
+          ? InactiveSubscriptionUseCaseFactory
+          : ActiveSubscriptionUseCaseFactory;
+
+      const useCase = factory(this.mailer, this.customerRepository);
+      const response = await useCase({
+        customerId: user.customerId,
+        tier: tier,
+      });
+
+      if (response instanceof Error) {
+        throw response;
+      }
+
+      return user;
     } catch (error) {
       throw new HttpException(
         "Erreur lors de la mise à jour de l'abonnement",
