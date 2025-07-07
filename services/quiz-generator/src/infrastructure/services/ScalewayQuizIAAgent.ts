@@ -1,6 +1,9 @@
 import { IQuizIAAgent } from "../../app/services/IQuizIAAgent";
 import { FileContent } from "../../app/value-objects/FileContent";
-import { QuizGenerationError, SafetyCheckError } from "../../app/exceptions/QuizGenerationError";
+import {
+  QuizGenerationError,
+  SafetyCheckError,
+} from "../../app/exceptions/QuizGenerationError";
 import OpenAI from "openai";
 import { Quiz } from "../../app/value-objects/Quiz";
 import { QuizSafetyCheckResult } from "../../app/value-objects/QuizSafetyCheckResult";
@@ -12,15 +15,14 @@ const defaultClient = new OpenAI({
   apiKey: process.env.SCALEWAY_ACCESS_KEY || "",
 });
 
-
 const model = process.env.SCALEWAY_MODEL || "deepseek-r1-distill-llama-70b";
 
 const maxTokenOutput = Number(process.env.SCALEWAY_MAX_TOKEN) || 1000;
-const maxTokenInput = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 5000;
+const maxTokenInput = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 30000;
 
 // Rend le prompt dynamique pour inclure le nombre de questions souhaité
 const quizGeneratePrompt = (questionsCount: number) => `
-Generate a quiz from the \"content\" key of a JSON file.  
+Generate a quiz from the \"contents\" key of a JSON files, you receive an array of multiple file content.  
 Detect the language of the content and write the quiz in that language.
 Generate exactly ${questionsCount} questions.
 Return **only** this JSON format (no text, no markdown):
@@ -44,41 +46,39 @@ Return **only** this JSON format in this strict format (no text, no markdown):
 `;
 
 export class ScalewayQuizIAAgent implements IQuizIAAgent {
-  constructor(
-    private AIClient: OpenAI = defaultClient
-  ) {}
+  constructor(private AIClient: OpenAI = defaultClient) {}
 
   getMaxTry(): number {
-       return Number(process.env.SCALEWAY_MAX_TRY) || 3;
+    return Number(process.env.SCALEWAY_MAX_TRY) || 3;
   }
 
-  private async getStream(systemPrompt : string, prompt : string){
+  private async getStream(systemPrompt: string, prompt: string) {
     const stream = await this.AIClient.chat.completions.create({
       model,
       messages: [
         {
-          "role": "system",
-          "content": systemPrompt
+          role: "system",
+          content: systemPrompt,
         },
-        { "role": "user", "content": `${prompt}` }
+        { role: "user", content: `${prompt}` },
       ],
       max_tokens: maxTokenOutput,
       temperature: 0.6,
       top_p: 0.95,
       presence_penalty: 0,
       stream: true,
-    })
+    });
 
     let data = "";
     for await (const part of stream) {
       data += part.choices[0].delta.content;
     }
 
-    return data
+    return data;
   }
 
   private cleanResult(data: string) {
-    if(data.endsWith("}") && data.startsWith("{")) {
+    if (data.endsWith("}") && data.startsWith("{")) {
       return data;
     }
     const start = data.indexOf("{");
@@ -90,32 +90,49 @@ export class ScalewayQuizIAAgent implements IQuizIAAgent {
   }
 
   // Ajoute une fonction pour normaliser les réponses (champ c)
-  async generateQuiz(fileContent: FileContent, questionsNumbers: number): Promise<Quiz | QuizGenerationError> {
-    const json = JSON.stringify(fileContent);
-    if(json.length > maxTokenInput) return new QuizGenerationError("File content is too long");
-    const data = await this.getStream(quizGeneratePrompt(questionsNumbers), json);
+  async generateQuiz(
+    filesContents: FileContent[] | FileContent,
+    questionsNumbers: number,
+  ): Promise<Quiz | QuizGenerationError> {
+    const json = JSON.stringify(filesContents);
+    if (json.length > maxTokenInput)
+      return new QuizGenerationError("Files contents is too long");
+    const data = await this.getStream(
+      quizGeneratePrompt(questionsNumbers),
+      json,
+    );
     try {
       return QuizSchema.parse(JSON.parse(this.cleanResult(data)));
     } catch (error) {
       console.error("[QUIZ] Error parsing result json IA Output:", error);
-      console.error(data)
+      console.error(data);
       return new QuizGenerationError("Failed to parse AI response");
     }
   }
 
-  async safetyContentCheck(quiz: Quiz): Promise<QuizSafetyCheckResult | QuizGenerationError> {
+  async safetyContentCheck(
+    quiz: Quiz,
+  ): Promise<QuizSafetyCheckResult | QuizGenerationError> {
     const json = JSON.stringify(quiz);
     const data = await this.getStream(quizEvaluatePrompt, json);
     try {
-      return QuizSafetyCheckResultSchema.parse(JSON.parse(this.cleanResult(data)));
+      return QuizSafetyCheckResultSchema.parse(
+        JSON.parse(this.cleanResult(data)),
+      );
     } catch (error) {
-      console.error("[SAFETYCHECK] Error parsing result json IA Output:", error);
-      console.error(data)
+      console.error(
+        "[SAFETYCHECK] Error parsing result json IA Output:",
+        error,
+      );
+      console.error(data);
       return new SafetyCheckError("Failed to parse AI response");
     }
   }
 
-  updateQuiz(quiz: Quiz, fileContent: FileContent): Promise<Quiz | QuizGenerationError> {
+  updateQuiz(
+    quiz: Quiz,
+    fileContent: FileContent,
+  ): Promise<Quiz | QuizGenerationError> {
     throw new Error("Method not implemented.");
   }
 }

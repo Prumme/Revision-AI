@@ -33,12 +33,12 @@ Charge les images précédemment buildées dans chaque nœud du cluster kind.
 ## 4. Créer une ConfigMap et un Secret à partir du fichier `.env`
 
 ```bash
-kubectl create configmap NAME --from-env-file=./.env --dry-run=client -o=yaml 
+kubectl create configmap NAME --from-env-file=./.env --dry-run=client -o=yaml
 kubectl create secret generic NAME --from-env-file=./.env --dry-run=client -o=yaml
 ```
 
-* Copier le contenu et vérifier que les variables sensibles (secrets) ne sont **pas** présentes dans la ConfigMap.
-* Ces commandes n’appliquent pas directement sur le cluster mais affichent le YAML à appliquer.
+- Copier le contenu et vérifier que les variables sensibles (secrets) ne sont **pas** présentes dans la ConfigMap.
+- Ces commandes n’appliquent pas directement sur le cluster mais affichent le YAML à appliquer.
 
 ---
 
@@ -141,9 +141,9 @@ Utiliser le dashboard Grafana avec l’ID `10991`.
 
 ## 16. Configurer les métriques pour `quiz-generator`
 
-* Créer un service `quiz-generator` exposant le serveur métriques Prometheus en `ClusterIP`.
-* Créer un `ServiceMonitor` pour ajouter une cible Prometheus sur ce service.
-* Créer un dashboard Grafana pour visualiser les métriques.
+- Créer un service `quiz-generator` exposant le serveur métriques Prometheus en `ClusterIP`.
+- Créer un `ServiceMonitor` pour ajouter une cible Prometheus sur ce service.
+- Créer un dashboard Grafana pour visualiser les métriques.
 
 ---
 
@@ -167,9 +167,9 @@ kubectl create configmap NAME --from-env-file=./.env --dry-run=client -o=yaml
 kubectl create secret generic NAME --from-env-file=./.env --dry-run=client -o=yaml
 ```
 
-* Ne prendre que ce qui est utile aux services backend.
-* Ne pas inclure les variables front-end dans ConfigMap ou Secret.
-* Bien distinguer variables d’environnement secrètes et non secrètes.
+- Ne prendre que ce qui est utile aux services backend.
+- Ne pas inclure les variables front-end dans ConfigMap ou Secret.
+- Bien distinguer variables d’environnement secrètes et non secrètes.
 
 ---
 
@@ -247,7 +247,7 @@ L’ingress controller devrait alors être déployé uniquement sur `worker1`.
 Exemple de sortie :
 
 ```bash
-kubectl get pods -n ingress-nginx -o wide  
+kubectl get pods -n ingress-nginx -o wide
 
 NAME                                        READY   STATUS      RESTARTS   AGE     IP            NODE           NOMINATED NODE   READINESS GATES
 ingress-nginx-admission-create-q9scv        0/1     Completed   0          30m     10.244.2.16   kind-worker2   <none>           <none>
@@ -266,4 +266,3 @@ Ajouter la ligne suivante :
 ```
 
 Tester l’API à l’adresse : [http://api.revision-ai.local](http://api.revision-ai.local)
-

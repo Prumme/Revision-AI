@@ -3,7 +3,16 @@ import { FileContent } from "../../app/value-objects/FileContent";
 import { Quiz } from "../../app/value-objects/Quiz";
 
 const mockStream = async function* () {
-  yield { choices: [{ delta: { content: '{ "t": "Mock Quiz", "questions": [ { "q": "Q?", "answers": [ { "a": "A", "c": true } ] } ] }' } }] };
+  yield {
+    choices: [
+      {
+        delta: {
+          content:
+            '{ "t": "Mock Quiz", "questions": [ { "q": "Q?", "answers": [ { "a": "A", "c": true } ] } ] }',
+        },
+      },
+    ],
+  };
 };
 
 const mockOpenAI = {
@@ -27,9 +36,7 @@ describe("ScalewayQuizIAAgent", () => {
       content: "Test content",
     };
 
-    const questionsNumbers = 5;
-
-    const result = await agent.generateQuiz(fileContent, questionsNumbers);
+    const result = await agent.generateQuiz(fileContent, 1);
 
     expect(result).toEqual({
       t: "Mock Quiz",
@@ -44,7 +51,15 @@ describe("ScalewayQuizIAAgent", () => {
   });
 
   const safetyMockStream = async function* () {
-    yield { choices: [{ delta: { content: '{ "isOffensive": false, "educationalScore": 85 }' } }] };
+    yield {
+      choices: [
+        {
+          delta: {
+            content: '{ "isOffensive": false, "educationalScore": 85 }',
+          },
+        },
+      ],
+    };
   };
 
   const mockOpenAIWithSafety = {
