@@ -219,7 +219,8 @@ export class UserService {
     return {
       user,
       customer,
-      quizzes: userQuizzes,
+      //quizzes: userQuizzes, //@todo corriger le type
+      quizzes: []
     };
   }
 }

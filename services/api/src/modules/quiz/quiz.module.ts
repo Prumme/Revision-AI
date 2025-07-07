@@ -7,15 +7,18 @@ import { QuizRepositoryProvider } from '@repositories/quiz.repository';
 import { QuizController } from './quiz.controller';
 import { QuizService } from './quiz.service';
 import { QueueProvider } from "@infrastructure/queue/queueProvider";
+import {UserRepositoryProvider} from "@repositories/user.repository";
+import {UserSchema} from "@mongo/user/user.schema";
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'Quiz', schema: QuizSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema },{ name: 'Quiz', schema: QuizSchema }]),
     forwardRef(() => UserModule),
     forwardRef(() => MinioModule),
   ],
   controllers: [QuizController],
   providers: [
+      UserRepositoryProvider,
     QuizService,
     QuizRepositoryProvider,
     {
