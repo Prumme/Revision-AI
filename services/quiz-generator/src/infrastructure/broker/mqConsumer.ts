@@ -1,14 +1,14 @@
 import amqp from "amqplib";
 import { generateQuizFromFileContentFactory } from "../../app/usecases/GenerateQuizFromFileContentUseCase";
 import { PrometheusMetricsExporter } from "../monitoring/PrometheusMetricsExporter";
-import { ScalewayQuizIAAgent } from "../services/ScalewayQuizIAAgent";
 import { quizGenerationMessage } from "./messages/quizGenerationMessage";
 import { mqProvide } from "./mqProvider";
+import { LangChainQuizIAAgent } from "../services/LangChainQuizIAAgent";
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://localhost";
 const QUEUE_NAME = process.env.QUEUE_NAME || "generate-quiz";
 
-const quizIAAgent = new ScalewayQuizIAAgent();
+const quizIAAgent = new LangChainQuizIAAgent();
 
 export const mqConsumer = async () => {
   console.log("Starting MQ Consumer for quiz generation...");
