@@ -18,7 +18,7 @@ export class MongoQuizRepository implements QuizRepository {
     return this.documentToQuiz(document);
   }
 
-  async findAll(filters?: any, currentUserId?: string): Promise<Quiz[]> {
+  async findAll(filters?: any, pagination?: any): Promise<Quiz[]> {
     const query: any = { status: 'completed' };
     if (filters) {
       if (filters.search) {
@@ -34,11 +34,16 @@ export class MongoQuizRepository implements QuizRepository {
       if (filters.isPublic !== undefined) {
         query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
       }
+      if (filters.userId) {
+        query.userId = { $ne: filters.userId };
+      }
     }
-    if (currentUserId) {
-      query.userId = { $ne: currentUserId };
+    let mongoQuery = this.quizModel.find(query);
+    if (pagination) {
+      if (pagination.skip) mongoQuery = mongoQuery.skip(pagination.skip);
+      if (pagination.limit) mongoQuery = mongoQuery.limit(pagination.limit);
     }
-    const documents = await this.quizModel.find(query).exec();
+    const documents = await mongoQuery.exec();
     return documents.map(this.documentToQuiz);
   }
 

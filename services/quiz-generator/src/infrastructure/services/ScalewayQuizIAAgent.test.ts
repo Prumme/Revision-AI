@@ -38,8 +38,6 @@ describe("ScalewayQuizIAAgent", () => {
 
     const result = await agent.generateQuiz(fileContent, 1);
 
-    const result = await agent.generateQuiz(fileContent, questionsNumbers);
-
     expect(result).toEqual({
       t: "Mock Quiz",
       questions: [

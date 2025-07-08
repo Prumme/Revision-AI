@@ -1,4 +1,4 @@
-import {Injectable, Inject, ForbiddenException} from '@nestjs/common';
+import {Injectable, Inject, ForbiddenException, NotFoundException} from '@nestjs/common';
 import {Session} from '@entities/session.entity';
 import {CreateSessionDto} from '@modules/session/dto/create-session.dto';
 import {SessionRepository} from '@repositories/session.repository';

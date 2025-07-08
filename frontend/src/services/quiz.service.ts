@@ -8,7 +8,6 @@ export interface QuizQuestion {
     }>;
 }
 
-// Ajouter une nouvelle interface pour la conversion des questions du backend
 export interface BackendQuestion {
     q: string;
     answers: Array<{

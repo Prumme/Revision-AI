@@ -48,7 +48,8 @@ export class QuizService {
   }
 
   async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
-    return this.quizRepository.findAll(filters, userId);
+    if (userId) filters = { ...filters, userId };
+    return this.quizRepository.findAll(filters, undefined);
   }
 
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
@@ -85,7 +86,7 @@ export class QuizService {
       this.quizRepository,
       this.quizGenerationJobRepository,
       this.cachedFileParsedRepository,
-      this.minioService,
+      this.fileService, // Pass FileService instead of minioService
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
     );

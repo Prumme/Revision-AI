@@ -144,6 +144,6 @@ const handleSubmit = async () => {
       <DownloadDataCard />
 
       <DeleteAccountCard />
-    </div>
+    </section>
   </MotionLayout>
 </template>

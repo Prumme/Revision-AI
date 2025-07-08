@@ -16,7 +16,6 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  Query,
   Inject,
   UseInterceptors,
 } from '@nestjs/common';
@@ -34,24 +33,19 @@ import {
   ActiveSubscriptionUseCaseFactory,
   InactiveSubscriptionUseCase,
   InactiveSubscriptionUseCaseFactory,
-} from '../../domain/usecases/SubscriptionUsecases';
+} from '@domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserFiltersDto } from './dto/user-filters.dto';
-import { User } from '@entities/user.entity';
 import { Request } from 'express';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
-import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
+import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
 import { UserData } from './dto/user-data.dto';
-import {UserService} from "@modules/user/user.service";
-
-
-
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
 @Controller('users')
