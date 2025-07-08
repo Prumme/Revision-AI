@@ -98,28 +98,24 @@ jobs:
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
       # Update deployment images and apply deployments, services, ingress
-#      - name: Update and Apply Deployments, Services, Ingress
-#        run: |
-#          IMAGE_TAG=rg.fr-par.scw.cloud/${{ vars.SCW_PROJECT_ID }}/revision-ai
+      - name: Update and Apply Deployments, Services, Ingress
+        run: |
+          IMAGE_TAG=rg.fr-par.scw.cloud/${{ vars.SCW_PROJECT_ID }}/revision-ai
+
+          # Use sed or kustomize to update image tags in deployment files
+          # Example using sed (requires GNU sed or equivalent)
+          sed -i '' "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/api.deployement.yaml
+          sed -i '' "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/file-parser.deployement.yml
+          sed -i '' "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/quiz-generator.deployement.yml
+
+          # Apply updated deployments, services, and ingress
+          kubectl apply -f k8s -R
+
+      - name: Wait for deployments to be ready
+        run: |
+          kubectl rollout status deployment/api-deploy --timeout=5m
+          kubectl rollout status deployment/file-parser-deploy --timeout=5m
+          kubectl rollout status deployment/quiz-generator-deploy --timeout=5m
 #
-#          # Use sed or kustomize to update image tags in deployment files
-#          # Example using sed (requires GNU sed or equivalent)
-#          sed -i '' "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/api.deployement.yaml
-#          sed -i '' "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/file-parser.deployement.yml
-#          sed -i '' "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/quiz-generator.deployement.yml
-#
-#          # Apply updated deployments, services, and ingress
-#          kubectl apply -f k8s/apps/api.deployement.yaml
-#          kubectl apply -f k8s/apps/file-parser.deployement.yml
-#          kubectl apply -f k8s/apps/quiz-generator.deployement.yml
-#          kubectl apply -f k8s/apps/api.service.yaml
-#          kubectl apply -f k8s/api-ingress.yaml
-#
-#      - name: Wait for deployments to be ready
-#        run: |
-#          kubectl rollout status deployment/api-deploy --timeout=5m
-#          kubectl rollout status deployment/file-parser-deploy --timeout=5m
-#          kubectl rollout status deployment/quiz-generator-deploy --timeout=5m
-#
-#      - name: Verify Ingress
-#        run: kubectl get ingress api-ingress
+      - name: Verify Ingress
+        run: kubectl get ingress api-ingress
