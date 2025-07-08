@@ -1,5 +1,5 @@
 import {Injectable} from "@nestjs/common";
-import {SessionRepository} from "@repositories/session.repository";
+import {PaginatedResult, SessionRepository} from "@repositories/session.repository";
 import {InjectModel} from "@nestjs/mongoose";
 import {SessionDocument} from "./session.schema";
 import {Model} from 'mongoose';
@@ -19,7 +19,6 @@ export class MongoSessionRepository implements SessionRepository {
      * @param id - The ID of the session to find.
      * @returns The session if found, otherwise null.
      */
-
     async findById(id: string): Promise<Session | null> {
         const document = await this.sessionModel.findById(id).exec();
         if (!document) return null;
@@ -27,20 +26,36 @@ export class MongoSessionRepository implements SessionRepository {
     }
 
     /**
-     * Finds all sessions for a specific user, optionally filtered by status and score range.
+     * Finds all sessions for a specific user, paginated.
      * @param userId - The ID of the user whose sessions are to be retrieved.
-     * @param filters - Optional filters for status and score range.
-     * @returns An array of sessions associated with the user.
+     * @param pagination - Pagination options (page, limit).
+     * @returns PaginatedResult of sessions associated with the user.
      */
-    async findAllByUserId(userId: string, filters?: SessionFiltersDto): Promise<Session[]> {
-        const query: any = {userId};
-        if (filters) {
-            if (filters.status) query.status = filters.status;
-            if (typeof filters.scoreMin === 'number') query.score = {...query.score, $gte: filters.scoreMin};
-            if (typeof filters.scoreMax === 'number') query.score = {...query.score, $lte: filters.scoreMax};
+    async findAllByUserId(userId: string, options: { page: number; limit: number; scoreMin?: number; scoreMax?: number; status?: string }): Promise<PaginatedResult<Session>> {
+        const query: any = { userId };
+        if (options.status) {
+            query.status = options.status;
         }
-        const documents = await this.sessionModel.find(query).exec();
-        return documents.map(this.documentToSession);
+        if (typeof options.scoreMin === 'number') {
+            query.score = { ...query.score, $gte: options.scoreMin };
+        }
+        if (typeof options.scoreMax === 'number') {
+            query.score = { ...query.score, $lte: options.scoreMax };
+        }
+        const page = options?.page ?? 1;
+        const limit = options?.limit ?? 10;
+        const skip = (page - 1) * limit;
+        const [total, documents] = await Promise.all([
+            this.sessionModel.countDocuments(query),
+            this.sessionModel.find(query).skip(skip).limit(limit).exec()
+        ]);
+        return {
+            data: documents.map(this.documentToSession),
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        };
     }
 
     /**

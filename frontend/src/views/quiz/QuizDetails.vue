@@ -90,7 +90,7 @@ watch(showAllSessions, async (val) => {
 function handlePauseSession() {
   sessionStore.pauseSession();
   activeTab.value = 'sessions';
-  toast.showToast("success", "Session mise en pause. Vous pouvez reprendre plus tard.");
+  toast.showToast("warning", "Session mise en pause. Vous pouvez reprendre plus tard.");
 }
 </script>
 

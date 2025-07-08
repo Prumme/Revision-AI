@@ -50,7 +50,7 @@ export function useQuizDetails(quizId: string) {
   const quizTabs = computed(() => {
     const tabs = [
       { key: "quiz", label: "Quiz" },
-      { key: "sessions", label: "Sessions", badge: userSessions.value.length > 0 ? userSessions.value.length.toString() : undefined },
+      { key: "sessions", label: "Sessions", badge: filteredSessions.value.length > 0 ? filteredSessions.value.length.toString() : undefined },
     ];
     if (quiz.value && quiz.value.userId === userId.value) {
       tabs.push({ key: "config", label: "Configuration" });
@@ -257,21 +257,50 @@ export function useQuizDetails(quizId: string) {
     }
   };
 
-  // Fetch all user sessions for this quiz once, then filter client-side
+  // Ajout pour la datatable sessions
+  const filteredSessions = ref<Session[]>([]);
+  const lastSessionsResponse = ref<{ data: Session[]; total: number; totalPages: number; page: number; limit: number } | null>(null);
+
   async function fetchAllUserSessions() {
-    if (!quiz.value || !userId.value) return;
     sessionTableLoading.value = true;
     try {
-      // Fetch all sessions for the user
-      const allSessions = await sessionService.findAllByUserId(userId.value);
-      // Filter to only sessions for this quiz
-      userSessions.value = allSessions.filter((s: { quizId: string }) => s.quizId === quiz.value.id);
+      // Reset page to 1 si un filtre change (hors pagination)
+      if (fetchAllUserSessions._filterChanged) {
+        sessionTablePagination.value.currentPage = 1;
+        fetchAllUserSessions._filterChanged = false;
+      }
+      const response = await sessionService.findAllByUserId(userId.value, {
+        page: sessionTablePagination.value.currentPage,
+        limit: sessionTablePagination.value.itemsPerPage,
+        status: sessionTableFilters.value.status !== 'all' ? sessionTableFilters.value.status : undefined,
+        scoreMin: sessionTableFilters.value.scoreMin !== undefined ? sessionTableFilters.value.scoreMin : undefined,
+        scoreMax: sessionTableFilters.value.scoreMax !== undefined ? sessionTableFilters.value.scoreMax : undefined,
+      });
+      filteredSessions.value = response.data;
+      lastSessionsResponse.value = response;
+      sessionTablePagination.value.totalItems = response.total;
+      sessionTablePagination.value.totalPages = response.totalPages;
     } catch {
-      userSessions.value = [];
+      filteredSessions.value = [];
+      lastSessionsResponse.value = null;
     } finally {
       sessionTableLoading.value = false;
     }
   }
+
+  // Rafraîchir les sessions quand les filtres changent
+  watch(sessionTableFilters, () => {
+    fetchAllUserSessions._filterChanged = true;
+    fetchAllUserSessions();
+  }, { deep: true });
+  watch(() => sessionTablePagination.value.currentPage, fetchAllUserSessions);
+  watch(() => sessionTablePagination.value.itemsPerPage, fetchAllUserSessions);
+
+  // Appel initial lors du montage ou changement d'onglet
+  onMounted(fetchAllUserSessions);
+  watch([activeTab, userId], ([tab]) => {
+    if (tab === 'sessions') fetchAllUserSessions();
+  });
 
   // Fetch toutes les sessions du quiz (pour owner)
   async function fetchAllQuizSessions() {
@@ -289,26 +318,26 @@ export function useQuizDetails(quizId: string) {
   }
 
   // Filtering logic (client-side)
-  const filteredSessions = computed(() => {
-    if (showAllSessions.value && isQuizOwner.value) {
-      return getFilteredSessions(allQuizSessions.value);
-    }
-    return getFilteredSessions(userSessions.value);
-  });
-  function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
-    let result = sessions;
-    const { status, scoreMin, scoreMax } = sessionTableFilters.value;
-    if (status && status !== 'all') {
-      result = result.filter((s) => s.status === status);
-    }
-    if (scoreMin != null) {
-      result = result.filter((s) => typeof s.score === 'number' ? s.score >= scoreMin : true);
-    }
-    if (scoreMax != null && scoreMax > 0) {
-      result = result.filter((s) => typeof s.score === 'number' ? s.score <= scoreMax : true);
-    }
-    return result;
-  }
+  // const filteredSessions = computed(() => {
+  //   if (showAllSessions.value && isQuizOwner.value) {
+  //     return getFilteredSessions(allQuizSessions.value);
+  //   }
+  //   return getFilteredSessions(userSessions.value);
+  // });
+  // function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
+  //   let result = sessions;
+  //   const { status, scoreMin, scoreMax } = sessionTableFilters.value;
+  //   if (status && status !== 'all') {
+  //     result = result.filter((s) => s.status === status);
+  //   }
+  //   if (scoreMin != null) {
+  //     result = result.filter((s) => typeof s.score === 'number' ? s.score >= scoreMin : true);
+  //   }
+  //   if (scoreMax != null && scoreMax > 0) {
+  //     result = result.filter((s) => typeof s.score === 'number' ? s.score <= scoreMax : true);
+  //   }
+  //   return result;
+  // }
 
   // Handlers for SessionDatatable (client-side filtering)
   function handleSessionTableFilters(filters: TableFilters) {

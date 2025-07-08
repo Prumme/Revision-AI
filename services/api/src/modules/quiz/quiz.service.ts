@@ -5,7 +5,7 @@ import { QuizRepository } from '@repositories/quiz.repository';
 import { UserRepository } from '@repositories/user.repository';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { CreateQuizUseCaseFactory } from '../../domain/usecases/QuizGenerationUseCase';
+import { CreateQuizUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
 import { QueueProvider } from '@services/QueueProvider';
@@ -48,7 +48,8 @@ export class QuizService {
   }
 
   async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
-    return this.quizRepository.findAll(filters, userId);
+    if (userId) filters = { ...filters, userId };
+    return this.quizRepository.findAll(filters, undefined);
   }
 
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
@@ -85,7 +86,7 @@ export class QuizService {
       this.quizRepository,
       this.quizGenerationJobRepository,
       this.cachedFileParsedRepository,
-      this.minioService,
+      this.fileService, // Pass FileService instead of minioService
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
     );
