@@ -2,7 +2,6 @@ import { ApiService } from "./api.service";
 import type { User } from "@/types/user";
 import type { UserApiFilters } from "@/types/admin";
 import type { Quiz } from "@/types/quiz";
-import type { Invoice } from "@/types/invoice";
 
 export interface PaginationParams {
   page?: number;
@@ -70,13 +69,6 @@ export class AdminService {
 
   static async requestPasswordReset(userId: string): Promise<void> {
     await ApiService.post(`/users/${userId}/password-reset`, {});
-  }
-
-  static async getUserInvoices(customerId: string): Promise<Invoice[]> {
-    const response = await ApiService.get<{ invoices: Invoice[] }>(
-      `/subscription/invoices/${customerId}`,
-    );
-    return response.data?.invoices || [];
   }
 
   static async updateUserSubscription(userId: string, tier: string): Promise<void> {

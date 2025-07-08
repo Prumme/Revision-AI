@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useToastStore } from "@/stores/toast";
 import { AdminService } from "@/services/admin.service";
+import { getUserInvoices } from "@/services/user.service";
 
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import StatusBadge from "@/components/badges/StatusBadge.vue";
@@ -71,8 +72,7 @@ const fetchUserDetails = async () => {
     if (userResponse.status === "fulfilled") {
       user.value = userResponse.value;
       if (user.value.customerId) {
-        const invoicesResponse = await AdminService.getUserInvoices(user.value.customerId);
-        userInvoices.value = invoicesResponse;
+        userInvoices.value = await getUserInvoices(user.value.customerId);
       }
     } else {
       throw new Error("Utilisateur non trouvé");
