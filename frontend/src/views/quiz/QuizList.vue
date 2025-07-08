@@ -10,7 +10,7 @@ import { useUserStore } from "@/stores/user";
 import { ArrowRight, Calendar, FileQuestion, PlusIcon } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Motion } from '@motionone/vue';
+import { Motion } from "@motionone/vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -87,7 +87,7 @@ async function fetchQuizzes() {
   if (!user?.id) return;
   loading.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 600))
+    await new Promise((resolve) => setTimeout(resolve, 600));
     const filters: Record<string, unknown> = {};
     if (search.value) filters.search = search.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
@@ -110,7 +110,6 @@ async function fetchQuizzes() {
       total.value = 0;
       totalPages.value = 1;
     }
-
   } catch {
     error.value = "Impossible de charger les quiz. Veuillez réessayer plus tard.";
   } finally {
@@ -122,12 +121,12 @@ import { watch } from "vue";
 watch([search, selectedCategory, isPublic, page, limit], fetchQuizzes);
 
 watch(
-  () => quizLoadingStore.quizStatus,
+  () => quizLoadingStore.status,
   (newStatus) => {
-    if (newStatus === "completed" && quizLoadingStore.currentQuizId) {
-      setTimeout(() => {
-        router.push(`/quiz/${quizLoadingStore.currentQuizId}`);
-      }, 1000);
+    if (newStatus === "completed") {
+      fetchQuizzes();
+    } else if (newStatus === "error") {
+      error.value = "Une erreur est survenue lors du chargement des quiz.";
     }
   },
 );
@@ -140,9 +139,7 @@ onMounted(async () => {
 <template>
   <section class="flex flex-col gap-1.5 w-full">
     <p class="font-outfit text-lg text-black-transparent">Tous vos quiz</p>
-    <h1 class="font-outfit text-4xl font-extrabold text-black">
-      Liste des quiz
-    </h1>
+    <h1 class="font-outfit text-4xl font-extrabold text-black">Liste des quiz</h1>
     <div class="flex justify-end w-full gap-4 mt-4 mb-8">
       <Button
         @click="router.push('/quiz/create')"
@@ -166,10 +163,14 @@ onMounted(async () => {
         <div class="flex gap-4 mb-4">
           <Select
             v-model="selectedCategory"
-            :options="[{ label: 'Toutes les catégories', value: '' }, ...Object.values(QuizService.categories || {})]"
+            :options="[
+              { label: 'Toutes les catégories', value: '' },
+              ...Object.values(QuizService.categories || {}),
+            ]"
             placeholder="Catégorie"
-           id="category"/>
-          <Switch v-model="isPublic" label="Quiz publics uniquement"  id="isPublic"/>
+            id="category"
+          />
+          <Switch v-model="isPublic" label="Quiz publics uniquement" id="isPublic" />
         </div>
       </Motion>
     </div>
@@ -178,7 +179,7 @@ onMounted(async () => {
       :animate="{ opacity: 1, y: 0 }"
       transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
     >
-      <QuizLoadingSpinner v-if="quizLoadingStore.loading" />
+      <!--      <QuizLoadingSpinner v-if="quizLoadingStore.isLoading" />-->
       <!-- Skeleton loading -->
       <div
         v-if="loading"
@@ -222,7 +223,6 @@ onMounted(async () => {
 
       <div v-else>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
-          {{console.log("QUIZZ", quizzes)}}
           <div
             v-for="quiz in quizzes"
             :key="quiz.id"
@@ -285,15 +285,18 @@ onMounted(async () => {
               <span
                 v-if="quiz.status === 'pending'"
                 class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
-                >En attente</span>
+                >En attente</span
+              >
               <span
                 v-else-if="quiz.status === 'published'"
                 class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
-                >Publié</span>
+                >Publié</span
+              >
               <span
                 v-else-if="quiz.status === 'draft'"
                 class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
-                >Brouillon</span>
+                >Brouillon</span
+              >
             </div>
           </div>
         </div>

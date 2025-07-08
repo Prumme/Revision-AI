@@ -1,10 +1,10 @@
 <template>
   <div
     class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white border border-primary shadow-lg rounded-lg px-5 py-4 min-w-[280px] max-w-xs animate-fade-in"
-    :class="{ 'bg-red-100 border-red-500': quizLoadingStore.quizStatus === 'failed' }"
+    :class="{ 'bg-red-100 border-red-500': quizLoadingStore.status === 'failed' }"
   >
     <svg
-      v-if="quizLoadingStore.quizStatus !== 'completed'"
+      v-if="quizLoadingStore.status !== 'completed'"
       class="animate-spin h-7 w-7 text-primary"
       viewBox="0 0 50 50"
     >
@@ -35,9 +35,9 @@
     </svg>
     <span
       class="text-primary font-semibold text-base"
-      :class="{ 'text-red-600': quizLoadingStore.quizStatus === 'failed' }"
+      :class="{ 'text-red-600': quizLoadingStore.status === 'failed' }"
     >
-      {{ quizLoadingStore.loadingMessage }}
+      {{ quizLoadingStore.message }}
     </span>
   </div>
 </template>
