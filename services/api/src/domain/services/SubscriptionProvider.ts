@@ -3,6 +3,8 @@ import { CustomerIdentifier } from '@entities/customer.entity';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { StripeSubscriptionProvider } from '../../infrastructure/stripe/StripeSubscriptionProvider';
 import { SubscriptionInfo } from 'domain/value-objects/subscriptionPrice';
+import { ReqUser } from '@common/types/request';
+import { Invoice } from '@common/types/invoice';
 
 export interface SubscriptionProvider {
   upsertCustomer(
@@ -21,6 +23,7 @@ export interface SubscriptionProvider {
     paymentMethodId: string,
   ): Promise<true | Error>;
   getProductsPrices(): Promise<SubscriptionInfo[] | Error>;
+  getInvoices(customerId: string, user: ReqUser): Promise<Invoice[] | Error>;
 }
 
 export const SubscriptionPrvProvider = {

@@ -25,7 +25,7 @@ const category = ref("");
 const questionsNumbers = ref(5);
 const description = ref("");
 const isPublic = ref(false);
-const media = ref<File | null>(null);
+const media = ref<File[] | null>(null);
 const isLoading = ref(false);
 
 const generatedQuestions = ref([]);
@@ -76,7 +76,7 @@ const generateQuiz = async () => {
     console.log("Données du quiz à envoyer:", quizData);
 
     // Préparation des fichiers
-    const files = media.value ? [media.value] : [];
+    const files = !Array.isArray(media.value) ? [media.value] : media.value;
     try {
       // Appel au service pour créer le quiz
       const createdQuiz = await QuizService.createQuiz(quizData, files);
@@ -173,7 +173,7 @@ const generateQuiz = async () => {
       <FormCard class="w-full">
         <template #title> Images </template>
         <template #content>
-          <Dropzone class="mb-5" :multiple="false" variant="yellow" v-model="media" />
+          <Dropzone class="mb-5" :multiple="true" variant="yellow" v-model="media" />
         </template>
       </FormCard>
 
@@ -254,7 +254,7 @@ const generateQuiz = async () => {
         <FormCard class="w-full">
           <template #title> Images </template>
           <template #content>
-            <Dropzone class="mb-5" :multiple="false" variant="yellow" v-model="media" />
+            <Dropzone class="mb-5" :multiple="true" variant="yellow" v-model="media" />
           </template>
         </FormCard>
 

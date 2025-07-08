@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix merge">
+      <change afterPath="$PROJECT_DIR$/k8s/api-ingress.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/k8s/mongodb/mongodb.replicatset.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/k8s/mongodb/mongodb.secrets.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s.README.md" beforeDir="false" afterPath="$PROJECT_DIR$/k8s.README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/apps/api.deployement.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/apps/api.deployement.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/apps/api.service.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/apps/api.service.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/configs/env-config-map.yml" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/configs/env-config-map.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/k8s/secrets/env-secret.yml.example" beforeDir="false" afterPath="$PROJECT_DIR$/k8s/secrets/env-secret.yml.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.kind.config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/local.kind.config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/build-docker-image.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/build-docker-image.sh" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="workflow" />
+        <option value="JavaScript File" />
+        <option value="HTML File" />
+        <option value="TypeScript File" />
+        <option value="Vue Composition API Component" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;history&quot;: [
+    {
+      &quot;state&quot;: &quot;OPEN&quot;
+    }
+  ],
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
+  }
+}&lt;/component&gt;
+  &lt;component name=&quot;GitHubPullRequestState&quot;&gt;{
+  &amp;quot;prStates&amp;quot;: [
+    {
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86TVCKA&amp;quot;,
+        &amp;quot;number&amp;quot;: 45
+      },
+      &amp;quot;lastSeen&amp;quot;: 1749295346319
+    },
+    {
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86YVJ5G&amp;quot;,
+        &amp;quot;number&amp;quot;: 47
+      },
+      &amp;quot;lastSeen&amp;quot;: 1749295777122
+    },
+    {
+      &amp;quot;id&amp;quot;: {
+        &amp;quot;id&amp;quot;: &amp;quot;PR_kwDOOHU1h86Yahp0&amp;quot;,
+        &amp;quot;number&amp;quot;: 49
+      },
+      &amp;quot;lastSeen&amp;quot;: 1749295787678
+    }
+  ]
+}&lt;/component&gt;
+  &lt;component name=&quot;GithubPullRequestsUISettings&quot;&gt;{
+  &amp;quot;selectedUrlAndAccountId&amp;quot;: {
+    &amp;quot;url&amp;quot;: &amp;quot;git@github.com:Prumme/Revision-AI.git&amp;quot;,
+    &amp;quot;accountId&amp;quot;: &amp;quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&amp;quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:Prumme/Revision-AI.git&quot;,
+    &quot;accountId&quot;: &quot;3aff0e21-277d-41d7-9fb5-7997b3ad2e34&quot;
+  }
+}</component>
+  <component name="JiraServerManager">
+    <selected>-1</selected>
+    <servers />
+  </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/services/file-parser/package.json" />
+  </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.2.7_2/bin/php" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2uG7ZroNClKQdpqRn5FMw5UsL4J" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Docker.docker-compose.yaml.frontend: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yaml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.S3FileDownloader.should download the file and return a valid file downloaded.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mongo&quot;
+    ],
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/services/api" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator/src/shared" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator/src/app/value-objects" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/k8s/mongodb" />
+      <recent name="$PROJECT_DIR$/services/api/src/modules/subscription" />
+      <recent name="$PROJECT_DIR$/services/api/src/modules" />
+      <recent name="$PROJECT_DIR$/services/quiz-generator" />
+      <recent name="$PROJECT_DIR$/services/file-parser" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Docker.docker-compose.yaml.frontend: Compose Deployment">
+    <configuration name="S3FileDownloader" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/services/file-parser/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/services/file-parser" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.test.ts" />
+      <test-names>
+        <test-name value="S3FileDownloader" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="S3FileDownloader.should download the file and return a valid file downloaded" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/services/file-parser/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/services/file-parser" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/services/file-parser/src/infrastructure/services/S3FileDownloader.test.ts" />
+      <test-names>
+        <test-name value="S3FileDownloader" />
+        <test-name value="should download the file and return a valid file downloaded" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yaml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yaml.frontend: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="frontend" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yaml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker-compose.yaml.frontend: Compose Deployment" />
+        <item itemvalue="Jest.S3FileDownloader.should download the file and return a valid file downloaded" />
+        <item itemvalue="Jest.S3FileDownloader" />
+        <item itemvalue="Docker.docker-compose.yaml: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PS-251.26094.133" />
+        <option value="bundled-php-predefined-a98d8de5180a-c5828cf854d9-com.jetbrains.php.sharedIndexes-PS-251.26094.133" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="" />
+      <created>1741863115901</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741863115901</updated>
+      <workItem from="1741863117099" duration="226000" />
+      <workItem from="1744552468733" duration="9473000" />
+      <workItem from="1744575317670" duration="2647000" />
+      <workItem from="1745166023523" duration="334000" />
+      <workItem from="1745166377506" duration="5783000" />
+      <workItem from="1745172185764" duration="720000" />
+      <workItem from="1745172990479" duration="20000" />
+      <workItem from="1745175009908" duration="110000" />
+      <workItem from="1745235121620" duration="23062000" />
+      <workItem from="1749301609329" duration="246000" />
+      <workItem from="1749301885239" duration="14317000" />
+      <workItem from="1749927095568" duration="11888000" />
+      <workItem from="1750659351384" duration="6503000" />
+      <workItem from="1750768341816" duration="633000" />
+    </task>
+    <task id="LOCAL-00001" summary="🔨 upgrade some lines">
+      <option name="closed" value="true" />
+      <created>1744274356124</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1744274356124</updated>
+    </task>
+    <task id="LOCAL-00002" summary="🔨 upgrade some lines">
+      <option name="closed" value="true" />
+      <created>1744274369680</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1744274369680</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Action frontend test">
+      <option name="closed" value="true" />
+      <created>1744278652412</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1744278652412</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Action frontend test">
+      <option name="closed" value="true" />
+      <created>1744278771390</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1744278771390</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Action frontend test">
+      <option name="closed" value="true" />
+      <created>1744278791637</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1744278791637</updated>
+    </task>
+    <task id="LOCAL-00006" summary="create file-parser-service&#10;&#10;create ts app&#10;create the pdf reader and the image reader using poppler for pdf and tesseract OCR for images">
+      <option name="closed" value="true" />
+      <created>1744555898718</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1744555898718</updated>
+    </task>
+    <task id="LOCAL-00007" summary="improve file-service&#10;&#10;introduce FileDownloader.ts interface and its implementation&#10;create use case parse file&#10;add the infrastructure logic&#10;cli entrypoint and brocker entrypoint">
+      <option name="closed" value="true" />
+      <created>1744575026512</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1744575026512</updated>
+    </task>
+    <task id="LOCAL-00008" summary="apply copilot sugestion">
+      <option name="closed" value="true" />
+      <created>1744575176388</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1744575176388</updated>
+    </task>
+    <task id="LOCAL-00009" summary="add tests">
+      <option name="closed" value="true" />
+      <created>1744577659508</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577659508</updated>
+    </task>
+    <task id="LOCAL-00010" summary="add tests">
+      <option name="closed" value="true" />
+      <created>1744577664214</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577664214</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fix workflow">
+      <option name="closed" value="true" />
+      <created>1744577888765</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1744577888765</updated>
+    </task>
+    <task id="LOCAL-00012" summary="setup premiere version rabit mq">
+      <option name="closed" value="true" />
+      <created>1745168749521</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1745168749521</updated>
+    </task>
+    <task id="LOCAL-00013" summary="add S3 File downloader and add tests">
+      <option name="closed" value="true" />
+      <created>1745172128650</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1745172128650</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fix copilot">
+      <option name="closed" value="true" />
+      <created>1745172361728</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1745172361728</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value=" upgrade some lines" />
+    <MESSAGE value="Action frontend test" />
+    <MESSAGE value="create file-parser-service&#10;&#10;create ts app&#10;create the pdf reader and the image reader using poppler for pdf and tesseract OCR for images" />
+    <MESSAGE value="improve file-service&#10;&#10;introduce FileDownloader.ts interface and its implementation&#10;create use case parse file&#10;add the infrastructure logic&#10;cli entrypoint and brocker entrypoint" />
+    <MESSAGE value="apply copilot sugestion" />
+    <MESSAGE value="add tests" />
+    <MESSAGE value="fix workflow" />
+    <MESSAGE value="setup premiere version rabit mq" />
+    <MESSAGE value="add S3 File downloader and add tests" />
+    <MESSAGE value="fix copilot" />
+    <MESSAGE value="remove secret" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove secret" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

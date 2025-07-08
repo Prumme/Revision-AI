@@ -1,30 +1,3 @@
-<template>
-  <div class="p-6">
-    <div class="mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900">Gestion des utilisateurs</h1>
-      <p class="text-gray-600 mt-2">Administrez et gérez les comptes utilisateurs</p>
-    </div>
-
-    <DataTable
-      :data="users"
-      :columns="columns"
-      :actions="actions"
-      :filters="filters"
-      :initial-filters="currentFilters"
-      :loading="loading"
-      :pagination="pagination"
-      :items-per-page-options="itemsPerPageOptions"
-      search-placeholder="Rechercher par nom ou email..."
-      empty-message="Aucun utilisateur trouvé"
-      @update:search="handleSearch"
-      @update:filters="handleFilters"
-      @update:sort="handleSort"
-      @update:page="handlePageChange"
-      @update:itemsPerPage="handleItemsPerPageChange"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted, h } from "vue";
 import { useToastStore } from "@/stores/toast";
@@ -46,8 +19,10 @@ import type {
   BlockedFilterValue,
   DeletedFilterValue,
 } from "@/types/admin";
+import { useRouter } from "vue-router";
 
 const toast = useToastStore();
+const router = useRouter();
 
 // Types pour le cache
 interface CacheKey {
@@ -144,6 +119,14 @@ const columns: TableColumn[] = [
 
 // Configuration des actions
 const actions: TableAction[] = [
+  {
+    label: "Voir",
+    icon: "Eye",
+    tooltip: "Voir cet utilisateur",
+    variant: "primary",
+    visible: (row: User) => !row.blocked && !row.deleted,
+    handler: handleSeeUser,
+  },
   {
     label: "Bloquer",
     icon: "Ban",
@@ -335,6 +318,10 @@ async function handleUnblockUser(user: User) {
   }
 }
 
+async function handleSeeUser(user: User) {
+  router.push(`/admin/users/${user.id}`);
+}
+
 // Variable pour le timeout de debounce
 let searchTimeout: NodeJS.Timeout | null = null;
 
@@ -389,3 +376,30 @@ onMounted(() => {
   loadUsers();
 });
 </script>
+
+<template>
+  <div class="p-6">
+    <div class="mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">Gestion des utilisateurs</h1>
+      <p class="text-gray-600 mt-2">Administrez et gérez les comptes utilisateurs</p>
+    </div>
+
+    <DataTable
+      :data="users"
+      :columns="columns"
+      :actions="actions"
+      :filters="filters"
+      :initial-filters="currentFilters"
+      :loading="loading"
+      :pagination="pagination"
+      :items-per-page-options="itemsPerPageOptions"
+      search-placeholder="Rechercher par nom ou email..."
+      empty-message="Aucun utilisateur trouvé"
+      @update:search="handleSearch"
+      @update:filters="handleFilters"
+      @update:sort="handleSort"
+      @update:page="handlePageChange"
+      @update:itemsPerPage="handleItemsPerPageChange"
+    />
+  </div>
+</template>

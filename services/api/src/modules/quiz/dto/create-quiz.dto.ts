@@ -46,12 +46,12 @@ class QuestionDto {
 }
 
 export class CreateQuizDto {
-  userId: string;
-
   @ApiProperty({
     description: 'ID de l’utilisateur créant le quiz',
     example: '1234567890abcdef12345678',
   })
+  userId: string;
+
   @ApiProperty({
     description: 'Titre du quiz',
     example: "Mon super quiz d'histoire",
@@ -104,30 +104,15 @@ export class CreateQuizDto {
   })
   @IsOptional()
   @IsString()
-  media?: string;
+  medias?: string[];
 
-  @ApiProperty({
-    description: 'Statut du quiz (par défaut "pending")',
-    example: 'pending',
-    required: false,
-  })
-  @IsString()
-  status?: 'pending' | 'processing' | 'completed' | 'failed' = 'pending';
-
-  @ApiProperty({
-    description: 'Date de création du quiz (générée automatiquement)',
-    example: new Date().toISOString(),
-    required: false,
-  })
-  @IsString()
-  createdAt?: string = new Date().toISOString();
-
-  @ApiProperty({
-    description:
-      'Date de dernière mise à jour du quiz (générée automatiquement)',
-    example: new Date().toISOString(),
-    required: false,
-  })
-  @IsString()
-  updatedAt?: string = new Date().toISOString();
+  // @ApiProperty({
+  //   description: 'Liste des questions du quiz',
+  //   type: [QuestionDto],
+  // })
+  // @IsArray()
+  // @ArrayMinSize(1)
+  // @ValidateNested({ each: true })
+  // @Type(() => QuestionDto)
+  // questions: QuestionDto[];
 }
