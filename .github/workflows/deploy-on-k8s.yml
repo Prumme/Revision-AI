@@ -39,26 +39,15 @@ jobs:
           password: ${{ secrets.SCW_SECRET_KEY }}
 
        #Build and push images for each service
-      - name: Build and push API image
+      - name: Build and push images
         uses: docker/build-push-action@v5
         with:
-          context: ./services/api
+          context: ./services/${{ matrix.service }}
           push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/api:${{github.branch}}
-
-      - name: Build and push File Parser image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/file-parser
-          push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/file-parser:${{github.branch}}
-
-      - name: Build and push Quiz Generator image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./services/quiz-generator
-          push: true
-          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/quiz-generator:${{github.branch}}
+          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/${{ matrix.service }}:${{ github.ref_name }}
+        strategy:
+          matrix:
+            service: [api, file-parser, quiz-generator]
 
 
       - name: Test connection to cluster
