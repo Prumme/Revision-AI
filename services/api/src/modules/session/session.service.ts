@@ -39,10 +39,16 @@ export class SessionService {
     /**
      * Retrieves all sessions for a specific user.
      * @param userId - The ID of the user whose sessions are to be retrieved.
+     * @param filters
+     * @param pagination
      * @returns An array of sessions associated with the user.
      */
-    async findAllByUserId(userId: string): Promise<Session[]> {
-        return this.sessionRepository.findAllByUserId(userId);
+    async findAllByUserId(
+        userId: string,
+        filters: { scoreMin?: number; scoreMax?: number; status?: string },
+        pagination: { page: number; limit: number }
+    ): Promise<any> {
+        return this.sessionRepository.findAllByUserId(userId, { ...pagination, ...filters });
     }
 
     /**

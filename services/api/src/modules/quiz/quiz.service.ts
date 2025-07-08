@@ -5,7 +5,7 @@ import { QuizRepository } from '@repositories/quiz.repository';
 import { UserRepository } from '@repositories/user.repository';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { CreateQuizUseCaseFactory } from '../../domain/usecases/QuizGenerationUseCase';
+import { CreateQuizUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
 import { QueueProvider } from '@services/QueueProvider';

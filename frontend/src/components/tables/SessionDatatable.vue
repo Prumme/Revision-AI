@@ -4,7 +4,6 @@ import DataTable from './DataTable.vue';
 import type { TableAction, TableColumn } from '@/types/datatable';
 import type { Session } from '@/types/session';
 
-// Définition stricte du type de filtre pour les sessions
 interface SessionDatatableFilter {
   status?: string;
   dateFrom?: string;

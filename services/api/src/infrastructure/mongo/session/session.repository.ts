@@ -31,10 +31,19 @@ export class MongoSessionRepository implements SessionRepository {
      * @param pagination - Pagination options (page, limit).
      * @returns PaginatedResult of sessions associated with the user.
      */
-    async findAllByUserId(userId: string, pagination: { page: number; limit: number }): Promise<PaginatedResult<Session>> {
+    async findAllByUserId(userId: string, options: { page: number; limit: number; scoreMin?: number; scoreMax?: number; status?: string }): Promise<PaginatedResult<Session>> {
         const query: any = { userId };
-        const page = pagination?.page ?? 1;
-        const limit = pagination?.limit ?? 10;
+        if (options.status) {
+            query.status = options.status;
+        }
+        if (typeof options.scoreMin === 'number') {
+            query.score = { ...query.score, $gte: options.scoreMin };
+        }
+        if (typeof options.scoreMax === 'number') {
+            query.score = { ...query.score, $lte: options.scoreMax };
+        }
+        const page = options?.page ?? 1;
+        const limit = options?.limit ?? 10;
         const skip = (page - 1) * limit;
         const [total, documents] = await Promise.all([
             this.sessionModel.countDocuments(query),

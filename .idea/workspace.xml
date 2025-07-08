@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix merge">
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/tables/SessionDatatable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/tables/SessionDatatable.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/composables/useQuizDetails.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/composables/useQuizDetails.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/session.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/session/session.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/session/session.repository.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/quiz-generator/src/infrastructure/services/ScalewayQuizIAAgent.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/session/session.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/session/session.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/session/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/session/session.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,7 +247,7 @@
       <workItem from="1749927095568" duration="11888000" />
       <workItem from="1750659351384" duration="6503000" />
       <workItem from="1750768341816" duration="633000" />
-      <workItem from="1751988769963" duration="1770000" />
+      <workItem from="1751988769963" duration="3396000" />
     </task>
     <task id="LOCAL-00001" summary="🔨 upgrade some lines">
       <option name="closed" value="true" />
@@ -360,6 +366,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value=" upgrade some lines" />

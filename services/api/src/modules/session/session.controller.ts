@@ -13,7 +13,6 @@ import {SessionFiltersDto} from "@modules/session/dto/filter-session.dto";
 @ApiBearerAuth('JWT-auth')
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
-
   @Get(':id')
   @ApiOperation({ summary: 'Récupérer une session par son ID' })
   @ApiParam({ name: 'id', description: 'ID de la session' })
@@ -57,12 +56,24 @@ export class SessionController {
     type: Number,
     description: 'Filtrer par score maximum',
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Numéro de page pour la pagination',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Nombre d\'éléments par page',
+  })
   async findAllByUserId(
     @Param('userId') userId: string,
-    @Query() filters: SessionFiltersDto
-  ): Promise<Session[]> {
-    const { scoreMin, scoreMax, status } = filters;
-    return this.sessionService.findAllByUserId(userId, { scoreMin, scoreMax, status });
+    @Query() filters: SessionFiltersDto & { page?: number; limit?: number }
+  ): Promise<any> {
+    const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
+    return this.sessionService.findAllByUserId(userId, { scoreMin, scoreMax, status }, { page: Number(page), limit: Number(limit) });
   }
 
   @Post('create')
