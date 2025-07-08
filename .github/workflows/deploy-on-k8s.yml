@@ -41,7 +41,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production # Optional: Define a production environment in GitHub
-    #needs: build_and_push_images
+    needs: build_and_push_images
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
