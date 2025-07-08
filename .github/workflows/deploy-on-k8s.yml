@@ -86,15 +86,15 @@ jobs:
 
        #Apply other Kubernetes manifests (Operators, RabbitMQ, MongoDB, Services, Ingress)
        #Note: Operators (RabbitMQ, MongoDB) might need to be installed manually once or in a separate job
-      - name: Apply RabbitMQ and MongoDB manifests
-        run: |
-          kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
-          helm repo update
-          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack
-          helm repo add mongodb https://mongodb.github.io/helm-charts || true
-          helm upgrade --install kubernetes-operator mongodb/mongodb-kubernetes --namespace mongodb --create-namespace
-          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+#      - name: Apply RabbitMQ and MongoDB manifests
+#        run: |
+#          kubectl apply -f https://github.com/rabbitmq/cluster-operator/releases/latest/download/cluster-operator.yml
+#          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+#          helm repo update
+#          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack
+#          helm repo add mongodb https://mongodb.github.io/helm-charts || true
+#          helm upgrade --install kubernetes-operator mongodb/mongodb-kubernetes --namespace mongodb --create-namespace
+#          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
 
       - name : verbose k8s/app dir
         run: |
@@ -108,9 +108,9 @@ jobs:
 
           # Use sed or kustomize to update image tags in deployment files
           # Example using sed (requires GNU sed or equivalent)
-          sed -i '' "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/api.deployement.yaml
-          sed -i '' "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/file-parser.deployement.yml
-          sed -i '' "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/quiz-generator.deployement.yml
+          sed -i "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/api.deployement.yaml
+          sed -i "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/file-parser.deployement.yml
+          sed -i "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:6be880db29417b678eb96a94fac9297d8591c301|g" k8s/apps/quiz-generator.deployement.yml
 
           # Apply updated deployments, services, and ingress
           kubectl apply -f k8s -R
