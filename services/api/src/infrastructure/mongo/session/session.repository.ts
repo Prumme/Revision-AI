@@ -200,7 +200,6 @@ export class MongoSessionRepository implements SessionRepository {
                 a: a.a,
             })),
             status: document.status as SessionStatus,
-            duration: document.duration,
         };
     }
 }

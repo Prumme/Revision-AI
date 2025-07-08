@@ -5,15 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f14dfb8-d602-4c42-935c-b245194483ea" name="Changes" comment="fix merge">
+      <change afterPath="$PROJECT_DIR$/frontend/src/services/kpi.service.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/api/src/modules/kpi/kpi.module.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/tables/SessionDatatable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/tables/SessionDatatable.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/composables/useQuizDetails.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/composables/useQuizDetails.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/session.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/quiz/QuizDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/quiz.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/stores/user.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/stores/user.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/DashboardView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/DashboardView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/domain/entities/kpi.entity.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/domain/entities/kpi.entity.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/domain/repositories/kpi.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/domain/repositories/kpi.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/domain/repositories/quiz.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/domain/repositories/quiz.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/kpi/kpi.schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/kpi/kpi.schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/kpi/mongo-kpi.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/kpi/kpi.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/quiz/quiz.repository.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/session/session.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/infrastructure/mongo/session/session.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/kpi/kpi.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/kpi/kpi.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/kpi/kpi.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/kpi/kpi.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.controller.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/quiz/quiz.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/session/session.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/session/session.controller.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/api/src/modules/session/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/services/api/src/modules/session/session.service.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +134,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs.jest.jest_package": "/Users/axelgodefroy/Documents/Programation/revision-ai-pa/services/file-parser/node_modules/jest",
     "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "/Users/axel/Documents/Cours/Revision-AI/frontend/node_modules/prettier",
+    "prettierjs.PrettierConfiguration.Package": "/home/ilyam/dev/Revision-AI/node_modules/prettier",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "/home/ilyam/dev/Revision-AI/frontend/node_modules/typescript/lib",

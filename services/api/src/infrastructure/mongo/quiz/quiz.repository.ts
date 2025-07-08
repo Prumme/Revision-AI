@@ -2,7 +2,7 @@ import { Quiz } from '@entities/quiz.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { QuizRepository } from '@repositories/quiz.repository';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { QuizDocument } from './quiz.schema';
 
 @Injectable()
@@ -87,6 +87,13 @@ export class MongoQuizRepository implements QuizRepository {
   async delete(id: string): Promise<boolean> {
     const result = await this.quizModel.findByIdAndDelete(id).exec();
     return result !== null;
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    if (!userId) {
+        throw new Error('User ID is required to count quizzes.');
+    }
+    return this.quizModel.countDocuments({ userId: userId }).exec();
   }
 
   private documentToQuiz(document: QuizDocument): Quiz {

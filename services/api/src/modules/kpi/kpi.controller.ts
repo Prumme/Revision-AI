@@ -10,5 +10,17 @@ export class KpiController {
   async getQuizKpi(@Param('quizId') quizId: string): Promise<QuizKpi> {
     return this.kpiService.getQuizKpi(quizId);
   }
-}
 
+  @Get('user/:userId/average-score')
+  async getUserAverageScore(@Param('userId') userId: string): Promise<{ averageScore: number }> {
+    const averageScore = await this.kpiService.getUserAverageScore(userId);
+    return { averageScore };
+  }
+
+  @Get('user/:userId/total-revision-time')
+  async getUserTotalRevisionTime(@Param('userId') userId: string): Promise<{ totalRevisionTime: string }> {
+    const totalRevisionTime = await this.kpiService.getUserTotalRevisionTime(userId);
+    console.log(`Total revision time for user ${userId}: ${totalRevisionTime}`);
+    return { totalRevisionTime };
+  }
+}

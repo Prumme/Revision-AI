@@ -21,6 +21,7 @@ export interface QuizRepository {
   create(quiz: Omit<Quiz, 'id'>): Promise<Quiz>;
   update(id: string, quiz: Partial<Quiz>): Promise<Quiz>;
   delete(id: string): Promise<boolean>;
+  countByUserId(userId: string): Promise<number>;
 }
 
 export const QuizRepositoryProvider = {

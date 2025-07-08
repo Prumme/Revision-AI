@@ -6,13 +6,14 @@ export const KpiSchema = new Schema({
   totalSessions: { type: Number, required: true },
   totalDuration: { type: Number, required: true },
   averageDuration: { type: Number, required: true },
+  revisionTime: { type: Number, required: true },
 });
 
-export interface KpiDocument extends Document {
-  quizId: string;
+export interface KpiDocument extends Document {quizId: string;
   averageScore: number;
   totalSessions: number;
   totalDuration: number;
   averageDuration: number;
+  revisionTime: number;
 }
 

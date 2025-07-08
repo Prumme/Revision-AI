@@ -2,26 +2,25 @@
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
 import { useUserStore } from "@/stores/user";
 import KPICard from '@/components/cards/KPICard.vue';
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { QuizService } from '@/services/quiz.service';
 import QuizCard from '@/components/cards/QuizCard.vue';
 import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
 
 const userStore = useUserStore();
 const user = userStore.user;
+const quizCount = ref(0);
+const averageScore = userStore.averageScore;
+const totalRevisionTimeFormatted = userStore.totalRevisionTimeFormatted;
 
-const stats = [
-  { label: "Quiz disponibles", value: 12, color: "pale-yellow" },
-  { label: "Cours importés", value: 16, color: "pale-red" },
-  { label: "Score moyen", value: "78%", color: "pale-purple" },
-  { label: "Temps de révision", value: "3h45", color: "pale-green" },
-];
-
+console.log(userStore);
 const userQuizzes = ref([]);
 const loadingUserQuizzes = ref(false);
 
 onMounted(async () => {
   loadingUserQuizzes.value = true;
+  quizCount.value = await userStore.fetchQuizCount();
+  await userStore.fetchKpis();
   try {
     const res = await QuizService.getUserQuizzes(user?.id);
     userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : (res?.data?.slice(0, 5) || []);
@@ -31,6 +30,13 @@ onMounted(async () => {
     loadingUserQuizzes.value = false;
   }
 });
+
+const stats = [
+  { label: "Quiz disponibles", value: quizCount, color: "pale-yellow" },
+  { label: "Cours importés", value: 16, color: "pale-red" },
+  { label: "Score moyen", value: averageScore, color: "pale-purple" },
+  { label: "Temps de révision", value: totalRevisionTimeFormatted, color: "pale-green" },
+];
 </script>
 
 <template>
@@ -132,11 +138,13 @@ onMounted(async () => {
             </div>
             <div class="flex justify-end mt-2">
               <router-link
-                to="/quizzes"
-                class="text-primary font-semibold flex items-center gap-2"
+                to="/quiz"
+                class="text-primary font-semibold text-base group flex items-center transition-all"
               >
-                Voir tous mes QCM
-                <ArrowRight class="w-5 h-5" />
+                <span class="transition-colors text-black group-hover:text-primary">Voir tous mes quiz</span>
+                <ArrowRight
+                  class="transition-colors w-5 h-5 inline-block mr-1 transform transition-transform group-hover:translate-x-1 ml-1 group-hover:text-primary text-black transition-colors"
+                />
               </router-link>
             </div>
           </div>

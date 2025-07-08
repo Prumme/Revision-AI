@@ -93,6 +93,7 @@ export function useQuizDetails(quizId: string) {
     {
       key: "score",
       label: "Score",
+      formatter: (value: number) => value != null ? `${value} / ${quiz.value?.questions.length || 0}` : "-",
     },
   ];
 
