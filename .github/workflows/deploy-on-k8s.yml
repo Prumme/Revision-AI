@@ -3,7 +3,7 @@ name: Deploy to Scaleway Kapsule
 on:
   push:
     branches:
-      - main
+      - 74-kube-deploy
 
 jobs:
   deploy:
