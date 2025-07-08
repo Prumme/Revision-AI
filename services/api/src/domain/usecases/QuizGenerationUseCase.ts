@@ -65,7 +65,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     FileService, // @todo abstration is better but to complex with the current implemetentation
     QueueProvider<FileToParseDTO>,
     QueueProvider<QuizGenerationDTO>,
-    (typeof generateQuizGenerationDTO)?,
+    typeof generateQuizGenerationDTO?,
   ]
 > = (
   _quizRepository,
@@ -187,7 +187,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
     QuizGenerationJobRepository,
     CachedFileParsedRepository,
     QueueProvider<QuizGenerationDTO>,
-    (typeof generateQuizGenerationDTO)?, // Injected for testing purposes
+    typeof generateQuizGenerationDTO?, // Injected for testing purposes
   ]
 > = (
   _quizRepository,
