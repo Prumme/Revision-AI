@@ -95,7 +95,11 @@ jobs:
           helm repo add mongodb https://mongodb.github.io/helm-charts || true
           helm upgrade --install kubernetes-operator mongodb/mongodb-kubernetes --namespace mongodb --create-namespace
           kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
-      
+
+      - name : verbose k8s/app dir
+        run: |
+          echo "Contents of k8s/apps directory:"
+          ls -la k8s/apps
 
       # Update deployment images and apply deployments, services, ingress
       - name: Update and Apply Deployments, Services, Ingress
