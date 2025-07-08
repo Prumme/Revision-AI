@@ -7,11 +7,13 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Inject,
   Param,
   Post,
   Put,
   Query,
   Req,
+  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -27,12 +29,20 @@ import { CreateQuizDto } from './dto/create-quiz.dto';
 import { QuizFiltersDto } from './dto/filters-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { QuizService } from './quiz.service';
+import {Response} from "express"
+import { GetJobProgressUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
+import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
+import { Public } from '@common/decorators/public.decorator';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
 @ApiBearerAuth('JWT-auth')
 export class QuizController {
-  constructor(private readonly quizService: QuizService) {}
+  constructor(
+      private readonly quizService: QuizService, 
+      @Inject('QuizGenerationJobRepository')
+      private readonly quizGenerationJobRepository: QuizGenerationJobRepository,
+    ) {}
 
   @Get()
   @ApiOperation({ summary: 'Récupérer tous les quiz' })
@@ -61,6 +71,43 @@ export class QuizController {
     }
     return quiz;
   }
+
+  @Public()
+  @Get(':id/jobs')
+  getJobsEvents(@Res() res: Response, @Param("id") id : string) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    function write(payload : any) {
+      res.write(`data: ${payload}\n\n`)
+    }
+    
+    const getJobProgressUseCase = GetJobProgressUseCaseFactory(this.quizGenerationJobRepository)
+    const intervalId = setInterval(async ()=>{
+      //polling mechanism
+      const result = await getJobProgressUseCase({
+        quizId:id
+      })
+
+      if(result instanceof Error) {
+        write(JSON.stringify({
+          error:true,
+          message:result.message
+        }))
+        clearInterval(intervalId)
+        res.end()
+        return
+      }
+
+      write(JSON.stringify(result))
+    }, 3000)
+
+    res.on('close', () => {
+      clearInterval(intervalId);
+      console.log('Client disconnected');
+    });
+  } 
 
   @Get('user/:id')
   @ApiOperation({

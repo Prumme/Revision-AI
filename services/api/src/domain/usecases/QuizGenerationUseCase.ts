@@ -38,8 +38,8 @@ async function generateQuizGenerationDTO(
   };
 }
 
-export interface JobIdentifier {
-  jobId: string;
+export interface QuizIdentifier {
+  quizId: string;
 }
 
 /**
@@ -143,20 +143,24 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       createdQuiz.id,
       createQuizDto.medias,
     );
+    job = QuizJobEntity.startParsing(job)
     for (const parsedFile of parsedFiles)
       job = QuizJobEntity.markFileAsParsed(job, parsedFile.identifier);
+
+    const needGenerating = QuizJobEntity.isReadyForGeneration(job)
+    if(needGenerating) job = QuizJobEntity.startGenerating(job)
 
     const inserted = await _quizGenerationJobRepository.putJob(job);
     if (!inserted) return new Error('Failed to create quiz generation job');
 
-    if (QuizJobEntity.isReadyForGeneration(job)) {
+    if (needGenerating) {
       await _quizGenerationQueueProvider.send(
         await _generateQuizGenerationDTO(
           createdQuiz.id,
           createQuizDto.questionsNumbers,
           createQuizDto.medias,
           _cachedFileParsedRepository,
-        ),
+        )
       );
     }
 
@@ -219,8 +223,10 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
 
     for (let job of processingJob) {
       job = QuizJobEntity.markFileAsParsed(job, fileContent.objectKey);
+      const needGenerating = QuizJobEntity.isReadyForGeneration(job)
+      if(needGenerating) job = QuizJobEntity.startGenerating(job)
       await _quizGenerationJobRepository.putJob(job, job.id);
-      if (QuizJobEntity.isReadyForGeneration(job)) {
+      if (needGenerating) {
         const quiz = await _quizRepository.findById(job.quizId);
         if (!quiz) {
           error = new Error('Quiz not found for the job');
@@ -310,26 +316,26 @@ export const HandleQuizGenerationCompletedUseCaseFactory: UseCaseFactory<
  *  Trigger by SSE controller to get the progress of a job by polling the job status
  */
 export type GetJobProgressDTO = {
-  progress: number;
+  parsingFileProgress: number;
   status: QuizJobEntity.QuizGenerationJobStatus;
 };
 export type GetJobProgressUseCase = UseCase<
-  JobIdentifier,
+  QuizIdentifier,
   Promise<GetJobProgressDTO | Error>
 >;
 export const GetJobProgressUseCaseFactory: UseCaseFactory<
   GetJobProgressUseCase,
   [QuizGenerationJobRepository]
 > = (_quizGenerationJobRepository) => {
-  return async (jobIdentifier) => {
-    const job = await _quizGenerationJobRepository.findById(
-      jobIdentifier.jobId,
+  return async (quizIdentifier) => {
+    const job = await _quizGenerationJobRepository.findByQuizId(
+      quizIdentifier.quizId,
     );
     if (!job) {
       return Error('Job not found');
     }
     return {
-      progress:
+      parsingFileProgress:
         job.files.filter((file) => file.parsed).length / job.files.length,
       status: job.status,
     };
