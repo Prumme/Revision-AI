@@ -46,7 +46,10 @@ export const cliEntrypoint = async () => {
     const fileContent = schemaFileParse.parse(json);
     const useCase = generateQuizFromFileContentFactory(quizIAAgent);
 
-    const result = await useCase({ fileContent });
+    const result = await useCase({
+      filesContents: [fileContent],
+      questionsNumbers: 5,
+    });
     if (result.success == false) {
       console.error("Error generating quiz:", result.error.message);
       process.exit(1);
