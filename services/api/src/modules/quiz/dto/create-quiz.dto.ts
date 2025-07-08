@@ -46,12 +46,12 @@ class QuestionDto {
 }
 
 export class CreateQuizDto {
-  userId: string;
-
   @ApiProperty({
     description: 'ID de l’utilisateur créant le quiz',
     example: '1234567890abcdef12345678',
   })
+  userId: string;
+
   @ApiProperty({
     description: 'Titre du quiz',
     example: "Mon super quiz d'histoire",
@@ -104,7 +104,7 @@ export class CreateQuizDto {
   })
   @IsOptional()
   @IsString()
-  media?: string;
+  medias?: string[];
 
   @ApiProperty({
     description: 'Statut du quiz (par défaut "pending")',

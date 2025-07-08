@@ -121,7 +121,7 @@ const handleLogout = () => {
             <a
               href="https://dashboard.stripe.com/test/customers"
               target="_blank"
-              class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200"
+              class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200 mt-2.5"
             >
               <HandCoinsIcon class="h-5 w-5" />
               <span v-if="isSidebarOpen" class="flex items-center gap-2">

@@ -1,1 +1,3 @@
-export type QueueProvider<T> = (queue: string, data: T) => Promise<void>;
+export interface QueueProvider<T> {
+  send: (data: T) => Promise<void>;
+}

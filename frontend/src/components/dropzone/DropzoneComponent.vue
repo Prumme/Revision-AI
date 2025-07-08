@@ -156,7 +156,10 @@ const isDropzoneBlocked = computed(() => {
     <!-- Dropzone -->
     <div
       class="relative w-full h-40 border-2 border-dashed border-gray-300 rounded-xl flex justify-center items-center cursor-pointer bg-white transition duration-200 group"
-      :class="[dropzoneClasses, isDropzoneBlocked ? 'opacity-60 pointer-events-none cursor-not-allowed' : '']"
+      :class="[
+        dropzoneClasses,
+        isDropzoneBlocked ? 'opacity-60 pointer-events-none cursor-not-allowed' : '',
+      ]"
       @dragover.prevent="!isDropzoneBlocked && $event.preventDefault()"
       @drop="!isDropzoneBlocked && handleDrop($event)"
       @click="!isDropzoneBlocked && $refs.fileInput.click()"
@@ -179,7 +182,7 @@ const isDropzoneBlocked = computed(() => {
             'group-hover:text-blue': props.variant === 'blue',
           }"
         >
-          Drag and drop your file or click here
+          Glissez et déposez votre fichier ou cliquez ici
         </span>
         <input
           ref="fileInput"
@@ -216,7 +219,7 @@ const isDropzoneBlocked = computed(() => {
 
     <!-- Tips -->
     <div class="flex flex-col gap-1 rounded-lg text-xs text-gray-600 mt-2">
-      <p class="text-sm font-medium">Tips</p>
+      <p class="text-sm font-medium">Conseil</p>
       <ul class="list-disc list-inside space-y-1">
         <li>Format acceptés: PDF, TXT, PNG, JPG, JPEG</li>
         <li>Taille maximale: 2 MB pour les fichiers</li>

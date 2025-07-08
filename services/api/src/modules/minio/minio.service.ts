@@ -8,17 +8,19 @@ import { ConfigService } from '@nestjs/config';
 import * as AWS from 'aws-sdk';
 import { Readable } from 'stream';
 import { ScalewayS3Options } from './interfaces/minio-options.interface';
+import { FileService } from '@services/FileService';
 
 interface StorageFile {
   stream: Readable;
   metadata: { [key: string]: string };
   contentType?: string;
+  checksum: string;
 }
 
 @Injectable()
-export class MinioService implements OnModuleInit {
+export class MinioService implements OnModuleInit, FileService {
   private s3Client: AWS.S3;
-  public readonly bucketName: string;
+  private readonly bucketName: string;
 
   constructor(
     private configService: ConfigService,
@@ -72,6 +74,10 @@ export class MinioService implements OnModuleInit {
       signatureVersion: 'v4',
       s3ForcePathStyle: true,
     });
+  }
+
+  getBucketName(): string {
+    return this.bucketName;
   }
 
   async onModuleInit() {
@@ -205,6 +211,8 @@ export class MinioService implements OnModuleInit {
         stream,
         metadata: headResult.Metadata || {},
         contentType: headResult.ContentType,
+        checksum:
+          headResult?.ChecksumSHA256 || headResult.ETag.replace(/"/g, ''),
       };
     } catch (error) {
       if (error.statusCode === 404) {

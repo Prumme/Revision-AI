@@ -1,5 +1,8 @@
 import { Quiz } from "../value-objects/Quiz";
-import { QuizGenerationError, SafetyCheckError } from "../exceptions/QuizGenerationError";
+import {
+  QuizGenerationError,
+  SafetyCheckError,
+} from "../exceptions/QuizGenerationError";
 import { Failure, Success } from "../../shared/Result";
 import { FileContent } from "../value-objects/FileContent";
 import { generateQuizFromFileContentFactory } from "./GenerateQuizFromFileContentUseCase";
@@ -18,10 +21,12 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     ],
   };
 
-  const mockFileContent: FileContent = {
-    fileName: "test.json",
-    content: "Educational content here" ,
-  };
+  const mockFileContent: FileContent[] = [
+    {
+      fileName: "test.json",
+      content: "Educational content here",
+    },
+  ];
 
   const mockQuestionsNumbers = 5;
 
@@ -33,13 +38,16 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
                             maxTry = TRY_LIMIT,
                           }: {
     generateQuizReturn: Quiz | QuizGenerationError;
-    safetyCheckReturn: QuizGenerationError | { isOffensive: boolean; educationalScore: number } | null;
+    safetyCheckReturn:
+      | QuizGenerationError
+      | { isOffensive: boolean; educationalScore: number }
+      | null;
     maxTry?: number;
   }) => ({
     getMaxTry: jest.fn(() => maxTry),
     generateQuiz: jest.fn().mockResolvedValue(generateQuizReturn),
     safetyContentCheck: jest.fn().mockResolvedValue(safetyCheckReturn),
-    updateQuiz : jest.fn(),
+    updateQuiz: jest.fn(),
   });
 
   it("should return a successful result when quiz generation and safety check pass", async () => {
@@ -49,7 +57,10 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Success<typeof mockQuiz>;
+    const result = (await useCase({
+      filesContents: mockFileContent,
+      questionsNumbers: 1,
+    })) as Success<typeof mockQuiz>;
 
     expect(result.success).toBe(true);
     expect(result.value).toEqual(mockQuiz);
@@ -65,7 +76,10 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers}) as Failure;
+    const result = (await useCase({
+      filesContents: mockFileContent,
+      questionsNumbers: 1,
+    })) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(QuizGenerationError);
@@ -80,7 +94,10 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Failure;
+    const result = (await useCase({
+      filesContents: mockFileContent,
+      questionsNumbers: 1,
+    })) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(QuizGenerationError);
@@ -92,11 +109,13 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     const agent = getMockIAAgent({
       generateQuizReturn: mockQuiz,
       safetyCheckReturn: { isOffensive: true, educationalScore: 20 },
-
     });
 
     const useCase = generateQuizFromFileContentFactory(agent);
-    const result = await useCase({ fileContent: mockFileContent, questionsNumbers: mockQuestionsNumbers }) as Failure;
+    const result = (await useCase({
+      filesContents: mockFileContent,
+      questionsNumbers: 1,
+    })) as Failure;
 
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(SafetyCheckError);

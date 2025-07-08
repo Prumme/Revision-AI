@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import DeleteAccountCard from "@/components/cards/DeleteAccountCard.vue";
-import PasswordChangeCard from "@/components/cards/PasswordChangeCard.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import ProfilePicture from "@/components/profile/ProfilePicture.vue";
