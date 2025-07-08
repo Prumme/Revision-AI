@@ -65,17 +65,6 @@ export class MongoQuizRepository implements QuizRepository {
     return result !== null;
   }
 
-  async countByUserId(userId: string): Promise<number> {
-    return this.quizModel.countDocuments({ userId }).exec();
-  }
-
-  async countByUserIdAndDateRange(userId: string, from: Date, to: Date): Promise<number> {
-    return this.quizModel.countDocuments({
-      userId,
-      createdAt: { $gte: from, $lt: to },
-    }).exec();
-  }
-
   private documentToQuiz(document: QuizDocument): Quiz {
     return {
       id: document._id.toString(),

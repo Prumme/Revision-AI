@@ -15,7 +15,6 @@ import { QuizGenerationJobRepositoryProvider } from '@repositories/quiz-generati
 import { QuizGenerationDTO } from 'types/QuizGenerationDTO';
 import { FileToParseDTO } from 'types/FileToParseDTO';
 import { RabbitMQProvider } from '@infrastructure/queue/RabbitMQProvider';
-import { QuizQuotaService } from './quiz-quota.service';
 
 @Module({
   imports: [
@@ -36,7 +35,6 @@ import { QuizQuotaService } from './quiz-quota.service';
     QuizRepositoryProvider,
     CachedFileParsedRepositoryProvider,
     QuizGenerationJobRepositoryProvider,
-    QuizQuotaService,
     {
       provide: 'QuizGenerationQueueProvider',
       useFactory: () => {

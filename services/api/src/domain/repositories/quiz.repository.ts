@@ -21,10 +21,6 @@ export interface QuizRepository {
   create(quiz: Omit<Quiz, 'id'>): Promise<Quiz>;
   update(id: string, quiz: Partial<Quiz>): Promise<Quiz>;
   delete(id: string): Promise<boolean>;
-
-  // Quotas
-  countByUserId(userId: string): Promise<number>;
-  countByUserIdAndDateRange(userId: string, from: Date, to: Date): Promise<number>;
 }
 
 export const QuizRepositoryProvider = {
