@@ -27,7 +27,7 @@ export class SessionController {
   // @Get()
   // async findAll() {
   //   const sessions = await this.sessionService.findAll();
-  //   return sessions.map((s) => {
+  //   return sessions.map(s => {
   //     const { userId, ...rest } = s.toObject ? s.toObject() : s;
   //     return rest;
   //   });
@@ -68,11 +68,7 @@ export class SessionController {
   //   @Param('id') id: string,
   //   @Body() body: { score: number; answers: { correct: boolean; a: string }[] },
   // ) {
-  //   const session = await this.sessionService.finishSession(
-  //     id,
-  //     body.score,
-  //     body.answers,
-  //   );
+  //   const session = await this.sessionService.finishSession(id, body.score, body.answers);
   //   const { userId, ...rest } = session.toObject ? session.toObject() : session;
   //   return rest;
   // }

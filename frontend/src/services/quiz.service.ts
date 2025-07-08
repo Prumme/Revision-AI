@@ -227,7 +227,7 @@ export class QuizService {
         const payload = { ...quiz };
         if (quiz.questions && quiz.questions.length > 0 && quiz.questions[0].question) {
             payload.questions = quiz.questions.map(q => ({
-                q: q.question,
+                question: q.question,
                 answers: q.answers
             }));
         }
