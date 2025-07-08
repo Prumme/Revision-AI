@@ -12,6 +12,8 @@ import { QueueProvider } from '@services/QueueProvider';
 import { FileToParseDTO } from '../../types/FileToParseDTO';
 import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import * as crypto from 'node:crypto';
+import { QuizQuotaService } from './quiz-quota.service';
+import { SubscriptionTier } from './subscription-tiers.config';
 
 @Injectable()
 export class QuizService {
@@ -30,6 +32,7 @@ export class QuizService {
     private readonly fileUploadedQueueProvider: QueueProvider<FileToParseDTO>,
     @Inject('QuizGenerationQueueProvider')
     private readonly quizGenerationQueueProvider: QueueProvider<QuizGenerationDTO>,
+    private readonly quizQuotaService: QuizQuotaService,
   ) {}
 
   async findById(id: string): Promise<Quiz | null> {
@@ -66,8 +69,16 @@ export class QuizService {
       throw new Error('Utilisateur non trouvé');
     }
 
+    // Validation des quotas selon le tier de l'utilisateur
+    await this.quizQuotaService.validateQuotaOrThrow(
+      quiz.userId,
+      foundUser.subscriptionTier as SubscriptionTier,
+      quiz,
+    );
+
     const medias = [];
-    /** Upload files to S3 */
+    const fileContents: string[] = [];
+    /** Upload files to S3 et récupération du contenu */
     for (const file of files) {
       const fileExtension = file.originalname.split('.').pop();
       const hashedFileName = crypto
@@ -78,9 +89,22 @@ export class QuizService {
       const fullPath = 'documents/' + objectName;
       await this.minioService.uploadFile(file, fullPath);
       medias.push(fullPath);
+      // Récupérer le contenu du fichier (en supposant que getFile renvoie un buffer ou string)
+      const fileData = await this.minioService.getFile(fullPath);
+      // Si Buffer, convertir en string
+      fileContents.push(fileData?.toString ? fileData.toString('utf-8') : String(fileData));
     }
 
     quiz.medias = medias;
+
+    // Concaténer tous les contenus pour la vérification du quota de tokens
+    const allText = fileContents.join(' ');
+    await this.quizQuotaService.validateQuotaOrThrow(
+      quiz.userId,
+      foundUser.subscriptionTier as SubscriptionTier,
+      quiz,
+      allText,
+    );
 
     const useCase = CreateQuizUseCaseFactory(
       this.quizRepository,
