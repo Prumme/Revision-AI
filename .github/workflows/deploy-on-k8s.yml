@@ -102,7 +102,7 @@ jobs:
       # Update deployment images and apply deployments, services, ingress
       - name: Update and Apply Deployments, Services, Ingress
         run: |
-          IMAGE_TAG=rg.fr-par.scw.cloud/${{ vars.SCW_PROJECT_ID }}/revision-ai
+          IMAGE_TAG=rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai
           REF_NAME=${{ github.ref_name }}
           # Use sed or kustomize to update image tags in deployment files
           # Example using sed (requires GNU sed or equivalent)
