@@ -4,7 +4,7 @@ metadata:
   name: mongodb
   namespace: mongodb
 spec:
-  members: 3
+  members: 2
   type: ReplicaSet
   version: "8.0.10"
   users:
@@ -37,11 +37,11 @@ spec:
             - name: mongod
               resources:
                 limits:
-                  cpu: "1"
-                  memory: 2Gi
+                  cpu: 800m
+                  memory: 700Mi
                 requests:
-                  cpu: 500m
-                  memory: 1Gi
+                  cpu: 200m
+                  memory: 500Mi
       volumeClaimTemplates:
         - metadata:
             name: data-volume

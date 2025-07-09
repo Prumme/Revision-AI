@@ -266,3 +266,29 @@ Ajouter la ligne suivante :
 ```
 
 Tester l’API à l’adresse : [http://api.revision-ai.local](http://api.revision-ai.local)
+
+
+# DEPLOYEMENT SCALEWWAY
+
+# 29. Créer une action GitHub pour le déploiement
+Faire le build et le push des images dockers des services,
+Et modifier les deployement pour utiliser les dernières images.
+
+# 30. Limiter la ressources du rabitMQ
+Les services dépendant de rabbitMQ ne se lancais pas correctement parce que RabbitMQ n’avait pas assez de ressources pour lancer ses pods
+Etapes pour debbuger
+- Regarder les logs du service failed, se rendre compte que le service ne se connecte pas a RabbitMQ
+- Voir l'ip du service rabbitMQ, -> Bonne addresse bon port
+- Regarder l'état du pod RabbitMQ, avec describe, voir les events warning : `0/2 nodes are available: 1 Insufficient cpu, 2 Insufficient memory. preemption: 0/2 nodes are available`
+- Voir comment limiter les ressources de RabbitMQ https://www.rabbitmq.com/kubernetes/operator/troubleshooting-operator & https://github.com/rabbitmq/cluster-operator/tree/main/docs/examples/resource-limits
+
+# 31 obtenir l'addresse fournis par le load balancer notre url internet pour acceder au cluster
+kubectl --kubeconfig c.yaml get svc --all-namespaces
+
+# 32 editer l'ingress pour qu'il soit lier a l'ingressClassName nginx
+kubectl edit ingress api-ingress -n default
+et ajouter la ligne ingressClassName: nginx dans spec sans ca 404
+apres ca on a eu un 502 BadGateway, en analysant il semblait que les pod api-service était deffectueux pas connecté a mongo
+
+# 33 limiter la ressource mongodb
+Pareil pour mongo probleme avec les limites de ressource
