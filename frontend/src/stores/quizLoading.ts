@@ -39,7 +39,7 @@ export const useQuizLoadingStore = defineStore("quizLoading", () => {
       case QuizGenerationJobStatus.PENDING:
         return "Génération de votre quiz...";
       case QuizGenerationJobStatus.PARSING_FILES:
-        return `Analyse des fichiers en cours... ${fileParsingProgress.value}%`;
+        return `Analyse des fichiers en cours... ${Math.round(fileParsingProgress.value * 100)}%`;
       case QuizGenerationJobStatus.GENERATING:
         return "Génération des questions en cours...";
       case QuizGenerationJobStatus.COMPLETED:
