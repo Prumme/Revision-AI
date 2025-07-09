@@ -178,7 +178,7 @@ export class QuizService {
   static async getQuizStatusJob(
     quizId: string,
     onMessage: (
-      message: { parsingFileProgress: boolean; status: string },
+      message: { parsingFileProgress: number; status: string },
       close: () => void,
     ) => void, // Callback function to handle incoming messages,
   ): Promise<boolean> {
