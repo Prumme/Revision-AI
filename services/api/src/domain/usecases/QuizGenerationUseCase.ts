@@ -13,6 +13,8 @@ import { CachedFileParsed } from '@entities/cached-file-parsed.entity';
 import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import { Quiz } from '@entities/quiz.entity';
 import { FileService } from '@services/FileService';
+import { SubscriptionPolicyService } from '../policies/SubscriptionPolicyService';
+import { SubscriptionTier } from '../policies/SubscriptionPolicy';
 
 async function generateQuizGenerationDTO(
   identifier: string,
@@ -66,6 +68,8 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     QueueProvider<FileToParseDTO>,
     QueueProvider<QuizGenerationDTO>,
     typeof generateQuizGenerationDTO,
+    SubscriptionPolicyService,
+    SubscriptionTier
   ]
 > = (
   _quizRepository,
@@ -75,8 +79,24 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
   _fileToParseQueueProvider,
   _quizGenerationQueueProvider,
   _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
+  _policyService,
+  _userTier
 ) => {
   return async (createQuizDto) => {
+    // Vérification des quotas
+    const [totalQuizzes, quizzesToday] = await Promise.all([
+      _quizRepository.countByUserId(createQuizDto.userId),
+      _quizRepository.countCreatedToday(createQuizDto.userId)
+    ]);
+    const filesCount = createQuizDto.medias.length;
+    let totalTokens = 0;
+    const checkTotal = _policyService.canCreateQuiz(_userTier, totalQuizzes);
+    if (!checkTotal.allowed) return new Error(checkTotal.reason);
+    const checkToday = _policyService.canGenerateToday(_userTier, quizzesToday);
+    if (!checkToday.allowed) return new Error(checkToday.reason);
+    const checkFiles = _policyService.canUseFilesForGeneration(_userTier, filesCount);
+    if (!checkFiles.allowed) return new Error(checkFiles.reason);
+
     type FileIdentifierWithChecksum = {
       fileIdentifier: string;
       checksum: string;
@@ -124,7 +144,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       for (const file of filesToParse)
         await _fileToParseQueueProvider.send(file);
     }
-
+    
     const quiz = QuizEntity.createQuiz(
       createQuizDto.title,
       createQuizDto.description,
@@ -150,13 +170,30 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     if (!inserted) return new Error('Failed to create quiz generation job');
 
     if (QuizJobEntity.isReadyForGeneration(job)) {
-      await _quizGenerationQueueProvider.send(
-        await _generateQuizGenerationDTO(
+      
+      const quizGenerationDTO = await _generateQuizGenerationDTO(
           createdQuiz.id,
           createQuizDto.questionsNumbers,
           createQuizDto.medias,
           _cachedFileParsedRepository,
-        ),
+        );
+
+      // foreach (const file of quizGenerationDTO.filesContents) -> on le transforme en json pour avoir sa length et on fait la verification token si pas bon = return error sinon continue 
+      const allParsedFiles = quizGenerationDTO.filesContents
+      for (const file of allParsedFiles) {
+         let jsonString = JSON.stringify(file.fileContent);
+         totalTokens += jsonString.length;
+      }
+      const checkTokens = _policyService.canUseTokensForGeneration(
+        _userTier,
+        totalTokens,
+      );
+      if (!checkTokens.allowed) {
+        return new Error(checkTokens.reason);
+      }
+
+      await _quizGenerationQueueProvider.send(
+        quizGenerationDTO,
       );
     }
 
