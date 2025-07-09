@@ -37,8 +37,8 @@ spec:
               cpu: 100m
               memory: 128Mi
             limits:
-              cpu: 200m
-              memory: 500Mi
+              cpu: 800m
+              memory: 1Gi
           envFrom:
             - configMapRef:
                 name: env-config-map

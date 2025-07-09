@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: api-deploy
-        debug: "true"
+        q: "true"
     spec:
       initContainers:
         - name: wait-for-rabbitmq
@@ -32,8 +32,8 @@ spec:
           name: api
           resources:
             limits:
-              cpu: 800m
-              memory: 700Mi
+              cpu: 900m
+              memory: 2Gi
             requests:
               cpu: 200m
               memory: 200Mi
