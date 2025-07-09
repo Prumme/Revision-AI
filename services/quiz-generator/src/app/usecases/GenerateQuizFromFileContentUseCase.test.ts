@@ -61,7 +61,19 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     })) as Success<typeof mockQuiz>;
 
     expect(result.success).toBe(true);
-    expect(result.value).toEqual(mockQuiz);
+
+    //ignore cause the answer are shuffled
+    function ignoreAnswers(quiz: Quiz) {
+      return {
+        ...quiz,
+        questions: quiz.questions.map((q) => ({
+          ...q,
+          answers: [],
+        })),
+      };
+    }
+
+    expect(ignoreAnswers(result.value)).toEqual(ignoreAnswers(mockQuiz));
     expect(agent.generateQuiz).toHaveBeenCalledTimes(1);
     expect(agent.safetyContentCheck).toHaveBeenCalledTimes(1);
   });
