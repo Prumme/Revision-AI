@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Label from "@/components/inputs/LabelComponent.vue";
 import { CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from "lucide-vue-next";
-import { computed, defineEmits, defineProps, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
   modelValue: { type: [String, Number], required: true },
@@ -154,7 +154,9 @@ const hasSymbols = computed(() => /[^a-zA-Z0-9]/.test(password.value));
         class="placeholder:font-outfit placeholder:text-gray-extralight mt-2 p-2 w-full border rounded-md outline-none text-sm text-black transition-colors duration-150"
         :class="[
           isFocused ? 'border-primary' : 'border-gray-300',
-          disabled ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-70 select-none focus:outline-none' : '',
+          disabled
+            ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-70 select-none focus:outline-none'
+            : '',
         ]"
         :rows="4"
         :disabled="disabled"
