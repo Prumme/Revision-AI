@@ -96,9 +96,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      jest.fn(),
       mockPolicy,
-      userTier
+      userTier,
+      jest.fn(),
     );
 
     // --- Act (Action) ---
@@ -154,9 +154,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      jest.fn(),
       mockPolicy,
-      userTier
+      userTier,
+      jest.fn(),
     );
 
     // --- Act (Action) ---
@@ -179,9 +179,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      jest.fn(),
       mockPolicy,
-      userTier
+      userTier,
+      jest.fn(),
     );
     const result = await useCase({ title: '', userId: '', medias: [] });
     expect(result).toBeInstanceOf(Error);
@@ -198,9 +198,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      jest.fn(),
       mockPolicy,
-      userTier
+      userTier,
+      jest.fn(),
     );
     const result = await useCase({ title: '', userId: '', medias: [] });
     expect(result).toBeInstanceOf(Error);
@@ -217,9 +217,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      jest.fn(),
       mockPolicy,
-      userTier
+      userTier,
+      jest.fn(),
     );
     const result = await useCase({ title: '', userId: '', medias: ['a', 'b', 'c'] });
     expect(result).toBeInstanceOf(Error);
@@ -240,9 +240,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      fakeGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      fakeGenerateQuizGenerationDTO,
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
@@ -263,9 +263,9 @@ describe('CreateQuizUseCase', () => {
       mockFileService,
       mockFileToParseQueue,
       mockQuizGenerationQueue,
-      fakeGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      fakeGenerateQuizGenerationDTO,
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
@@ -336,9 +336,9 @@ describe('HandleParsedFileUseCase', () => {
       mockJobRepository,
       mockCachedFileRepository,
       mockQuizGenerationQueue,
-      mockGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      mockGenerateQuizGenerationDTO,
     );
 
     // --- Act (Action) ---
@@ -385,9 +385,9 @@ describe('HandleParsedFileUseCase', () => {
       mockJobRepository,
       mockCachedFileRepository,
       mockQuizGenerationQueue,
-      mockGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      mockGenerateQuizGenerationDTO,
     );
 
     // --- Act (Action) ---
@@ -415,9 +415,9 @@ describe('HandleParsedFileUseCase', () => {
       mockJobRepository,
       mockCachedFileRepository,
       mockQuizGenerationQueue,
-      mockGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      mockGenerateQuizGenerationDTO,
     );
     const fileContent: FileContentDTO = {
       fileName: 'file1.txt',
@@ -443,9 +443,9 @@ describe('HandleParsedFileUseCase', () => {
       mockJobRepository,
       mockCachedFileRepository,
       mockQuizGenerationQueue,
-      mockGenerateQuizGenerationDTO,
       mockPolicy,
-      userTier
+      userTier,
+      mockGenerateQuizGenerationDTO,
     );
     const fileContent: FileContentDTO = {
       fileName: 'file1.txt',
