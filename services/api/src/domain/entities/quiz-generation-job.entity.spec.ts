@@ -1,4 +1,4 @@
-import { createQuizGenerationJob, markFileAsParsed, isReadyForGeneration, addEventJob, completeJob, failJob, processJob, QuizGenerationJobStatus } from './quiz-generation-job.entity';
+import { createQuizGenerationJob, markFileAsParsed, isReadyForGeneration, addEventJob, completeJob, startParsing, failJob, QuizGenerationJobStatus, startGenerating } from './quiz-generation-job.entity';
 
 describe('QuizGenerationJob Entity', () => {
   describe('createQuizGenerationJob', () => {
@@ -117,16 +117,30 @@ describe('QuizGenerationJob Entity', () => {
     });
   });
 
-  describe('processJob', () => {
-    it('should mark the job as processing', () => {
+  describe('startParsing', () => {
+    it('should mark the job as parsing file', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
       const files = ['file1', 'file2'];
       const job = createQuizGenerationJob(userId, quizId, files);
 
-      const processingJob = processJob(job);
+      const processingJob = startParsing(job);
 
-      expect(processingJob.status).toBe(QuizGenerationJobStatus.PROCESSING);
+      expect(processingJob.status).toBe(QuizGenerationJobStatus.PARSING_FILES);
+      expect(processingJob.updatedAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('startGenerated', () => {
+    it('should mark the job as parsing file', () => {
+      const userId = 'user123';
+      const quizId = 'quiz123';
+      const files = ['file1', 'file2'];
+      const job = createQuizGenerationJob(userId, quizId, files);
+
+      const processingJob = startGenerating(job);
+
+      expect(processingJob.status).toBe(QuizGenerationJobStatus.GENERATING);
       expect(processingJob.updatedAt).toBeInstanceOf(Date);
     });
   });

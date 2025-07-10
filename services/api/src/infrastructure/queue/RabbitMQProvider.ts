@@ -20,7 +20,7 @@ export class RabbitMQProvider<Payload> implements QueueProvider<Payload> {
         persistent: true,
       });
 
-      this.logger.log('Message envoyé rabitMQ ->', msg);
+      this.logger.log('Message envoyé RabbitMQ on -> ' + this.queueName);
 
       setTimeout(() => {
         channel.close();

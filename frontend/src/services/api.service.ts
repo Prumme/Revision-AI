@@ -17,6 +17,9 @@ interface ApiResponse<T> {
 }
 
 export class ApiService {
+  public static getBaseUrl(): string {
+    return API_CONFIG.BASE_URL;
+  }
   private static getAuthToken(): string | null {
     return localStorage.getItem("token");
   }
@@ -58,7 +61,7 @@ export class ApiService {
       const response = await fetch(url, {
         method,
         headers: requestHeaders,
-        ...((body !== undefined ? { body } : {})),
+        ...(body !== undefined ? { body } : {}),
       });
 
       const data = await response.json();
