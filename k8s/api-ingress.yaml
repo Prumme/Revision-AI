@@ -3,11 +3,16 @@ kind: Ingress
 metadata:
   name: api-ingress
   annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - revision-ai.com
+      secretName: letsencrypt-prod
   rules:
-    - host: api.revision-ai.local
+    - host: revision-ai.com
       http:
         paths:
           - path: /
