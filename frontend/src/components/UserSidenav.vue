@@ -110,25 +110,33 @@ const handleLogout = () => {
               Administration
             </div>
             <div v-else class="border-t border-gray-200 my-3"></div>
-            <NavLink
-              to="/admin/user"
-              icon="Users"
-              :text="isSidebarOpen ? 'Utilisateurs' : ''"
-              :active="false"
-              :showText="isSidebarOpen"
-            />
-
-            <a
-              href="https://dashboard.stripe.com/test/customers"
-              target="_blank"
-              class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200 mt-2.5"
-            >
-              <HandCoinsIcon class="h-5 w-5" />
-              <span v-if="isSidebarOpen" class="flex items-center gap-2">
-                Clients
-                <ExternalLinkIcon class="h-4 w-4" />
-              </span>
-            </a>
+            <div class="flex flex-col gap-2.5">
+              <NavLink
+                to="/admin/user"
+                icon="Users"
+                :text="isSidebarOpen ? 'Utilisateurs' : ''"
+                :active="false"
+                :showText="isSidebarOpen"
+              />
+              <NavLink
+                to="/admin/reports"
+                icon="Flag"
+                :text="isSidebarOpen ? 'Signalements' : ''"
+                :active="false"
+                :showText="isSidebarOpen"
+              />
+              <a
+                href="https://dashboard.stripe.com/test/customers"
+                target="_blank"
+                class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200"
+              >
+                <HandCoinsIcon class="h-5 w-5" />
+                <span v-if="isSidebarOpen" class="flex items-center gap-2">
+                  Clients
+                  <ExternalLinkIcon class="h-4 w-4" />
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 

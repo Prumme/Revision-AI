@@ -7,10 +7,12 @@ import QuizLoadingSpinner from "@/components/loaders/QuizLoadingSpinner.vue";
 import { Quiz, QuizService } from "@/services/quiz.service";
 import { useQuizLoadingStore } from "@/stores/quizLoading";
 import { useUserStore } from "@/stores/user";
-import { ArrowRight, Calendar, FileQuestion, PlusIcon } from "lucide-vue-next";
+import { ArrowRight, Calendar, FileQuestion, PlusIcon, MoreVertical } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { Motion } from '@motionone/vue';
+import { Motion } from "@motionone/vue";
+import { useDialogStore } from "@/stores/dialog";
+import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -87,7 +89,7 @@ async function fetchQuizzes() {
   if (!user?.id) return;
   loading.value = true;
   try {
-    await new Promise((resolve) => setTimeout(resolve, 600))
+    await new Promise((resolve) => setTimeout(resolve, 600));
     const filters: Record<string, unknown> = {};
     if (search.value) filters.search = search.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
@@ -110,7 +112,6 @@ async function fetchQuizzes() {
       total.value = 0;
       totalPages.value = 1;
     }
-
   } catch {
     error.value = "Impossible de charger les quiz. Veuillez réessayer plus tard.";
   } finally {
@@ -132,6 +133,15 @@ watch(
   },
 );
 
+const dialogStore = useDialogStore();
+
+const handleReport = (quiz: Quiz) => {
+  dialogStore.showReport({
+    quizId: quiz.id,
+    quizName: quiz.title,
+  });
+};
+
 onMounted(async () => {
   await fetchQuizzes();
 });
@@ -140,9 +150,7 @@ onMounted(async () => {
 <template>
   <section class="flex flex-col gap-1.5 w-full">
     <p class="font-outfit text-lg text-black-transparent">Tous vos quiz</p>
-    <h1 class="font-outfit text-4xl font-extrabold text-black">
-      Liste des quiz
-    </h1>
+    <h1 class="font-outfit text-4xl font-extrabold text-black">Liste des quiz</h1>
     <div class="flex justify-end w-full gap-4 mt-4 mb-8">
       <Button
         @click="router.push('/quiz/create')"
@@ -166,10 +174,14 @@ onMounted(async () => {
         <div class="flex gap-4 mb-4">
           <Select
             v-model="selectedCategory"
-            :options="[{ label: 'Toutes les catégories', value: '' }, ...Object.values(QuizService.categories || {})]"
+            :options="[
+              { label: 'Toutes les catégories', value: '' },
+              ...Object.values(QuizService.categories || {}),
+            ]"
             placeholder="Catégorie"
-           id="category"/>
-          <Switch v-model="isPublic" label="Quiz publics uniquement"  id="isPublic"/>
+            id="category"
+          />
+          <Switch v-model="isPublic" label="Quiz publics uniquement" id="isPublic" />
         </div>
       </Motion>
     </div>
@@ -222,18 +234,35 @@ onMounted(async () => {
 
       <div v-else>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
-          {{console.log("QUIZZ", quizzes)}}
           <div
             v-for="quiz in quizzes"
             :key="quiz.id"
-            @click="goToQuizDetail(quiz.id!)"
-            class="cursor-pointer flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
+            class="flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
           >
+            <div class="absolute top-2 right-2 z-10" @click.stop>
+              <DropdownInput position="top-right">
+                <template #trigger>
+                  <MoreVertical class="w-5 h-5 text-gray-600" />
+                </template>
+                <template #menus>
+                  <div class="py-1">
+                    <button
+                      @click="handleReport(quiz)"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      Signaler ce quiz
+                    </button>
+                  </div>
+                </template>
+              </DropdownInput>
+            </div>
+
             <div
-              class="flex flex-col flex-1 p-6 rounded-t-2xl"
+              class="flex flex-col flex-1 p-6 rounded-t-2xl cursor-pointer"
               :style="{
                 background: `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)`,
               }"
+              @click="goToQuizDetail(quiz.id!)"
             >
               <h3 class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</h3>
               <p class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">
@@ -285,15 +314,18 @@ onMounted(async () => {
               <span
                 v-if="quiz.status === 'pending'"
                 class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
-                >En attente</span>
+                >En attente</span
+              >
               <span
                 v-else-if="quiz.status === 'published'"
                 class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
-                >Publié</span>
+                >Publié</span
+              >
               <span
                 v-else-if="quiz.status === 'draft'"
                 class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
-                >Brouillon</span>
+                >Brouillon</span
+              >
             </div>
           </div>
         </div>

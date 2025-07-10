@@ -340,10 +340,10 @@ const formatCellValue = (column: TableColumn, value: string, row: string) => {
           <div class="flex items-center gap-1">
             <ButtonComponent
               variant="outline"
-              size="icon"
+              size="default"
               :disabled="isFirstPageDisabled"
               @click="handlePageChange((props.pagination?.currentPage || 1) - 1)"
-              class="!p-2"
+              class="!px-3 !py-1.5 !text-sm min-w-[40px] flex items-center justify-center"
             >
               <ChevronLeftIcon class="w-4 h-4" />
             </ButtonComponent>
@@ -361,10 +361,10 @@ const formatCellValue = (column: TableColumn, value: string, row: string) => {
 
             <ButtonComponent
               variant="outline"
-              size="icon"
+              size="default"
               :disabled="isLastPageDisabled"
               @click="handlePageChange((props.pagination?.currentPage || 1) + 1)"
-              class="!p-2"
+              class="!px-3 !py-1.5 !text-sm min-w-[40px] flex items-center justify-center"
             >
               <ChevronRightIcon class="w-4 h-4" />
             </ButtonComponent>
