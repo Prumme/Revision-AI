@@ -295,3 +295,6 @@ apres ca on a eu un 502 BadGateway, en analysant il semblait que les pod api-ser
 
 # 34 limiter la ressource mongodb
 Pareil pour mongo probleme avec les limites de ressource
+
+# 35 attendre que les process mongodb et rabbitMQ soit pret pour lancer les services
+En essayant de créer une nouveau cluster on a remarquer que les services crashais en boucle et se metttais en erreurs parce que les clusters rabbitmq et mongo prennais plusieurs minutes a être ready
