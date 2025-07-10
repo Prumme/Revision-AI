@@ -225,6 +225,8 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
     CachedFileParsedRepository,
     QueueProvider<QuizGenerationDTO>,
     typeof generateQuizGenerationDTO, // Injected for testing purposes
+    SubscriptionPolicyService,
+    SubscriptionTier
   ]
 > = (
   _quizRepository,
@@ -232,8 +234,11 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
   _cachedFileParsedRepository,
   _quizGenerationQueueProvider,
   _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
+  _policyService,
+  _userTier
 ) => {
   return async (fileContent) => {
+    let totalTokens = 0;
     // Sauvegarder le fichier parsé dans la base de données pour éviter de le parser à nouveau plus tard
     const cachedFile: CachedFileParsed = {
       fileContent,
@@ -270,6 +275,20 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           job.files.map((file) => file.identifier),
           _cachedFileParsedRepository,
         );
+        
+        const allParsedFiles = quizGenerationDTO.filesContents
+        for (const file of allParsedFiles) {
+          let jsonString = JSON.stringify(file.fileContent);
+          totalTokens += jsonString.length;
+        }
+        const checkTokens = _policyService.canUseTokensForGeneration(
+          _userTier,
+          totalTokens,
+        );
+        if (!checkTokens.allowed) {
+          return new Error(checkTokens.reason);
+        }
+
         await _quizGenerationQueueProvider.send(quizGenerationDTO);
       }
     }
