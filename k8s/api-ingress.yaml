@@ -10,7 +10,7 @@ spec:
   tls:
     - hosts:
         - revision-ai.com
-      secretName: letsencrypt-prod
+      secretName: revision-ai-com-tls
   rules:
     - host: revision-ai.com
       http:

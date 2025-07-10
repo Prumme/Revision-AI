@@ -267,34 +267,70 @@ Ajouter la ligne suivante :
 
 Tester l’API à l’adresse : [http://api.revision-ai.local](http://api.revision-ai.local)
 
+# DÉPLOIEMENT SCALEWAY
 
-# DEPLOYEMENT SCALEWWAY
+## 29. Appliquer les secrets locaux sur le cluster
 
-# 29 appliquer les secrets local sur le cluster
+```bash
 kubectl apply -f k8s/secrets/env-secret.yml
+```
 
-# 30. Créer une action GitHub pour le déploiement
-Faire le build et le push des images dockers des services,
-Et modifier les deployement pour utiliser les dernières images.
+## 30. Créer une action GitHub pour le déploiement
 
-# 31. Limiter la ressources du rabitMQ
-Les services dépendant de rabbitMQ ne se lancais pas correctement parce que RabbitMQ n’avait pas assez de ressources pour lancer ses pods
-Etapes pour debbuger
-- Regarder les logs du service failed, se rendre compte que le service ne se connecte pas a RabbitMQ
-- Voir l'ip du service rabbitMQ, -> Bonne addresse bon port
-- Regarder l'état du pod RabbitMQ, avec describe, voir les events warning : `0/2 nodes are available: 1 Insufficient cpu, 2 Insufficient memory. preemption: 0/2 nodes are available`
-- Voir comment limiter les ressources de RabbitMQ https://www.rabbitmq.com/kubernetes/operator/troubleshooting-operator & https://github.com/rabbitmq/cluster-operator/tree/main/docs/examples/resource-limits
+Faire le build et le push des images Docker des services, puis modifier les déploiements pour utiliser les dernières images.
 
-# 32 obtenir l'addresse fournis par le load balancer notre url internet pour acceder au cluster
+## 31. Limiter les ressources de RabbitMQ
+
+Les services dépendant de RabbitMQ ne se lançaient pas correctement car RabbitMQ n’avait pas assez de ressources pour démarrer ses pods.
+
+Étapes pour déboguer :
+- Consulter les logs du service en échec, constater que le service ne se connecte pas à RabbitMQ.
+- Vérifier l’IP et le port du service RabbitMQ.
+- Examiner l’état du pod RabbitMQ avec `describe`, observer les événements d’avertissement : `0/2 nodes are available: 1 Insufficient cpu, 2 Insufficient memory. preemption: 0/2 nodes are available`
+- Voir comment limiter les ressources de RabbitMQ :  
+  [Troubleshooting Operator](https://www.rabbitmq.com/kubernetes/operator/troubleshooting-operator)  
+  [Resource Limits Example](https://github.com/rabbitmq/cluster-operator/tree/main/docs/examples/resource-limits)
+
+## 32. Obtenir l’adresse fournie par le load balancer pour accéder au cluster
+
+```bash
 kubectl --kubeconfig c.yaml get svc --all-namespaces
+```
 
-# 33 editer l'ingress pour qu'il soit lier a l'ingressClassName nginx
+## 33. Éditer l’ingress pour le lier à l’ingressClassName nginx
+
+```bash
 kubectl edit ingress api-ingress -n default
-et ajouter la ligne ingressClassName: nginx dans spec sans ca 404
-apres ca on a eu un 502 BadGateway, en analysant il semblait que les pod api-service était deffectueux pas connecté a mongo
+```
+Ajouter la ligne `ingressClassName: nginx` dans `spec`. Sans cela, erreur 404.  
+Après modification, une erreur 502 BadGateway peut survenir si les pods `api-service` sont défectueux ou non connectés à MongoDB.
 
-# 34 limiter la ressource mongodb
-Pareil pour mongo probleme avec les limites de ressource
+## 34. Limiter les ressources de MongoDB
 
-# 35 attendre que les process mongodb et rabbitMQ soit pret pour lancer les services
-En essayant de créer une nouveau cluster on a remarquer que les services crashais en boucle et se metttais en erreurs parce que les clusters rabbitmq et mongo prennais plusieurs minutes a être ready
+Même problème que pour RabbitMQ, lié aux limites de ressources.
+
+## 35. Attendre que les clusters MongoDB et RabbitMQ soient prêts avant de lancer les services
+
+Lors de la création d’un nouveau cluster, les services crashaient en boucle car RabbitMQ et MongoDB prenaient plusieurs minutes à être prêts.
+
+## 36. Installer cert-manager avec Helm et créer un cluster-issuer
+
+Attention : ne pas nommer le secret TLS comme l’issuer, cela pose problème.
+
+## 37. Supprimer la règle ValidatingWebhookConfiguration `ingress-nginx-admission` pour que le certificat soit validé
+
+Après plusieurs vérifications des ressources :
+- certificate → certificaterequest → order → challenge
+
+On remarque une erreur :
+```
+admission webhook "validate.nginx.ingress.kubernetes.io" denied the request: \
+ingress contains invalid paths: path /.well-known/acme-challenge/<TOKEN> \
+cannot be used with pathType Exact
+```
+Le cert-manager tente de créer une route temporaire dans l’ingress, mais une règle empêche la création de la route de validation du challenge Let’s Encrypt, ce qui bloque la certification.
+
+Solution trouvée (à utiliser avec précaution) :
+```
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+```
