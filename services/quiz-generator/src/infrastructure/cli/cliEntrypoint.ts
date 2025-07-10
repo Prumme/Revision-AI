@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import { z } from "zod";
 import { generateQuizFromFileContentFactory } from "../../app/usecases/GenerateQuizFromFileContentUseCase";
-import { ScalewayQuizIAAgent } from "../services/ScalewayQuizIAAgent";
+import { LangChainQuizIAAgent } from "../services/LangChainQuizIAAgent";
 
-const quizIAAgent = new ScalewayQuizIAAgent();
+const quizIAAgent = new LangChainQuizIAAgent();
 
 export const cliEntrypoint = async () => {
   const filePathJSON = process.argv[2];
@@ -46,7 +46,10 @@ export const cliEntrypoint = async () => {
     const fileContent = schemaFileParse.parse(json);
     const useCase = generateQuizFromFileContentFactory(quizIAAgent);
 
-    const result = await useCase({ fileContent });
+    const result = await useCase({
+      filesContents: [fileContent],
+      questionsNumbers: 10,
+    });
     if (result.success == false) {
       console.error("Error generating quiz:", result.error.message);
       process.exit(1);

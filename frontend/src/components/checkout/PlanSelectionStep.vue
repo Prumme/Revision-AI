@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from "vue";
+import { computed } from "vue";
 import { useSubscriptionStore } from "@/stores/subscription";
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import CheckoutPlanCard from "@/components/checkout/CheckoutPlanCard.vue";
@@ -13,8 +13,7 @@ const availablePlans = computed(() => {
   if (!subscriptionStore.products) return [];
   return subscriptionStore.products.filter(
     (product) =>
-      product.productName.toLowerCase() === "basic" ||
-      product.productName.toLowerCase() === "pro",
+      product.productName.toLowerCase() === "basic" || product.productName.toLowerCase() === "pro",
   );
 });
 
@@ -34,7 +33,10 @@ const handlePlanSelect = (plan: SubscriptionInfo) => {
     </div>
 
     <!-- Error state -->
-    <div v-if="subscriptionStore.error" class="bg-error/10 border border-error text-error rounded-lg p-4 mb-2">
+    <div
+      v-if="subscriptionStore.error"
+      class="bg-error/10 border border-error text-error rounded-lg p-4 mb-2"
+    >
       <p class="font-outfit font-medium">{{ subscriptionStore.error }}</p>
     </div>
 

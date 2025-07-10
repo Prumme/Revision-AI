@@ -9,7 +9,7 @@ import {
 import { IMetricsExporter } from "../services/IMetricsExporter";
 import { IQuizIAAgent } from "../services/IQuizIAAgent";
 import { FileContent } from "../value-objects/FileContent";
-import { Quiz } from "../value-objects/Quiz";
+import { Quiz, suffleQuizChoice } from "../value-objects/Quiz";
 
 export type GenerateQuizFromFileContentInput = {
   filesContents: FileContent[];
@@ -72,7 +72,7 @@ export const generateQuizFromFileContentFactory = (
       metricExporter?.reportQuizGenerationRetries(
         quizIAAgent.getMaxTry() - tryLeft,
       );
-      return Result.Success(quiz);
+      return Result.Success(suffleQuizChoice(quiz));
     } while (tryLeft > 0);
 
     metricExporter?.reportQuizGenerationRetries(

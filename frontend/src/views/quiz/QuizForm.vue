@@ -83,7 +83,7 @@ const generateQuiz = async () => {
       console.log("Quiz créé:", createdQuiz);
 
       // Démarrer le chargement avec l'ID du quiz pour suivre son état
-      quizLoadingStore.startLoading(createdQuiz.id);
+      if (createdQuiz?.id) quizLoadingStore.startPolling(createdQuiz.id);
 
       toast.showToast("success", "Quiz créé avec succès! Génération des questions en cours...");
 
@@ -101,7 +101,6 @@ const generateQuiz = async () => {
   } catch (error) {
     console.error("Erreur lors de la génération du quiz:", error);
     toast.showToast("error", "Une erreur est survenue lors de la création du quiz");
-    quizLoadingStore.stopLoading(); // Arrêter le spinner en cas d'erreur
   } finally {
     isLoading.value = false;
   }

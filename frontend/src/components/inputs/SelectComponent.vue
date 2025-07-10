@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineEmits, defineProps, ref } from "vue";
+import { ref } from "vue";
 import Label from "./LabelComponent.vue";
 
 const { modelValue, label, options, placeholder, id } = defineProps<{
