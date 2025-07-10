@@ -123,12 +123,12 @@ import { watch } from "vue";
 watch([search, selectedCategory, isPublic, page, limit], fetchQuizzes);
 
 watch(
-  () => quizLoadingStore.quizStatus,
+  () => quizLoadingStore.status,
   (newStatus) => {
-    if (newStatus === "completed" && quizLoadingStore.currentQuizId) {
-      setTimeout(() => {
-        router.push(`/quiz/${quizLoadingStore.currentQuizId}`);
-      }, 1000);
+    if (newStatus === "completed") {
+      fetchQuizzes();
+    } else if (newStatus === "error") {
+      error.value = "Une erreur est survenue lors du chargement des quiz.";
     }
   },
 );
@@ -190,7 +190,7 @@ onMounted(async () => {
       :animate="{ opacity: 1, y: 0 }"
       transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
     >
-      <QuizLoadingSpinner v-if="quizLoadingStore.loading" />
+      <!--      <QuizLoadingSpinner v-if="quizLoadingStore.isLoading" />-->
       <!-- Skeleton loading -->
       <div
         v-if="loading"

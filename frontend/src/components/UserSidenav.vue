@@ -42,16 +42,15 @@ const handleLogout = () => {
     <ToastContainer />
     <!-- Sidebar Desktop -->
     <nav
-      class="hidden md:block relative p-5"
+      class="hidden md:block relative p-2.5"
       :class="[
         'bg-white text-foreground-alt border border-l border-gray-extralight',
         'h-full',
         'transition-all duration-500 ease-in-out',
-        'shadow-lg',
-        isSidebarOpen ? 'lg:w-92' : 'lg:w-24',
-        'w-24',
+
+        isSidebarOpen ? 'lg:w-92' : 'lg:w-19',
+        'w-19',
         isSidebarOpen && 'md:w-32',
-        isSidebarOpen && 'lg:shadow-lg',
       ]"
     >
       <div class="flex flex-col justify-between h-full">
@@ -252,7 +251,7 @@ const handleLogout = () => {
       </div>
     </div>
 
-    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8">
+    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8 p-4">
       <router-view></router-view>
     </div>
   </main>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, XCircleIcon, XIcon } from "lucide-vue-next";
-import { defineEmits, defineProps, onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps<{
   message: string;
