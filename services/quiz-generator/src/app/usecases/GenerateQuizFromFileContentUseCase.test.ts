@@ -28,13 +28,15 @@ describe("generateQuizFromFileContentFactory (unit)", () => {
     },
   ];
 
+  const mockQuestionsNumbers = 5;
+
   const TRY_LIMIT = 3;
 
   const getMockIAAgent = ({
-    generateQuizReturn,
-    safetyCheckReturn,
-    maxTry = TRY_LIMIT,
-  }: {
+                            generateQuizReturn,
+                            safetyCheckReturn,
+                            maxTry = TRY_LIMIT,
+                          }: {
     generateQuizReturn: Quiz | QuizGenerationError;
     safetyCheckReturn:
       | QuizGenerationError

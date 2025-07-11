@@ -31,6 +31,6 @@ import { QuizSchema } from '@mongo/quiz/quiz.schema';
     MailerServiceProvider,
     QuizRepositoryProvider,
   ],
-  exports: [UserService],
+  exports: [UserService, UserRepositoryProvider],
 })
 export class UserModule { }
