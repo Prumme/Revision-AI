@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { QuizKpi } from '@entities/kpi.entity';
+import { Kpi } from '@entities/kpi.entity';
 import { SessionDocument } from '../session/session.schema';
 
 @Injectable()
@@ -11,8 +11,8 @@ export class KpiRepository implements KpiRepository {
     private readonly sessionModel: Model<SessionDocument>,
   ) {}
 
-  async getQuizKpi(quizId: string): Promise<QuizKpi> {
-    const sessions = await this.sessio  nModel.find({ quizId, status: 'finished' }).exec();
+  async getQuizKpi(quizId: string): Promise<Kpi> {
+    const sessions = await this.sessionModel.find({ quizId, status: 'finished' }).exec();
     const totalSessions = sessions.length;
     if (totalSessions === 0) {
       return {

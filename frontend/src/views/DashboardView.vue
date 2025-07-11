@@ -2,7 +2,7 @@
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
 import { useUserStore } from "@/stores/user";
 import KPICard from '@/components/cards/KPICard.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { QuizService } from '@/services/quiz.service';
 import QuizCard from '@/components/cards/QuizCard.vue';
 import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
@@ -10,10 +10,9 @@ import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
 const userStore = useUserStore();
 const user = userStore.user;
 const quizCount = ref(0);
-const averageScore = userStore.averageScore;
-const totalRevisionTimeFormatted = userStore.totalRevisionTimeFormatted;
+const averageScore = ref('0%');
+const totalRevisionTime = ref('0m');
 
-console.log(userStore);
 const userQuizzes = ref([]);
 const loadingUserQuizzes = ref(false);
 
@@ -21,6 +20,8 @@ onMounted(async () => {
   loadingUserQuizzes.value = true;
   quizCount.value = await userStore.fetchQuizCount();
   await userStore.fetchKpis();
+  averageScore.value = userStore.averageScore;
+  totalRevisionTime.value = userStore.totalRevisionTimeFormatted;
   try {
     const res = await QuizService.getUserQuizzes(user?.id);
     userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : (res?.data?.slice(0, 5) || []);
@@ -31,12 +32,53 @@ onMounted(async () => {
   }
 });
 
+const animatedStats = ref([
+  { label: "Quiz disponibles", value: 0, color: "pale-yellow" },
+  { label: "Cours importés", value: 0, color: "pale-red" },
+  { label: "Score moyen", value: 0, color: "pale-purple" },
+  { label: "Temps de révision", value: 0, color: "pale-green" },
+]);
+
+watch([quizCount, averageScore, totalRevisionTime], ([newQuizCount, newAverageScore, newTotalRevisionTime]) => {
+  animateNumber(animatedStats.value[0], newQuizCount);
+  animateNumber(animatedStats.value[1], 16);
+  animateNumber(animatedStats.value[2], parseInt(newAverageScore));
+  animatedStats.value[3].value = newTotalRevisionTime; // For time, just update directly
+});
+
+function animateNumber(stat, target) {
+  const start = Number(stat.value) || 0;
+  const end = Number(target) || 0;
+  if (isNaN(end)) {
+    stat.value = target;
+    return;
+  }
+  const duration = 1000;
+  const frameRate = 60;
+  const totalFrames = Math.round(duration / (1000 / frameRate));
+  let frame = 0;
+  const increment = (end - start) / totalFrames;
+  function step() {
+    frame++;
+    stat.value = Math.round(start + increment * frame);
+    if (frame < totalFrames) {
+      requestAnimationFrame(step);
+    } else {
+      stat.value = end;
+    }
+  }
+  step();
+}
+
+
 const stats = [
   { label: "Quiz disponibles", value: quizCount, color: "pale-yellow" },
   { label: "Cours importés", value: 16, color: "pale-red" },
   { label: "Score moyen", value: averageScore, color: "pale-purple" },
-  { label: "Temps de révision", value: totalRevisionTimeFormatted, color: "pale-green" },
+  { label: "Temps de révision", value: totalRevisionTime, color: "pale-green" },
 ];
+
+console.log(stats);
 </script>
 
 <template>
@@ -97,7 +139,7 @@ const stats = [
                 :key="quiz.id"
                 class="min-w-[260px] max-w-[320px] flex-shrink-0"
               >
-                <QuizCard :category="quiz.category">
+                <QuizCard :category="quiz.category" :date="quiz.createdAt" :questionsCount="quiz.questionsNumbers">
                   <template #title>
                     <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
                   </template>

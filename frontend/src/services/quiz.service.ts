@@ -211,4 +211,16 @@ export class QuizService {
       return false;
     }
   }
+
+
+  /**
+   * Compte le nombre de quiz pour un utilisateur
+   * @param userId - L'ID de l'utilisateur
+   * @returns Promise<{ count: number }>
+   */
+  static async countByUserId(userId: string): Promise<number> {
+    // Appel en tant que paramètre de chemin, pas query param
+    const response = await ApiService.get<{ count: number }>(`/quizzes/count/${userId}`);
+    return response.data.count;
+  }
 }

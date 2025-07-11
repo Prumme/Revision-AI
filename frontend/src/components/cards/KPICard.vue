@@ -9,7 +9,17 @@
           {{ label }}
         </div>
         <div class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-          {{ value }}
+          <Motion
+            v-if="isAnimated"
+            :initial="{ opacity: 0, y: 20 }"
+            :animate="{ opacity: 1, y: 0 }"
+            transition="{ duration: 0.5 }"
+          >
+            {{ animatedDisplayValue }}
+          </Motion>
+          <template v-else>
+            {{ animatedDisplayValue }}
+          </template>
         </div>
       </div>
       <slot name="icon"></slot>
@@ -18,11 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { Motion } from '@motionone/vue';
 
 const props = defineProps({
   label: String,
-  value: [String, Number],
+  value: [String, Number, Object],
   color: {
     type: String,
     default: 'pale-green',
@@ -40,4 +51,47 @@ const gradientStyle = computed(() => {
   const colors = colorMap[props.color] || colorMap['pale-green'];
   return `background: linear-gradient(90deg, ${colors[0]}, ${colors[1]})`;
 });
+
+const displayValue = computed(() => {
+  if (typeof props.value === 'object' && props.value !== null && 'value' in props.value) {
+    return props.value.value;
+  }
+  return props.value;
+});
+
+const isAnimated = computed(() => typeof displayValue.value === 'number' || /^[0-9]+$/.test(displayValue.value));
+
+const animatedDisplayValue = ref(displayValue.value);
+
+watch(() => displayValue.value, (newVal, oldVal) => {
+  if (isAnimated.value) {
+    animateCounter(oldVal, newVal);
+  } else {
+    animatedDisplayValue.value = newVal;
+  }
+}, { immediate: true });
+
+function animateCounter(from, to) {
+  const start = Number(from) || 0;
+  const end = Number(to) || 0;
+  if (isNaN(end)) {
+    animatedDisplayValue.value = to;
+    return;
+  }
+  const duration = 800;
+  const frameRate = 60;
+  const totalFrames = Math.round(duration / (1000 / frameRate));
+  let frame = 0;
+  const increment = (end - start) / totalFrames;
+  function step() {
+    frame++;
+    animatedDisplayValue.value = Math.round(start + increment * frame);
+    if (frame < totalFrames) {
+      requestAnimationFrame(step);
+    } else {
+      animatedDisplayValue.value = end;
+    }
+  }
+  step();
+}
 </script>

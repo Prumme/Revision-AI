@@ -86,7 +86,6 @@ export class QuizService {
       this.quizRepository,
       this.quizGenerationJobRepository,
       this.cachedFileParsedRepository,
-      this.fileService, // Pass FileService instead of minioService
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
     );

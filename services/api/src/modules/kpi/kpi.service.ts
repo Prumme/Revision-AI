@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { KpiRepository } from '../../domain/repositories/kpi.repository';
-import { QuizKpi } from '../../domain/entities/kpi.entity';
+import { Kpi } from '../../domain/entities/kpi.entity';
 
 @Injectable()
 export class KpiService {
@@ -9,7 +9,7 @@ export class KpiService {
     private readonly kpiRepository: KpiRepository,
   ) {}
 
-  async getQuizKpi(quizId: string): Promise<QuizKpi> {
+  async getQuizKpi(quizId: string): Promise<Kpi> {
     return this.kpiRepository.getQuizKpi(quizId);
   }
 

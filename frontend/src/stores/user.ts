@@ -202,18 +202,6 @@ export const useUserStore = defineStore("user", () => {
     return count;
   }
 
-  function formatRevisionTime(seconds: number): string {
-    if (!seconds || seconds <= 0) return "0m";
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    let result = "";
-    if (h > 0) result += `${h}h `;
-    if (m > 0) result += `${m}m`;
-    if (h === 0 && m === 0) result = `${s}s`;
-    return result.trim();
-  }
-
   async function fetchKpis() {
     if (!user.value) {
       averageScore.value = "0%";
@@ -226,10 +214,9 @@ export const useUserStore = defineStore("user", () => {
         KpiService.getUserTotalRevisionTime(user.value.id || user.value._id),
       ]);
       averageScore.value = (score || 0) + "%";
-      const formattedTime = formatRevisionTime(Number(time) || 0);
-      totalRevisionTimeFormatted.value = formattedTime;
+      totalRevisionTimeFormatted.value = time || "0m";
       localStorage.setItem('averageScore', averageScore.value);
-      localStorage.setItem('totalRevisionTimeFormatted', formattedTime);
+      localStorage.setItem('totalRevisionTimeFormatted', totalRevisionTimeFormatted.value);
     } catch {
       averageScore.value = "0%";
       totalRevisionTimeFormatted.value = "0m";

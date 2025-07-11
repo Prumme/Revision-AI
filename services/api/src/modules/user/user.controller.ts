@@ -45,7 +45,6 @@ import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
 import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
-import { UserService } from '@modules/user/user.service';
 import { UserData } from '../../common/types/user-data';
 
 @ApiTags('Utilisateurs')
