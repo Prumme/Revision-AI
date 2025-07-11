@@ -7,11 +7,13 @@ import QuizLoadingSpinner from "@/components/loaders/QuizLoadingSpinner.vue";
 import { Quiz, QuizService } from "@/services/quiz.service";
 import { useQuizLoadingStore } from "@/stores/quizLoading";
 import { useUserStore } from "@/stores/user";
-import { ArrowRight, Calendar, FileQuestion, PlusIcon } from "lucide-vue-next";
+import { ArrowRight, Calendar, FileQuestion, PlusIcon, MoreVertical } from "lucide-vue-next";
 import { onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Motion } from "@motionone/vue";
-import QuizCard from "@/components/cards/QuizCard.vue";
+import TabNavigation from "@/components/common/TabNavigation.vue";
+import { useDialogStore } from "@/stores/dialog";
+import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -29,8 +31,8 @@ const error = ref<string | null>(null);
 const quizCount = ref(0);
 
 const quizTabs = computed(() => [
-  { key: 'my', label: 'Mes quiz', badge: quizCount.value },
-  { key: 'shared', label: 'Quiz de la communauté' },
+  {key: 'my', label: 'Mes quiz', badge: quizCount.value},
+  {key: 'shared', label: 'Quiz de la communauté'},
 ]);
 const activeTab = ref('my');
 
@@ -51,7 +53,7 @@ async function fetchQuizzes() {
     if (search.value) filters.search = search.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
     if (isPublic.value !== null) filters.isPublic = isPublic.value;
-    const pagination = { page: page.value, limit: limit.value };
+    const pagination = {page: page.value, limit: limit.value};
     let res;
     if (activeTab.value === 'shared') {
       res = await QuizService.getAllQuizzes(filters, pagination);
@@ -104,9 +106,20 @@ watch(
   },
 );
 
+
+const dialogStore = useDialogStore();
+
+const handleReport = (quiz: Quiz) => {
+  dialogStore.showReport({
+    quizId: quiz.id,
+    quizName: quiz.title,
+  });
+};
+
 watch(quizCount, (newCount) => {
   quizTabs.value[0].badge = newCount;
 });
+
 
 onMounted(async () => {
   await fetchQuizzes();
@@ -126,7 +139,7 @@ onMounted(async () => {
         class="group w-min whitespace-nowrap"
       >
         <template #icon>
-          <PlusIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
+          <PlusIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90"/>
         </template>
         Créez un quiz
       </Button>
@@ -138,7 +151,7 @@ onMounted(async () => {
         :animate="{ opacity: 1, y: 0 }"
         :transition="{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }"
       >
-        <SearchBarComponent v-model="search" class="mb-4" />
+        <SearchBarComponent v-model="search" class="mb-4"/>
         <div class="flex gap-4 mb-4">
           <Select
             v-model="selectedCategory"
@@ -149,20 +162,23 @@ onMounted(async () => {
             placeholder="Catégorie"
             id="category"
           />
-          <Switch v-model="isPublic" label="Quiz privés uniquement" id="isPublic" />
+          <Switch v-model="isPublic" label="Quiz publics uniquement" id="isPublic"/>
         </div>
       </Motion>
     </div>
+
+    <TabNavigation
+      :tabs="quizTabs"
+      v-model:activeTab="activeTab"
+      class="mb-6"
+    />
 
     <Motion
       :initial="{ opacity: 0, y: 40 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
     >
-      <!-- Spinner -->
-      <QuizLoadingSpinner v-if="quizLoadingStore.isLoading" />
-
-      <!-- Loading Skeleton -->
+      <!-- Loading -->
       <div
         v-else-if="loading"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5 animate-pulse"
@@ -181,29 +197,19 @@ onMounted(async () => {
               <div class="h-5 w-20 bg-gray-200 rounded-full"></div>
             </div>
           </div>
-          <div
-            class="px-4 py-3 bg-gray-50 rounded-b-2xl border-t border-gray-100 flex justify-between items-center"
-          >
+          <div class="px-4 py-3 bg-gray-50 rounded-b-2xl border-t border-gray-100 flex justify-between items-center">
             <div class="h-5 w-16 bg-gray-200 rounded-full"></div>
             <div class="h-5 w-20 bg-gray-200 rounded-full"></div>
           </div>
         </div>
       </div>
 
-      <!-- Onglets -->
-      <TabNavigation
-        v-else
-        :tabs="quizTabs"
-        v-model:activeTab="activeTab"
-        class="mb-6"
-      />
-
-      <!-- Message d'erreur -->
-      <div v-if="error" class="bg-red-100 text-red-800 px-4 py-3 rounded-md text-center">
+      <!-- Error -->
+      <div v-else-if="error" class="bg-red-100 text-red-800 px-4 py-3 rounded-md text-center">
         {{ error }}
       </div>
 
-      <!-- Aucune donnée -->
+      <!-- Empty -->
       <div
         v-else-if="quizzes.length === 0"
         class="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg shadow-inner"
@@ -213,54 +219,97 @@ onMounted(async () => {
         <p class="text-gray-600">Créez votre premier quiz pour commencer !</p>
       </div>
 
-      <!-- Liste des quiz -->
+      <!-- Quiz list -->
       <div v-else>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
           <div
             v-for="quiz in quizzes"
             :key="quiz.id"
-            @click="goToQuizDetail(quiz.id!)"
-            class="cursor-pointer h-full"
+            class="flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
           >
-            <QuizCard :category="quiz.category" :date="quiz.createdAt" :questionsCount="quiz.questionsNumbers">
-              <template #title>
-                <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
-              </template>
-              <template #description>
-                <span class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">
-                  {{ quiz.description || 'Aucune description' }}
-                </span>
-              </template>
-              <template #meta="{ getCategoryLabel, formatDate }">
-                <span class="px-3 py-1 rounded-full font-bold shadow text-base bg-white/80 border border-black/10 text-gray-900 whitespace-nowrap">
+            <div class="absolute top-2 right-2 z-10" @click.stop>
+              <DropdownInput position="top-right">
+                <template #trigger>
+                  <MoreVertical class="w-5 h-5 text-gray-600" />
+                </template>
+                <template #menus>
+                  <div class="py-1">
+                    <button
+                      @click="handleReport(quiz)"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      Signaler ce quiz
+                    </button>
+                  </div>
+                </template>
+              </DropdownInput>
+            </div>
+
+            <div
+              class="flex flex-col flex-1 p-6 rounded-t-2xl cursor-pointer"
+              :style="{
+                background: `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)`,
+              }"
+              @click="goToQuizDetail(quiz.id!)"
+
+            >
+              <h3 class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</h3>
+              <p class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">
+                {{ quiz.description || "Aucune description" }}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-2 mt-auto text-xs">
+                <span
+                  class="px-2 py-1 rounded-full font-semibold shadow"
+                  :style="{ backgroundColor: getCategoryColor(quiz.category), color: '#333' }"
+                >
                   {{ getCategoryLabel(quiz.category) }}
                 </span>
-                <span class="flex items-center gap-1 text-gray-600">
-                  <FileQuestion class="w-4 h-4" />
+
+                <div class="flex items-center gap-1 text-gray-600">
+                  <FileQuestion class="w-4 h-4"/>
                   <span>{{ quiz.questionsNumbers || 0 }} questions</span>
-                </span>
-                <span class="flex items-center gap-1 text-gray-600">
-                  <Calendar class="w-4 h-4" />
+                </div>
+
+                <div class="flex items-center gap-1 text-gray-600">
+                  <Calendar class="w-4 h-4"/>
                   <span>{{ formatDate(quiz.createdAt) }}</span>
-                </span>
-              </template>
-              <template #status>
-                <span :class="['text-xs font-medium px-2 py-1 rounded-full', quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600']">
-                  {{ quiz.isPublic ? 'Public' : 'Privé' }}
-                </span>
-              </template>
-              <template #action>
-                <span class="text-sm text-primary flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
-                  Voir le quiz
-                  <ArrowRight class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </template>
-              <template #badge>
-                <span v-if="quiz.status === 'pending'" class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">En attente</span>
-                <span v-else-if="quiz.status === 'published'" class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full">Publié</span>
-                <span v-else-if="quiz.status === 'draft'" class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">Brouillon</span>
-              </template>
-            </QuizCard>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center px-4 py-3 bg-gray-50 rounded-b-2xl border-t border-gray-100">
+              <span
+                :class="[
+                  'text-xs font-medium px-2 py-1 rounded-full',
+                  quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600',
+                ]"
+              >
+                {{ quiz.isPublic ? "Public" : "Privé" }}
+              </span>
+
+              <div
+                class="text-sm text-primary flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all"
+              >
+                Voir le quiz
+                <ArrowRight class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"/>
+              </div>
+            </div>
+
+            <div class="absolute top-0 right-0 m-2">
+              <span
+                v-if="quiz.status === 'pending'"
+                class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+              >En attente</span>
+              <span
+                v-else-if="quiz.status === 'published'"
+                class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
+              >Publié</span>
+              <span
+                v-else-if="quiz.status === 'draft'"
+                class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
+              >Brouillon</span>
+            </div>
           </div>
         </div>
 
@@ -283,6 +332,12 @@ onMounted(async () => {
           </button>
         </div>
       </div>
+
+      <QuizLoadingSpinner
+        v-if="quizLoadingStore.isLoading"
+        class="fixed bottom-6 right-6 z-50 bg-primary border-2 border-black shadow-[0_4px_0_#000] rounded-lg p-4 flex items-center justify-center"
+      />
     </Motion>
   </section>
 </template>
+
