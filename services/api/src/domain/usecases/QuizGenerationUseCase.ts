@@ -1,4 +1,5 @@
 import { UseCase, UseCaseFactory } from './IUseCase';
+import { ForbiddenException } from '@nestjs/common';
 import { QuizGeneratedDTO } from '../../types/QuizGeneratedDTO';
 import { FileContentDTO } from '../../types/FileContentDTO';
 import { CreateQuizDto } from '@modules/quiz/dto/create-quiz.dto';
@@ -58,7 +59,7 @@ export interface QuizIdentifier {
  *  It returns the created pending quiz or an error if something goes wrong
  */
 
-export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error>>;
+export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error | ForbiddenException>>;
 export const CreateQuizUseCaseFactory: UseCaseFactory<
   CreateQuizUseCase,
   [
@@ -92,11 +93,11 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     const filesCount = createQuizDto.medias.length;
     let totalTokens = 0;
     const checkTotal = _policyService.canCreateQuiz(_userTier, totalQuizzes);
-    if (!checkTotal.allowed) return new Error(checkTotal.reason);
+    if (!checkTotal.allowed) return new ForbiddenException(checkTotal.reason);
     const checkToday = _policyService.canGenerateToday(_userTier, quizzesToday);
-    if (!checkToday.allowed) return new Error(checkToday.reason);
+    if (!checkToday.allowed) return new ForbiddenException(checkToday.reason);
     const checkFiles = _policyService.canUseFilesForGeneration(_userTier, filesCount);
-    if (!checkFiles.allowed) return new Error(checkFiles.reason);
+    if (!checkFiles.allowed) return new ForbiddenException(checkFiles.reason);
 
     type FileIdentifierWithChecksum = {
       fileIdentifier: string;
@@ -201,7 +202,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
       const allParsedFiles = quizGenerationDTO.filesContents
       for (const file of allParsedFiles) {
-         let jsonString = JSON.stringify(file.fileContent);
+         let jsonString = JSON.stringify(file);
          totalTokens += jsonString.length;
       }
       const checkTokens = _policyService.canUseTokensForGeneration(
@@ -209,7 +210,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
         totalTokens,
       );
       if (!checkTokens.allowed) {
-        return new Error(checkTokens.reason);
+        return new ForbiddenException(checkTokens.reason);
       }
 
       await _quizGenerationQueueProvider.send(quizGenerationDTO);
@@ -232,7 +233,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
 export type HandleParsedFileUseCase = UseCase<
   FileContentDTO,
-  Promise<void | Error>
+  Promise<void | Error | ForbiddenException>
 >;
 
 export const HandleParsedFileUseCaseFactory: UseCaseFactory<
@@ -317,7 +318,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
 
         const allParsedFiles = quizGenerationDTO.filesContents
         for (const file of allParsedFiles) {
-          let jsonString = JSON.stringify(file.fileContent);
+          let jsonString = JSON.stringify(file);
           totalTokens += jsonString.length;
         }
         const checkTokens = _policyService.canUseTokensForGeneration(
@@ -325,7 +326,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           totalTokens,
         );
         if (!checkTokens.allowed) {
-          return new Error(checkTokens.reason);
+          return new ForbiddenException(checkTokens.reason);
         }
 
         await _quizGenerationQueueProvider.send(quizGenerationDTO);

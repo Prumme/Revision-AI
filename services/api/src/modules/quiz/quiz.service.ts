@@ -1,4 +1,5 @@
 import { Quiz } from '@entities/quiz.entity';
+import { ForbiddenException } from '@nestjs/common';
 import { MinioService } from '@modules/minio/minio.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { QuizRepository } from '@repositories/quiz.repository';
@@ -99,6 +100,13 @@ export class QuizService {
     );
 
     const createdQuiz = await useCase(quiz);
+
+    if (createdQuiz instanceof ForbiddenException) {
+      this.logger.error(
+        `Création de quiz interdite: ${createdQuiz.message}`,
+      );
+      throw createdQuiz;
+    }
 
     if (createdQuiz instanceof Error) {
       this.logger.error(
