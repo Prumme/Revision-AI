@@ -96,6 +96,11 @@ export class MongoQuizRepository implements QuizRepository {
     return this.quizModel.countDocuments({ userId: userId }).exec();
   }
 
+  async findAllMediaByUserId(userId: string): Promise<string[]> {
+    const documents = await this.quizModel.find({ userId, media: { $exists: true, $ne: [] } }, { media: 1, _id: 0 }).exec();
+    return documents.flatMap(doc => doc.media || []);
+  }
+
   private documentToQuiz(document: QuizDocument): Quiz {
     return {
       id: document._id.toString(),

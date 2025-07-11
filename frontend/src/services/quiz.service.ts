@@ -212,7 +212,6 @@ export class QuizService {
     }
   }
 
-
   /**
    * Compte le nombre de quiz pour un utilisateur
    * @param userId - L'ID de l'utilisateur
@@ -222,5 +221,10 @@ export class QuizService {
     // Appel en tant que paramètre de chemin, pas query param
     const response = await ApiService.get<{ count: number }>(`/quizzes/count/${userId}`);
     return response.data.count;
+  }
+
+  static async getUserMedia(userId: string): Promise<string[]> {
+    const response = await ApiService.get<string[]>(`/quizzes/media/${userId}`);
+    return response.data;
   }
 }

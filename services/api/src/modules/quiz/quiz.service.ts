@@ -177,4 +177,8 @@ export class QuizService {
   async countByUserId(userId: string): Promise<number> {
     return this.quizRepository.countByUserId(userId);
   }
+
+  async findAllMediaByUserId(userId: string): Promise<string[]> {
+    return this.quizRepository.findAllMediaByUserId(userId);
+  }
 }

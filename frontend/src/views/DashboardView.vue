@@ -5,6 +5,7 @@ import KPICard from '@/components/cards/KPICard.vue';
 import { onMounted, ref, watch } from 'vue';
 import { QuizService } from '@/services/quiz.service';
 import QuizCard from '@/components/cards/QuizCard.vue';
+import MediaList from '@/components/cards/MediaList.vue';
 import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
 
 const userStore = useUserStore();
@@ -112,25 +113,15 @@ console.log(stats);
         </div>
       </section>
 
-      <!-- Recent Activity Section -->
-      <section
-        id="recent-activity"
-      >
-        <h2 class="text-3xl font-bold mb-5">Mes révisions</h2>
-
-      </section>
-
-
       <!-- Documents & QCM -->
       <section
         class="grid grid-cols-2 gap-15"
       >
         <div class="col-span-2 md:col-span-1">
-          <h2 class="text-3xl font-bold mb-5">Mes documents</h2>
-          <p class="text-lg">Aucun document importé pour le moment.</p>
+          <MediaList />
         </div>
         <div class="col-span-2 md:col-span-1">
-          <h2 class="text-3xl font-bold mb-5">Mes QCM</h2>
+          <h2 class="text-3xl font-bold mb-5">Mes Quiz</h2>
           <p class="text-lg" v-if="userQuizzes.length === 0">Aucun QCM créé pour le moment.</p>
           <div v-else>
             <div class="flex gap-6 overflow-x-auto pb-2 custom-scrollbar">
