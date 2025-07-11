@@ -42,16 +42,15 @@ const handleLogout = () => {
     <ToastContainer />
     <!-- Sidebar Desktop -->
     <nav
-      class="hidden md:block relative p-5"
+      class="hidden md:block relative p-2.5"
       :class="[
         'bg-white text-foreground-alt border border-l border-gray-extralight',
         'h-full',
         'transition-all duration-500 ease-in-out',
-        'shadow-lg',
-        isSidebarOpen ? 'lg:w-92' : 'lg:w-24',
-        'w-24',
+
+        isSidebarOpen ? 'lg:w-92' : 'lg:w-19',
+        'w-19',
         isSidebarOpen && 'md:w-32',
-        isSidebarOpen && 'lg:shadow-lg',
       ]"
     >
       <div class="flex flex-col justify-between h-full">
@@ -110,25 +109,33 @@ const handleLogout = () => {
               Administration
             </div>
             <div v-else class="border-t border-gray-200 my-3"></div>
-            <NavLink
-              to="/admin/user"
-              icon="Users"
-              :text="isSidebarOpen ? 'Utilisateurs' : ''"
-              :active="false"
-              :showText="isSidebarOpen"
-            />
-
-            <a
-              href="https://dashboard.stripe.com/test/customers"
-              target="_blank"
-              class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200"
-            >
-              <HandCoinsIcon class="h-5 w-5" />
-              <span v-if="isSidebarOpen" class="flex items-center gap-2">
-                Clients
-                <ExternalLinkIcon class="h-4 w-4" />
-              </span>
-            </a>
+            <div class="flex flex-col gap-2.5">
+              <NavLink
+                to="/admin/user"
+                icon="Users"
+                :text="isSidebarOpen ? 'Utilisateurs' : ''"
+                :active="false"
+                :showText="isSidebarOpen"
+              />
+              <NavLink
+                to="/admin/reports"
+                icon="Flag"
+                :text="isSidebarOpen ? 'Signalements' : ''"
+                :active="false"
+                :showText="isSidebarOpen"
+              />
+              <a
+                href="https://dashboard.stripe.com/test/customers"
+                target="_blank"
+                class="flex items-center gap-5 px-4 py-3 rounded-lg text-sm hover:bg-primary/50 duration-200"
+              >
+                <HandCoinsIcon class="h-5 w-5" />
+                <span v-if="isSidebarOpen" class="flex items-center gap-2">
+                  Clients
+                  <ExternalLinkIcon class="h-4 w-4" />
+                </span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -216,7 +223,7 @@ const handleLogout = () => {
 
       <!-- Profile Section with Dropdown -->
       <div class="w-full mt-10">
-        <Dropdown>
+        <Dropdown trigger="">
           <template #trigger>
             <ProfileComponent :isSidebarOpen="isSidebarOpen" :icon="true" />
           </template>
@@ -244,7 +251,7 @@ const handleLogout = () => {
       </div>
     </div>
 
-    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8">
+    <div class="w-full h-full overflow-scroll bg-background-alt text-foreground pt-10 lg:p-8 p-4">
       <router-view></router-view>
     </div>
   </main>

@@ -33,7 +33,7 @@ import {
   ActiveSubscriptionUseCaseFactory,
   InactiveSubscriptionUseCase,
   InactiveSubscriptionUseCaseFactory,
-} from '../../domain/usecases/SubscriptionUsecases';
+} from '@domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -43,11 +43,9 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
-import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
-import { UserData } from './dto/user-data.dto';
-import {UserService} from "@modules/user/user.service";
-
-
+import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
+import { UserService } from '@modules/user/user.service';
+import { UserData } from '../../common/types/user-data';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -371,7 +369,6 @@ export class UserController {
     @Param('id') id: string,
     @Body('tier') tier: SubscriptionTier,
   ): Promise<User> {
-    let useCase: InactiveSubscriptionUseCase | ActiveSubscriptionUseCase;
     const user = await this.userService.findById(id);
     if (!user) {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
@@ -407,7 +404,6 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: "Les données de l'utilisateur ont été récupérées avec succès",
-    type: UserData,
   })
   @ApiResponse({
     status: 401,
@@ -417,7 +413,7 @@ export class UserController {
     status: 403,
     description: "L'utilisateur n'a pas les droits nécessaires",
   })
-  async downloadData(@CurrentUser() user: ReqUser) {
+  async downloadData(@CurrentUser() user: ReqUser): Promise<UserData> {
     try {
       return await this.userService.downloadData(user.sub);
     } catch (error) {

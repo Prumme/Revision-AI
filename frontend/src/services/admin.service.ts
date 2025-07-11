@@ -2,19 +2,12 @@ import { ApiService } from "./api.service";
 import type { User } from "@/types/user";
 import type { UserApiFilters } from "@/types/admin";
 import type { Quiz } from "@/types/quiz";
-
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-}
-
-export interface PaginatedUsersResponse {
-  data: User[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import type { Report, GetReportsParams } from "@/types/report";
+import type {
+  PaginationParams,
+  PaginatedResponse,
+  PaginatedUsersResponse,
+} from "@/types/pagination";
 
 export class AdminService {
   static async getUsers(
@@ -76,6 +69,43 @@ export class AdminService {
     if (!response.data) {
       throw new Error("Erreur lors de la mise à jour de l'abonnement");
     }
+  }
+
+  static async getReports(params: GetReportsParams): Promise<PaginatedResponse<Report>> {
+    const queryParams = new URLSearchParams();
+
+    if (params.resolved !== undefined) {
+      queryParams.append("resolved", params.resolved.toString());
+    }
+    if (params.page) {
+      queryParams.append("page", params.page.toString());
+    }
+    if (params.limit) {
+      queryParams.append("limit", params.limit.toString());
+    }
+    if (params.search) {
+      queryParams.append("search", params.search);
+    }
+    if (params.sortBy) {
+      queryParams.append("sortBy", params.sortBy);
+    }
+    if (params.sortOrder) {
+      queryParams.append("sortOrder", params.sortOrder);
+    }
+
+    const response = await ApiService.get<PaginatedResponse<Report>>(
+      `/reports?${queryParams.toString()}`,
+    );
+    return response.data;
+  }
+
+  static async resolveReport(reportId: string): Promise<void> {
+    await ApiService.patch(`/reports/${reportId}/resolve`, {});
+  }
+
+  static async getReportById(id: string): Promise<Report> {
+    const response = await ApiService.get<Report>(`/reports/${id}`);
+    return response.data;
   }
 
   private static buildQueryParams(filters: UserApiFilters): string[] {

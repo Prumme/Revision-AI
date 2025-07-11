@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, defineProps, defineEmits, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import { ApiService } from "@/services/api.service";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
@@ -167,7 +167,7 @@ onMounted(() => {
         @click="saveAddress"
         class="font-outfit text-sm text-primary hover:text-primary/80 transition-colors duration-150 flex items-center gap-2"
       >
-        <SaveIcon class="h-6 w-6"/>
+        <SaveIcon class="h-6 w-6" />
         <span>Sauvegarder l'adresse pour plus tard</span>
       </button>
     </div>

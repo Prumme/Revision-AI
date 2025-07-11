@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import { z } from "zod";
 import { generateQuizFromFileContentFactory } from "../../app/usecases/GenerateQuizFromFileContentUseCase";
-import { ScalewayQuizIAAgent } from "../services/ScalewayQuizIAAgent";
+import { LangChainQuizIAAgent } from "../services/LangChainQuizIAAgent";
 
-const quizIAAgent = new ScalewayQuizIAAgent();
+const quizIAAgent = new LangChainQuizIAAgent();
 
 export const cliEntrypoint = async () => {
   const filePathJSON = process.argv[2];

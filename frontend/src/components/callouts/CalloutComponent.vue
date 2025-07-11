@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, type Component } from "vue";
+import { type Component } from "vue";
 
 const props = defineProps<{
   message: string;
