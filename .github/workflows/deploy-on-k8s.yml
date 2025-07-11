@@ -3,7 +3,7 @@ name: Deploy to Scaleway Kapsule
 on:
   push:
     branches:
-      - main
+      - 98-intégré-matamo-sur-la-génération-des-quiz-et-les-sessions
 
 jobs:
   build_and_push_images:
