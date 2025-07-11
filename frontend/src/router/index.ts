@@ -2,6 +2,7 @@ import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInp
 import UserSidenav from "@/components/UserSidenav.vue";
 import { useUserStore } from "@/stores/user";
 import AdminUserView from "@/views/admin/AdminUserView.vue";
+import AdminReportView from "@/views/admin/AdminReportView.vue";
 import EmailSend from "@/views/authentication/EmailSend.vue";
 import ForgotPassword from "@/views/authentication/ForgotPassword.vue";
 import LoginPage from "@/views/authentication/LoginPage.vue";
@@ -18,6 +19,7 @@ import QuizDetails from "@/views/quiz/QuizDetails.vue";
 import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,9 +81,21 @@ const router = createRouter({
           meta: { requiresAdmin: true },
         },
         {
+          path: "/admin/reports",
+          name: "admin-reports",
+          component: AdminReportView,
+          meta: { requiresAdmin: true },
+        },
+        {
           path: "/admin/users/:id",
           name: "admin-user",
           component: AdminUserDetailView,
+          meta: { requiresAdmin: true },
+        },
+        {
+          path: "/admin/reports/:id",
+          name: "admin-report-detail",
+          component: AdminReportDetailView,
           meta: { requiresAdmin: true },
         },
       ],
@@ -172,6 +186,5 @@ router.beforeEach(async (to, from, next) => {
 
   next();
 });
-
 
 export default router;

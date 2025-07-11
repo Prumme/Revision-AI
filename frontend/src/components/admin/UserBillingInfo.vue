@@ -129,7 +129,7 @@ const emit = defineEmits<{
         </div>
 
         <!-- Liste des factures -->
-        <InvoiceList :invoices="invoices" />
+        <InvoiceList :invoices="invoices" :scrollable="true" />
       </div>
       <div v-else class="text-center py-8 text-gray-500">
         <CreditCard class="w-12 h-12 mx-auto mb-2 opacity-50" />

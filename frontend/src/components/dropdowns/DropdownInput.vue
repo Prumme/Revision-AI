@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const isOpen = ref(false);
+const dropdownRef = ref<HTMLElement>();
 
 const toggleMenu = () => {
   isOpen.value = !isOpen.value;
@@ -22,15 +23,7 @@ const positionClasses = computed(() => {
 });
 
 const closeMenu = (event: MouseEvent) => {
-  const menu = document.getElementById("dropdown-menu");
-  const button = document.getElementById("dropdown-button");
-
-  if (
-    menu &&
-    button &&
-    !menu.contains(event.target as Node) &&
-    !button.contains(event.target as Node)
-  ) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
     isOpen.value = false;
   }
 };
@@ -83,11 +76,10 @@ defineExpose({
 </style>
 
 <template>
-  <div class="relative">
+  <div class="relative" ref="dropdownRef">
     <div
       @click="toggleMenu"
       class="cursor-pointer hover:bg-gray-extralight/40 p-2 rounded-md flex items-center gap-2 w-full"
-      id="dropdown-button"
     >
       <slot name="trigger"></slot>
     </div>
@@ -95,7 +87,6 @@ defineExpose({
     <transition name="fade" mode="out-in">
       <div
         v-if="isOpen"
-        id="dropdown-menu"
         class="absolute z-30 w-72 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-gray-extralight ring-opacity-5 transition-all transform ease-in-out duration-300"
         :class="positionClasses"
       >

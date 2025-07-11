@@ -4,14 +4,16 @@ import SearchBarComponent from "@/components/inputs/SearchBarComponent.vue";
 import Select from "@/components/inputs/SelectComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import QuizLoadingSpinner from "@/components/loaders/QuizLoadingSpinner.vue";
-import {Quiz, QuizService} from "@/services/quiz.service";
-import {useQuizLoadingStore} from "@/stores/quizLoading";
-import {useUserStore} from "@/stores/user";
-import {ArrowRight, Calendar, FileQuestion, PlusIcon} from "lucide-vue-next";
-import {onMounted, ref, computed, watch} from "vue";
-import {useRouter} from "vue-router";
+import { Quiz, QuizService } from "@/services/quiz.service";
+import { useQuizLoadingStore } from "@/stores/quizLoading";
+import { useUserStore } from "@/stores/user";
+import { ArrowRight, Calendar, FileQuestion, PlusIcon, MoreVertical } from "lucide-vue-next";
+import { onMounted, ref, computed, watch } from "vue";
+import { useRouter } from "vue-router";
+import { Motion } from "@motionone/vue";
 import TabNavigation from "@/components/common/TabNavigation.vue";
-import {Motion} from "@motionone/vue";
+import { useDialogStore } from "@/stores/dialog";
+import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -153,9 +155,20 @@ watch(
   },
 );
 
+
+const dialogStore = useDialogStore();
+
+const handleReport = (quiz: Quiz) => {
+  dialogStore.showReport({
+    quizId: quiz.id,
+    quizName: quiz.title,
+  });
+};
+
 watch(quizCount, (newCount) => {
   quizTabs.value[0].badge = newCount;
 });
+
 
 onMounted(async () => {
   await fetchQuizzes();
@@ -261,12 +274,33 @@ onMounted(async () => {
           <div
             v-for="quiz in quizzes"
             :key="quiz.id"
-            @click="goToQuizDetail(quiz.id!)"
-            class="cursor-pointer flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
+            class="flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
           >
+            <div class="absolute top-2 right-2 z-10" @click.stop>
+              <DropdownInput position="top-right">
+                <template #trigger>
+                  <MoreVertical class="w-5 h-5 text-gray-600" />
+                </template>
+                <template #menus>
+                  <div class="py-1">
+                    <button
+                      @click="handleReport(quiz)"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      Signaler ce quiz
+                    </button>
+                  </div>
+                </template>
+              </DropdownInput>
+            </div>
+
             <div
-              class="flex flex-col flex-1 p-6 rounded-t-2xl"
-              :style="{ background: `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)` }"
+              class="flex flex-col flex-1 p-6 rounded-t-2xl cursor-pointer"
+              :style="{
+                background: `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)`,
+              }"
+              @click="goToQuizDetail(quiz.id!)"
+
             >
               <h3 class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</h3>
               <p class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">

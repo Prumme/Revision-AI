@@ -9,6 +9,7 @@ import { QuizModule } from '@modules/quiz/quiz.module';
 import { CacheModule } from '@nestjs/cache-manager';
 
 import { SubscriptionModule } from '@modules/subscription/subscription.module';
+import { ReportModule } from '@modules/report/report.module';
 import { SessionModule } from './modules/session/session.module';
 
 @Module({
@@ -29,6 +30,7 @@ import { SessionModule } from './modules/session/session.module';
     AuthModule,
     QuizModule,
     SubscriptionModule,
+    ReportModule,
     SessionModule,
   ],
   providers: [
