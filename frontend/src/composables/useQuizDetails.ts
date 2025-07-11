@@ -95,7 +95,7 @@ export function useQuizDetails(quizId: string) {
       label: "Reprendre",
       icon: "Play",
       tooltip: "Reprendre cette session",
-      variant: "yellow",
+      variant: "warning",
       visible: (row) => row.status === "paused",
       handler: async (row) => {
         if (row && row.id) {
