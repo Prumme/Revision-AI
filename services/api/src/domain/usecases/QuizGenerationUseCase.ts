@@ -15,6 +15,7 @@ import { Quiz } from '@entities/quiz.entity';
 import { FileService } from '@services/FileService';
 import { SubscriptionPolicyService } from '../policies/SubscriptionPolicyService';
 import { SubscriptionTier } from '../policies/SubscriptionPolicy';
+import { UserRepository } from '@repositories/user.repository';
 
 async function generateQuizGenerationDTO(
   identifier: string,
@@ -242,7 +243,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
     CachedFileParsedRepository,
     QueueProvider<QuizGenerationDTO>,
     SubscriptionPolicyService,
-    SubscriptionTier,
+    UserRepository,
     typeof generateQuizGenerationDTO?, // Injected for testing purposes
   ]
 > = (
@@ -251,7 +252,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
   _cachedFileParsedRepository,
   _quizGenerationQueueProvider,
   _policyService,
-  _userTier,
+  _userRepository,
   _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
 ) => {
   return async (fileContent) => {
@@ -293,6 +294,14 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           console.error(error);
           continue;
         }
+
+        const user = await _userRepository.findById(quiz.userId);
+        if (!user) {
+          error = new Error('User not found for the quiz');
+          console.error(error);
+          continue;
+        }
+
         const quizGenerationDTO = await _generateQuizGenerationDTO(
           quiz.id,
           quiz.questionsNumbers,
@@ -312,7 +321,7 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           totalTokens += jsonString.length;
         }
         const checkTokens = _policyService.canUseTokensForGeneration(
-          _userTier,
+          user.subscriptionTier as SubscriptionTier || "free",
           totalTokens,
         );
         if (!checkTokens.allowed) {

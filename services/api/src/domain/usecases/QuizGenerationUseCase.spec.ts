@@ -4,6 +4,7 @@ import {
   HandleQuizGenerationCompletedUseCaseFactory,
 } from './QuizGenerationUseCase';
 import { QuizRepository } from '@repositories/quiz.repository';
+import { UserRepository } from '@repositories/user.repository';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
 import { QueueProvider } from '@services/QueueProvider';
@@ -282,6 +283,7 @@ describe('HandleParsedFileUseCase', () => {
   const mockGenerateQuizGenerationDTO = jest.fn();
   // Déclaration des mocks avec jest-mock-extended
   let mockQuizRepository: Mocked<QuizRepository>;
+  let mockUserRepository: Mocked<UserRepository>;
   let mockJobRepository: Mocked<QuizGenerationJobRepository>;
   let mockCachedFileRepository: Mocked<CachedFileParsedRepository>;
   let mockQuizGenerationQueue: Mocked<QueueProvider<any>>;
@@ -291,6 +293,7 @@ describe('HandleParsedFileUseCase', () => {
   beforeEach(() => {
     // Initialisation des mocks
     mockQuizRepository = mock<QuizRepository>();
+    mockUserRepository = mock<UserRepository>();
     mockJobRepository = mock<QuizGenerationJobRepository>();
     mockCachedFileRepository = mock<CachedFileParsedRepository>();
 
@@ -337,7 +340,7 @@ describe('HandleParsedFileUseCase', () => {
       mockCachedFileRepository,
       mockQuizGenerationQueue,
       mockPolicy,
-      userTier,
+      mockUserRepository,
       mockGenerateQuizGenerationDTO,
     );
 
@@ -386,7 +389,7 @@ describe('HandleParsedFileUseCase', () => {
       mockCachedFileRepository,
       mockQuizGenerationQueue,
       mockPolicy,
-      userTier,
+      mockUserRepository,
       mockGenerateQuizGenerationDTO,
     );
 
@@ -416,7 +419,7 @@ describe('HandleParsedFileUseCase', () => {
       mockCachedFileRepository,
       mockQuizGenerationQueue,
       mockPolicy,
-      userTier,
+      mockUserRepository,
       mockGenerateQuizGenerationDTO,
     );
     const fileContent: FileContentDTO = {
@@ -444,7 +447,7 @@ describe('HandleParsedFileUseCase', () => {
       mockCachedFileRepository,
       mockQuizGenerationQueue,
       mockPolicy,
-      userTier,
+      mockUserRepository,
       mockGenerateQuizGenerationDTO,
     );
     const fileContent: FileContentDTO = {
