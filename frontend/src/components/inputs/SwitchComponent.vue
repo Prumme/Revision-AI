@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Label from "@/components/inputs/LabelComponent.vue";
-import { defineEmits, defineProps } from "vue";
 
 const { modelValue, disabled, label, description } = defineProps<{
   id: string;

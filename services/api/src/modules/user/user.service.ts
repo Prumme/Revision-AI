@@ -14,7 +14,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from '@infrastructure/resend/mail.service';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { QuizRepository } from '@repositories/quiz.repository';
-import { UserData } from './dto/user-data.dto';
+import { UserData } from '@common/types/user-data';
 import { Customer, CustomerAndUser } from '@entities/customer.entity';
 
 @Injectable()
@@ -219,8 +219,7 @@ export class UserService {
     return {
       user,
       customer,
-      //quizzes: userQuizzes, //@todo corriger le type
-      quizzes: []
+      quizzes: userQuizzes,
     };
   }
 }

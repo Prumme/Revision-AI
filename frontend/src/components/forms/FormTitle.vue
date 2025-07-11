@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { PencilIcon } from "lucide-vue-next";
-import { computed, defineEmits, nextTick, ref, useSlots } from "vue";
+import { computed, nextTick, ref, useSlots } from "vue";
 
 const inputRef = ref<HTMLInputElement | null>(null);
 const emit = defineEmits(["update:title"]);

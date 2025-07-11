@@ -18,7 +18,7 @@ export async function createQueueConsumer<T extends ZodType>(
       const content = msg.content.toString();
       const notSafeContent = JSON.parse(content);
       const parsedData = zodSchema.parse(notSafeContent);
-      logger.log(`Received message: ${content}`);
+      logger.log(`Received message on ${queueName}`);
       await handler(parsedData);
       channel.ack(msg);
     } catch (err) {
