@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
-import { defineProps, defineEmits } from "vue";
 
 const props = defineProps<{
   selectedPlan: SubscriptionInfo | null;

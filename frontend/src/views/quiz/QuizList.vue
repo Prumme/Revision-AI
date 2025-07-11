@@ -143,12 +143,12 @@ watch([search, selectedCategory, isPublic, page, limit, activeTab], async () => 
 });
 
 watch(
-  () => quizLoadingStore.quizStatus,
+  () => quizLoadingStore.status,
   (newStatus) => {
-    if (newStatus === "completed" && quizLoadingStore.currentQuizId) {
-      setTimeout(() => {
-        router.push(`/quiz/${quizLoadingStore.currentQuizId}`);
-      }, 1000);
+    if (newStatus === "completed") {
+      fetchQuizzes();
+    } else if (newStatus === "error") {
+      error.value = "Une erreur est survenue lors du chargement des quiz.";
     }
   },
 );
@@ -163,45 +163,54 @@ onMounted(async () => {
 </script>
 
 <template>
-  <MotionLayout>
-    <section class="flex flex-col gap-1.5 w-full">
-      <p class="font-outfit text-lg text-black-transparent">Tous vos quiz</p>
-      <h1 class="font-outfit text-4xl font-extrabold text-black">
-        Liste des quiz
-      </h1>
-      <div class="flex justify-end w-full gap-4 mt-4 mb-8">
-        <Button
-          @click="router.push('/quiz/create')"
-          variant="primary"
-          position-icon="right"
-          class="group w-min whitespace-nowrap"
-        >
-          <template #icon>
-            <PlusIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
-          </template>
-          Créez un quiz
-        </Button>
-      </div>
-      <div class="flex flex-col gap-4 mb-2">
-          <SearchBarComponent v-model="search" class="mb-4" />
-          <div class="flex gap-4 mb-4">
-            <Select
-              v-model="selectedCategory"
-              :options="[{ label: 'Toutes les catégories', value: '' }, ...Object.values(QuizService.categories || {})]"
-              placeholder="Catégorie"
-             id="category"/>
-            <Switch v-model="isPublic" label="Quiz publics uniquement"  id="isPublic"/>
-          </div>
-      </div>
-
-        <TabNavigation
-          :tabs="quizTabs"
-          v-model:activeTab="activeTab"
-          class="mb-6"
-        />
-
-        <QuizLoadingSpinner v-if="quizLoadingStore.loading" />
-        <!-- Skeleton loading -->
+  <section class="flex flex-col gap-1.5 w-full">
+    <p class="font-outfit text-lg text-black-transparent">Tous vos quiz</p>
+    <h1 class="font-outfit text-4xl font-extrabold text-black">Liste des quiz</h1>
+    <div class="flex justify-end w-full gap-4 mt-4 mb-8">
+      <Button
+        @click="router.push('/quiz/create')"
+        variant="primary"
+        position-icon="right"
+        class="group w-min whitespace-nowrap"
+      >
+        <template #icon>
+          <PlusIcon class="w-6 h-6 transition-transform duration-300 group-hover:rotate-90" />
+        </template>
+        Créez un quiz
+      </Button>
+    </div>
+    <div class="flex flex-col gap-4 mb-8">
+      <Motion
+        :initial="{ opacity: 0, y: 40 }"
+        :animate="{ opacity: 1, y: 0 }"
+        transition="{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }"
+      >
+        <SearchBarComponent v-model="search" class="mb-4" />
+        <div class="flex gap-4 mb-4">
+          <Select
+            v-model="selectedCategory"
+            :options="[
+              { label: 'Toutes les catégories', value: '' },
+              ...Object.values(QuizService.categories || {}),
+            ]"
+            placeholder="Catégorie"
+            id="category"
+          />
+          <Switch v-model="isPublic" label="Quiz publics uniquement" id="isPublic" />
+        </div>
+      </Motion>
+    </div>
+    <Motion
+      :initial="{ opacity: 0, y: 40 }"
+      :animate="{ opacity: 1, y: 0 }"
+      transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
+    >
+      <!--      <QuizLoadingSpinner v-if="quizLoadingStore.isLoading" />-->
+      <!-- Skeleton loading -->
+      <div
+        v-if="loading"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5 animate-pulse"
+      >
         <div
           v-if="loading"
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 animate-pulse"
@@ -242,8 +251,14 @@ onMounted(async () => {
           <p class="text-gray-600">Créez votre premier quiz pour commencer !</p>
         </div>
 
-        <div v-else>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+      <div v-else>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
+          <div
+            v-for="quiz in quizzes"
+            :key="quiz.id"
+            @click="goToQuizDetail(quiz.id!)"
+            class="cursor-pointer flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative aspect-square transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none"
+          >
             <div
               v-for="quiz in quizzes"
               :key="quiz.id"
@@ -316,6 +331,23 @@ onMounted(async () => {
                   class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
                   >Brouillon</span>
               </div>
+            </div>
+            <div class="absolute top-0 right-0 m-2">
+              <span
+                v-if="quiz.status === 'pending'"
+                class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+                >En attente</span
+              >
+              <span
+                v-else-if="quiz.status === 'published'"
+                class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
+                >Publié</span
+              >
+              <span
+                v-else-if="quiz.status === 'draft'"
+                class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
+                >Brouillon</span
+              >
             </div>
           </div>
           <!-- Pagination -->

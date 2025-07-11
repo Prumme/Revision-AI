@@ -3,7 +3,8 @@ import * as crypto from 'node:crypto';
 
 export enum QuizGenerationJobStatus {
   PENDING = 'pending',
-  PROCESSING = 'processing',
+  PARSING_FILES = "parsing_files",
+  GENERATING = "generating",
   COMPLETED = 'completed',
   FAILED = 'failed',
 }
@@ -90,6 +91,22 @@ export function addEventJob(
   };
 }
 
+export function startParsing(job: QuizGenerationJob): QuizGenerationJob {
+  return {
+    ...job,
+    status: QuizGenerationJobStatus.PARSING_FILES,
+    updatedAt : new Date()
+  }
+}
+
+export function startGenerating(job: QuizGenerationJob): QuizGenerationJob {
+  return {
+    ...job,
+    status: QuizGenerationJobStatus.GENERATING,
+    updatedAt : new Date()
+  }
+}
+
 export function completeJob(job: QuizGenerationJob): QuizGenerationJob {
   job = addEventJob(job, {
     error: false,
@@ -120,10 +137,10 @@ export function failJob(
   );
 }
 
-export function processJob(job: QuizGenerationJob): QuizGenerationJob {
+/* export function processJob(job: QuizGenerationJob): QuizGenerationJob {
   return {
     ...job,
     status: QuizGenerationJobStatus.PROCESSING,
     updatedAt: new Date(),
   };
-}
+} */
