@@ -223,7 +223,7 @@ const handleLogout = () => {
 
       <!-- Profile Section with Dropdown -->
       <div class="w-full mt-10">
-        <Dropdown>
+        <Dropdown trigger="">
           <template #trigger>
             <ProfileComponent :isSidebarOpen="isSidebarOpen" :icon="true" />
           </template>

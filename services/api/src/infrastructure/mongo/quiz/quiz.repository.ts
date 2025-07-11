@@ -18,8 +18,32 @@ export class MongoQuizRepository implements QuizRepository {
     return this.documentToQuiz(document);
   }
 
-  async findAll(): Promise<Quiz[]> {
-    const documents = await this.quizModel.find().exec();
+  async findAll(filters?: any, pagination?: any): Promise<Quiz[]> {
+    const query: any = { status: 'completed' };
+    if (filters) {
+      if (filters.search) {
+        const searchRegex = new RegExp(filters.search, 'i');
+        query.$or = [
+          { title: { $regex: searchRegex } },
+          { description: { $regex: searchRegex } },
+        ];
+      }
+      if (filters.category) {
+        query.category = filters.category;
+      }
+      if (filters.isPublic !== undefined) {
+        query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
+      }
+      if (filters.userId) {
+        query.userId = { $ne: filters.userId };
+      }
+    }
+    let mongoQuery = this.quizModel.find(query);
+    if (pagination) {
+      if (pagination.skip) mongoQuery = mongoQuery.skip(pagination.skip);
+      if (pagination.limit) mongoQuery = mongoQuery.limit(pagination.limit);
+    }
+    const documents = await mongoQuery.exec();
     return documents.map(this.documentToQuiz);
   }
 

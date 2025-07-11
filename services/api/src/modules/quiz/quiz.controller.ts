@@ -45,14 +45,15 @@ export class QuizController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Récupérer tous les quiz' })
+  @ApiOperation({ summary: 'Récupérer tous les quiz (avec filtres)' })
   @ApiResponse({
     status: 200,
     description: 'Liste des quiz récupérée avec succès',
     type: [Quiz],
   })
-  async findAll(): Promise<Quiz[]> {
-    return this.quizService.findAll();
+  async findAll(@Query() filters: QuizFiltersDto, @Req() req: Request & { user?: ReqUser }): Promise<Quiz[]> {
+    const userId = req.user?.sub;
+    return this.quizService.findAll(filters, userId);
   }
 
   @Get(':id')
@@ -146,18 +147,8 @@ export class QuizController {
     @UploadedFiles() files: Express.Multer.File[],
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Quiz> {
-    // S'assurer que files est un tableau
     const fileArray = Array.isArray(files) ? files : files ? [files] : [];
-    if (fileArray.length > 0) {
-      console.log(
-        'File details:',
-        fileArray.map((f) => ({
-          name: f.originalname,
-          size: f.size,
-          mimetype: f.mimetype,
-        })),
-      );
-    }
+
     return this.quizService.create(
       { ...createQuizDto, userId: user.sub },
       fileArray,

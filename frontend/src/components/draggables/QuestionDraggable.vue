@@ -165,7 +165,6 @@ const isMultipleChoice = (question) => {
   </draggable>
 
   <template v-else>
-    {{selectedAnswers}}
     <div v-for="(question, index) in questions" :key="question.id || index" class="mb-6 relative flex items-start gap-2 group">
       <section
         class="flex flex-col p-5 bg-white border border-gray-extralight rounded-lg shadow-sm w-full flex-wrap"
