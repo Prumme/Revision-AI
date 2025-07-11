@@ -6,7 +6,7 @@ import { QuizRepository } from '@repositories/quiz.repository';
 import { UserRepository } from '@repositories/user.repository';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { CreateQuizUseCaseFactory } from '../../domain/usecases/QuizGenerationUseCase';
+import { CreateQuizUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { CachedFileParsedRepository } from '@repositories/cached-file-parsed.repository';
 import { QueueProvider } from '@services/QueueProvider';
@@ -39,7 +39,6 @@ export class QuizService {
   async findById(id: string): Promise<Quiz | null> {
     const quiz = await this.quizRepository.findById(id);
     if (!quiz) return null;
-    // Normalisation du format des questions pour le frontend
     return {
       ...quiz,
       questions: (quiz.questions || []).map(q => ({
@@ -52,8 +51,9 @@ export class QuizService {
     };
   }
 
-  async findAll(): Promise<Quiz[]> {
-    return this.quizRepository.findAll();
+  async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
+    if (userId) filters = { ...filters, userId };
+    return this.quizRepository.findAll(filters, undefined);
   }
 
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
@@ -92,7 +92,7 @@ export class QuizService {
       this.quizRepository,
       this.quizGenerationJobRepository,
       this.cachedFileParsedRepository,
-      this.minioService,
+      this.fileService, // Pass FileService instead of minioService
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
       this.subscriptionPolicyService,
@@ -170,7 +170,7 @@ export class QuizService {
       ...q,
       answers: (q.answers || []).map((a) => {
         let cValue = a.c;
-        if (typeof a.correct === 'boolean') cValue = a.correct;
+        if (typeof a.c === 'boolean') cValue = a.c;
         return {
           ...a,
           c: typeof cValue === 'boolean' ? cValue : false,

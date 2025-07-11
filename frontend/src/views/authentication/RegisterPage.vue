@@ -69,12 +69,7 @@ const handleRegister = async () => {
     <!-- Layout Simple -->
     <div class="grid grid-cols-1">
       <!-- Illustration -->
-      <div class="relative w-full h-screen">
-        <img
-          src="../../assets/backgrounds/background_illustration.webp"
-          alt="background_illustration"
-          class="w-full h-full object-cover"
-        />
+      <div class="relative w-full h-screen bg-primary">
         <!-- Card -->
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <Card>

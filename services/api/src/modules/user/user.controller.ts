@@ -33,7 +33,7 @@ import {
   ActiveSubscriptionUseCaseFactory,
   InactiveSubscriptionUseCase,
   InactiveSubscriptionUseCaseFactory,
-} from '../../domain/usecases/SubscriptionUsecases';
+} from '@domain/usecases/SubscriptionUsecases';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -43,7 +43,7 @@ import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
-import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
+import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
 import { UserService } from '@modules/user/user.service';
 import { UserData } from '../../common/types/user-data';
 
