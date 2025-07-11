@@ -16,7 +16,7 @@ export function fileParsedQueueConsumer(app: INestApplication) {
     'QuizGenerationQueueProvider',
   );
   const subscriptionPolicyService = app.get<SubscriptionPolicyService>(
-    'SubscriptionPolicyService',
+    SubscriptionPolicyService,
   );
   const userRepository = app.get<UserRepository>('UserRepository');
   const handleParsedFileUseCase = HandleParsedFileUseCaseFactory(

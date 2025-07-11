@@ -1,5 +1,7 @@
+import { Injectable } from '@nestjs/common';
 import { SUBSCRIPTION_POLICIES, SubscriptionTier } from './SubscriptionPolicy';
 
+@Injectable()
 export class SubscriptionPolicyService {
   canCreateQuiz(tier: SubscriptionTier, totalQuizzes: number): { allowed: boolean; reason?: string } {
     const policy = SUBSCRIPTION_POLICIES[tier];

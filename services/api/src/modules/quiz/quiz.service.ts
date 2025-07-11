@@ -32,7 +32,6 @@ export class QuizService {
     private readonly fileUploadedQueueProvider: QueueProvider<FileToParseDTO>,
     @Inject('QuizGenerationQueueProvider')
     private readonly quizGenerationQueueProvider: QueueProvider<QuizGenerationDTO>,
-    @Inject('SubscriptionPolicyService')
     private readonly subscriptionPolicyService: SubscriptionPolicyService,
   ) {}
 
