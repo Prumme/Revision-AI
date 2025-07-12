@@ -1,4 +1,5 @@
 import { Quiz } from '@entities/quiz.entity';
+import { ForbiddenException } from '@nestjs/common';
 import { MinioService } from '@modules/minio/minio.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { QuizRepository } from '@repositories/quiz.repository';
@@ -12,6 +13,8 @@ import { QueueProvider } from '@services/QueueProvider';
 import { FileToParseDTO } from '../../types/FileToParseDTO';
 import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import * as crypto from 'node:crypto';
+import { SubscriptionPolicyService } from '../../domain/policies/SubscriptionPolicyService';
+import { SubscriptionTier } from '@domain/policies/SubscriptionPolicy';
 
 @Injectable()
 export class QuizService {
@@ -30,6 +33,7 @@ export class QuizService {
     private readonly fileUploadedQueueProvider: QueueProvider<FileToParseDTO>,
     @Inject('QuizGenerationQueueProvider')
     private readonly quizGenerationQueueProvider: QueueProvider<QuizGenerationDTO>,
+    private readonly subscriptionPolicyService: SubscriptionPolicyService,
   ) {}
 
   async findById(id: string): Promise<Quiz | null> {
@@ -82,6 +86,8 @@ export class QuizService {
 
     quiz.medias = medias;
 
+    const userTier = (foundUser.subscriptionTier || 'free') as SubscriptionTier;
+
     const useCase = CreateQuizUseCaseFactory(
       this.quizRepository,
       this.quizGenerationJobRepository,
@@ -89,9 +95,18 @@ export class QuizService {
       this.fileService, // Pass FileService instead of minioService
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
+      this.subscriptionPolicyService,
+      userTier
     );
 
     const createdQuiz = await useCase(quiz);
+
+    if (createdQuiz instanceof ForbiddenException) {
+      this.logger.error(
+        `Création de quiz interdite: ${createdQuiz.message}`,
+      );
+      throw createdQuiz;
+    }
 
     if (createdQuiz instanceof Error) {
       this.logger.error(
