@@ -129,9 +129,8 @@ function goToQuizDetail(id: string) {
           <img
             :src="illu"
             alt="Welcome Image"
-            class="w-3/4 min-w-[220px] max-w-[400px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
+            class="w-3/4 min-w-[220px] max-w-[400px] hidden lg:block absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
             style="filter: drop-shadow(0 2em 1em rgba(0, 0, 0, 0.05))"
-          />
           />
         </div>
       </section>
@@ -237,7 +236,7 @@ function goToQuizDetail(id: string) {
                   >Voir tous mes quiz</span
                 >
                 <ArrowRight
-                  class="transition-colors w-5 h-5 inline-block mr-1 transform transition-transform group-hover:translate-x-1 ml-1 group-hover:text-primary text-black transition-colors"
+                  class="w-5 h-5 inline-block mr-1 transform transition-all group-hover:translate-x-1 ml-1 group-hover:text-primary text-black"
                 />
               </router-link>
             </div>
