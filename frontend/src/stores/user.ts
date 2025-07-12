@@ -197,7 +197,8 @@ export const useUserStore = defineStore("user", () => {
       quizCount.value = 0;
       return 0;
     }
-    const count = await QuizService.countByUserId(user.value.id || user.value._id);
+    const response = await QuizService.getUserQuizzes(user.value.id || user.value._id);
+    const count = response.length;
     quizCount.value = count;
     return count;
   }
