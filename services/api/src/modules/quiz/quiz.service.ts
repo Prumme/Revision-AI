@@ -204,20 +204,20 @@ export class QuizService {
         undefined,
       );
 
-      if (userQuizzes.length === 0) {
+      if (userQuizzes.data.length === 0) {
         this.logger.log(`Aucun quiz trouvé pour l'utilisateur ${userId}`);
         return;
       }
 
       // Mettre à jour chaque quiz avec le nouveau username
-      const updatePromises = userQuizzes.map((quiz) =>
+      const updatePromises = userQuizzes.data.map((quiz) =>
         this.quizRepository.update(quiz.id, { username: newUsername }),
       );
 
       await Promise.all(updatePromises);
 
       this.logger.log(
-        `Username mis à jour dans ${userQuizzes.length} quiz(s) pour l'utilisateur ${userId}`,
+        `Username mis à jour dans ${userQuizzes.data.length} quiz(s) pour l'utilisateur ${userId}`,
       );
     } catch (error) {
       this.logger.error(
