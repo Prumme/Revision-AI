@@ -21,10 +21,10 @@ const toast = useToastStore();
 const quizLoadingStore = useQuizLoadingStore();
 
 // Quiz Data
-const formTitle = ref(`Test privé/public ${Date.now()}`);
-const category = ref("general_history"); // Valeur par défaut pour la catégorie
+const formTitle = ref("Titre du quiz"); // Titre par défaut
+const category = ref(""); // Valeur par défaut pour la catégorie
 const questionsNumbers = ref(5);
-const description = ref("lorem");
+const description = ref("");
 const isPublic = ref(false);
 const media = ref<File[] | null>(null);
 const isLoading = ref(false);
