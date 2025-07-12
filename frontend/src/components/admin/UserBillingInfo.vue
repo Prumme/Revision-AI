@@ -57,7 +57,7 @@ const emit = defineEmits<{
 <template>
   <CardComponent>
     <template #header>
-      <div class="flex items-center gap-2 mb-4">
+      <div class="flex items-center gap-2">
         <CreditCard class="w-5 h-5 text-primary" />
         <h2 class="text-xl font-semibold text-gray-900">Informations de Facturation</h2>
       </div>

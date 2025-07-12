@@ -58,14 +58,9 @@ const fetchUserDetails = async () => {
     loading.value = true;
 
     // Récupérer toutes les données en parallèle
-    const [
-      userResponse,
-      //  quizzesData,
-      //  documentsData
-    ] = await Promise.allSettled([
+    const [userResponse, quizzesData] = await Promise.allSettled([
       AdminService.getUserById(userId.value),
-      //   AdminService.getUserQuizzes(userId.value),
-      //   AdminService.getUserDocuments(userId.value),
+      AdminService.getUserQuizzes(userId.value),
     ]);
 
     // Traiter les résultats
@@ -78,8 +73,8 @@ const fetchUserDetails = async () => {
       throw new Error("Utilisateur non trouvé");
     }
 
-    // userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value : [];
-    // userDocuments.value = documentsData.status === "fulfilled" ? documentsData.value : [];
+    userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value : [];
+    userDocuments.value = quizzesData.value.map((quiz) => quiz.media).flat();
   } catch (error) {
     console.error("Erreur lors du chargement des détails utilisateur:", error);
     toast.showToast("error", "Impossible de charger les détails de l'utilisateur");

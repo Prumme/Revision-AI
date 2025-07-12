@@ -1,13 +1,19 @@
 <template>
-  <div
-    class="flex flex-col justify-center items-center bg-white rounded-lg px-2 md:px-8 lg:px-12 py-6 lg:py-12 shadow-md"
-  >
-    <slot name="header" class="bg-red-500" />
+  <div class="bg-white rounded-lg shadow-md">
+    <div v-if="$slots.header" class="px-4 md:px-6 pt-6 pb-2">
+      <slot name="header" />
+    </div>
 
-    <slot name="content" />
+    <div class="px-4 md:px-6 pb-6">
+      <slot name="content" />
+    </div>
 
-    <slot name="actions" />
+    <div v-if="$slots.actions" class="px-4 md:px-6 pb-4">
+      <slot name="actions" />
+    </div>
 
-    <slot name="footer" />
+    <div v-if="$slots.footer" class="px-4 md:px-6 pb-6">
+      <slot name="footer" />
+    </div>
   </div>
 </template>
