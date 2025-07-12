@@ -10,7 +10,7 @@ spec:
   tls:
     - hosts:
         - revision-ai.com
-      secretName: revkubectision-ai-com-tls
+      secretName: revision-ai-com-tls
   rules:
     - host: revision-ai.com
       http:
