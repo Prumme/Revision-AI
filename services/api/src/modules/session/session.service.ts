@@ -91,21 +91,15 @@ export class SessionService {
     /**
      * Starts a session by its ID.
      * @param id - The ID of the session to start.
-     * @param userId - The ID of the user attempting to start the session.
      * @returns The started session.
      * @throws NotFoundException if the session does not exist.
-     * @throws ForbiddenException if the user is not the owner of the session.
      */
-    async startSession(id: string, userId: string): Promise<Session> {
-        const session = await this.sessionRepository.findById(id);
+    async startSession(id: string): Promise<Session> {
+        const session = await this.sessionRepository.startSession(id);
         if (!session) {
             throw new SessionNotFoundException();
         }
-        if (session.userId !== userId) {
-            throw new ForbiddenException('Vous ne pouvez pas démarrer cette session');
-        }
-        const startedSession = await this.sessionRepository.startSession(id);
-        return startedSession;
+        return session;
     }
 
     /**

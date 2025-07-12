@@ -83,11 +83,12 @@ export class QuizService {
     quiz.medias = medias;
 
     const useCase = CreateQuizUseCaseFactory(
-      this.quizRepository,
-      this.quizGenerationJobRepository,
-      this.cachedFileParsedRepository,
-      this.fileUploadedQueueProvider,
-      this.quizGenerationQueueProvider,
+        this.quizRepository,
+        this.quizGenerationJobRepository,
+        this.cachedFileParsedRepository,
+        this.fileService, // Pass FileService instead of minioService
+        this.fileUploadedQueueProvider,
+        this.quizGenerationQueueProvider,
     );
 
     const createdQuiz = await useCase(quiz);
@@ -176,9 +177,5 @@ export class QuizService {
 
   async countByUserId(userId: string): Promise<number> {
     return this.quizRepository.countByUserId(userId);
-  }
-
-  async findAllMediaByUserId(userId: string): Promise<string[]> {
-    return this.quizRepository.findAllMediaByUserId(userId);
   }
 }

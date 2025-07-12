@@ -197,11 +197,4 @@ export class QuizController {
     const count = await this.quizService.countByUserId(userId);
     return { count };
   }
-
-  @Get('media/:userId')
-  @ApiOperation({ summary: 'Récupérer tous les documents (médias) d’un utilisateur' })
-  @ApiResponse({ status: 200, description: 'Liste des chemins de fichiers médias', type: [String] })
-  async getAllMediaByUserId(@Param('userId') userId: string): Promise<string[]> {
-    return this.quizService.findAllMediaByUserId(userId);
-  }
 }
