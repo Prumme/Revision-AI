@@ -177,7 +177,7 @@ const generateQuiz = async () => {
       </FormCard>
 
       <div class="flex justify-center items-center w-fit">
-        <Button variant="primary" @click="generateQuiz" :disabled="isLoading">
+        <Button tracking_event="quiz_create" variant="primary" @click="generateQuiz" :disabled="isLoading">
           {{ isLoading ? "Génération en cours..." : "Générer le quiz" }}
         </Button>
       </div>
@@ -188,7 +188,7 @@ const generateQuiz = async () => {
   <section v-else class="flex flex-col gap-5 w-full">
     <FormHeader v-model:title="formTitle" description="Création & Génération du quiz" />
 
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-4 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
       <!-- Formulaires -->
       <div class="flex flex-col gap-5">
         <!-- Quizz Informations -->
@@ -259,6 +259,56 @@ const generateQuiz = async () => {
           <Button variant="primary" @click="generateQuiz" :disabled="isLoading">
             {{ isLoading ? "Génération en cours..." : "Générer le quiz" }}
           </Button>
+        </div>
+      </div>
+
+      <!-- Carte d'aide UX utilisateur -->
+      <div class="bg-white rounded-2xl border-2 border-primary p-6 mt-5 lg:mt-0">
+        <div class="flex items-center mb-4">
+          <div class="mr-4">
+            <img src="@/assets/caracters/caracterOrange.png" alt="Mascotte IA" class="w-16 h-16 object-contain" />
+          </div>
+          <div>
+            <h3 class="font-encode text-xl font-bold text-black mb-1">
+              Prêt à créer ton quiz ?
+            </h3>
+            <p class="font-outfit text-primary text-sm font-medium">
+              RevisionAI va faire le taf pour toi !
+            </p>
+          </div>
+        </div>
+        
+        <div class="space-y-3 mb-6">
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-primary rounded-full mr-3"></div>
+            <p class="font-outfit text-gray-700 text-sm">
+              <span class="font-semibold">Remplis le formulaire</span> avec tes préférences
+            </p>
+          </div>
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-primary  rounded-full mr-3"></div>
+            <p class="font-outfit text-gray-700 text-sm">
+              <span class="font-semibold">Ajoute tes cours</span> pour nous aider à générer des questions pertinentes
+            </p>
+          </div>
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-primary  rounded-full mr-3"></div>
+            <p class="font-outfit text-gray-700 text-sm">
+              <span class="font-semibold">Clique sur "Générer"</span> et laisse l'IA créer ton quiz !
+            </p>
+          </div>
+        </div>
+        
+        <div class="bg-primary-50 rounded-lg p-4 border border-primary">
+          <div class="flex items-center mb-2">
+            <svg class="w-5 h-5 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <h4 class="font-encode font-semibold text-primary text-sm">Petit conseil</h4>
+          </div>
+          <p class="font-outfit text-primary text-xs">
+            Plus tu donnes d'infos (description, images), plus ton quiz sera adapté à tes besoins !
+          </p>
         </div>
       </div>
     </div>

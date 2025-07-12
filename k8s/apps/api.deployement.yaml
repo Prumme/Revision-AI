@@ -14,7 +14,7 @@ spec:
     metadata:
       labels:
         app: api-deploy
-        q: "true"
+        debug: "true"
     spec:
       initContainers:
         - name: wait-for-rabbitmq

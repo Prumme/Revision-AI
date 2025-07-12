@@ -7,6 +7,7 @@ import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from '@mongo/user/user.schema';
 import { MailModule } from '@infrastructure/resend/mail.module';
+import { TOTPServiceProvider } from '@services/TOTPService';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { MailModule } from '@infrastructure/resend/mail.module';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [AuthService, CustomerRepositoryProvider],
+  providers: [AuthService, CustomerRepositoryProvider, TOTPServiceProvider],
   controllers: [AuthController],
   exports: [AuthService],
 })
