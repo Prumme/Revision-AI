@@ -22,6 +22,7 @@ export interface QuizRepository {
   update(id: string, quiz: Partial<Quiz>): Promise<Quiz>;
   delete(id: string): Promise<boolean>;
   countByUserId(userId: string): Promise<number>;
+  countCreatedToday(userId: string): Promise<number>;
 }
 
 export const QuizRepositoryProvider = {

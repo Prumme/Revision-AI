@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "name": "ROOT",
+      "path": "./"
+    },
+    {
+      "name": "services/api",
+      "path": "./services/api"
+    },
+    {
+      "name": "services/quiz-generator",
+      "path": "./services/quiz-generator"
+    },
+    {
+      "name": "services/file-parser",
+      "path": "./services/file-parser"
+    },
+    {
+      "name": "frontend",
+      "path": "./frontend"
+    }
+  
+  ],
+  "settings": {}
+}

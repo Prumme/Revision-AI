@@ -90,11 +90,22 @@ export class MongoQuizRepository implements QuizRepository {
   }
 
   async countByUserId(userId: string): Promise<number> {
-    if (!userId) {
-        throw new Error('User ID is required to count quizzes.');
-    }
-    return this.quizModel.countDocuments({ userId: userId }).exec();
+    return this.quizModel.countDocuments({ userId }).exec();
   }
+
+  async countCreatedToday(userId: string): Promise<number> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+    return this.quizModel
+      .countDocuments({
+        userId,
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
+      })
+      .exec();
+  }
+
   private documentToQuiz(document: QuizDocument): Quiz {
     return {
       id: document._id.toString(),
