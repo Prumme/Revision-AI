@@ -55,7 +55,6 @@ export class QuizService {
   async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
     return this.quizRepository.findAllByUserId(userId, filters);
   }
-
   async create(
     quiz: CreateQuizDto,
     files: Express.Multer.File[],
@@ -86,9 +85,9 @@ export class QuizService {
       this.quizRepository,
       this.quizGenerationJobRepository,
       this.cachedFileParsedRepository,
-      this.fileService, // Pass FileService instead of minioService
+      this.fileService,
       this.fileUploadedQueueProvider,
-      this.quizGenerationQueueProvider,
+      this.quizGenerationQueueProvider
     );
 
     const createdQuiz = await useCase(quiz);

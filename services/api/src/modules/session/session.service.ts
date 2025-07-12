@@ -72,7 +72,7 @@ export class SessionService {
         userId: string,
         options?: { page?: number; limit?: number; scoreMin?: number; scoreMax?: number; status?: string }
     ): Promise<any> {
-        return this.sessionRepository.findAllByQuizIdAndUserId(quizId, userId, options);
+        return this.sessionRepository.findAllByQuizIdAndUserId(quizId, userId);
     }
 
     /**

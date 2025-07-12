@@ -77,6 +77,7 @@ export class MongoSessionRepository implements SessionRepository {
      * Finds all sessions for a specific quiz and user.
      * @param quizId - The ID of the quiz.
      * @param userId - The ID of the user.
+     * @param options
      * @returns An array of sessions associated with the quiz and user.
      */
     async findAllByQuizIdAndUserId(quizId: string, userId: string, options?: { page?: number; limit?: number; scoreMin?: number; scoreMax?: number; status?: string }): Promise<PaginatedResult<Session>> {

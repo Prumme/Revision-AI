@@ -38,7 +38,7 @@ export interface SessionRepository {
 
     findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
 
-    findAllByQuizIdAndUserId(quizId: string, userId: string): Promise<Session[]>;
+    findAllByQuizIdAndUserId(quizId: string, userId: string): Promise<PaginatedResult<Session>>;
 }
 
 export const SessionRepositoryProvider = {

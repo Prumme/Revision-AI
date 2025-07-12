@@ -101,6 +101,7 @@ export class SessionController {
   })
   async startSession(
     @Body() startSessionDto: StartSessionDto,
+    @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
     return this.sessionService.startSession(startSessionDto.sessionId);
   }
@@ -184,7 +185,6 @@ export class SessionController {
       quizId,
       userId,
       { scoreMin, scoreMax, status },
-      { page: Number(page), limit: Number(limit) }
     );
   }
 }
