@@ -13,6 +13,7 @@ import {
   type SubscriptionTier,
 } from "@/config/subscription.config";
 import { CheckIcon } from "lucide-vue-next";
+import ButtonComponent from "../buttons/ButtonComponent.vue";
 
 interface Props {
   user: User | null;
@@ -124,12 +125,13 @@ onMounted(() => {
         <div class="flex items-center gap-3">
           <!-- Upgrade button -->
           <div v-if="canUpgrade">
-            <button
+            <ButtonComponent
               @click="handleUpgrade"
-              class="bg-primary hover:bg-primary/90 text-white font-outfit font-medium px-6 py-2 rounded-lg transition-colors duration-150"
+              tracking_event="upgrade_subscription"
+              class=" text-white font-outfit font-medium px-6 py-2 rounded-lg transition-colors duration-150"
             >
               Améliorer mon offre
-            </button>
+          </ButtonComponent>
           </div>
 
           <!-- Cancel subscription button -->

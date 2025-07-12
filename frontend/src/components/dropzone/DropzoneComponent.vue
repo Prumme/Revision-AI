@@ -3,6 +3,7 @@ import Button from "@/components/buttons/ButtonComponent.vue";
 import Label from "@/components/inputs/LabelComponent.vue";
 import { CloudUploadIcon, TrashIcon } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
+import AutoFileIcon from "../icons/AutoFileIcon.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -21,9 +22,9 @@ const emit = defineEmits<{
 }>();
 
 const acceptedFileTypes = ["image/*", "application/pdf"];
-const maxFileSize = 2 * 1024 * 1024;
+const maxFileSize = 5 * 1024 * 1024;
 // const maxTokenFileSize = 25 * 1024;
-const maxImageSize = { width: 100, height: 100 };
+const maxImageSize = { width: 3000, height: 3000 };
 
 const files = ref<File[]>([]);
 const error = ref<string | null>(null);
@@ -205,7 +206,13 @@ const isDropzoneBlocked = computed(() => {
           :key="index"
           class="flex justify-between items-center py-2"
         >
+          <div class="flex items-center gap-2">
+            <AutoFileIcon
+            :mime-type="file.type"
+            class="w-6 h-6 text-gray-600"
+            />
           <span class="text-gray-700 text-sm truncate">{{ file.name }}</span>
+          </div>
           <Button
             size="icon"
             @click="removeFile(index)"

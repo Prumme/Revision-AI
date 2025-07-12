@@ -1,14 +1,16 @@
-import { API_URL } from "@/config/api";
+import {API_URL} from "@/config/api";
 import type {
   AuthResponse,
   LoginCredentials,
   LoginResponse,
   RegisterCredentials,
 } from "@/types/auth";
-import type { User } from "@/types/user";
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import type {User} from "@/types/user";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {useRouter} from "vue-router";
+import {QuizService} from '@/services/quiz.service';
+import { KpiService } from '@/services/kpi.service';
 
 interface LoginFunctionResponse{
   totpRequired: boolean;
@@ -25,6 +27,9 @@ export const useUserStore = defineStore("user", () => {
   const router = useRouter();
   const user = ref<User | null>(null);
   const token = ref<string | null>(localStorage.getItem("token"));
+  const quizCount = ref<number>(localStorage.getItem("quizCount") ? parseInt(localStorage.getItem("quizCount")!) : 0);
+  const averageScore = ref<string>(localStorage.getItem("averageScore") || "0%");
+  const totalRevisionTimeFormatted = ref<string>(localStorage.getItem("totalRevisionTimeFormatted") || "0m");
 
   const getFullName = () => {
     return user?.value?.username;
@@ -176,7 +181,7 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
-        const { message } = await response.json();
+        const {message} = await response.json();
         if (message && message === "Email not verified") {
           throw new AuthError("Email not verified");
         }
@@ -205,6 +210,38 @@ export const useUserStore = defineStore("user", () => {
     router.push("/login");
   }
 
+  async function fetchQuizCount() {
+    if (!user.value) {
+      quizCount.value = 0;
+      return 0;
+    }
+    const response = await QuizService.getUserQuizzes(user.value.id || user.value._id);
+    const count = response.length;
+    quizCount.value = count;
+    return count;
+  }
+
+  async function fetchKpis() {
+    if (!user.value) {
+      averageScore.value = "0%";
+      totalRevisionTimeFormatted.value = "0m";
+      return;
+    }
+    try {
+      const [score, time] = await Promise.all([
+        KpiService.getUserAverageScore(user.value.id || user.value._id),
+        KpiService.getUserTotalRevisionTime(user.value.id || user.value._id),
+      ]);
+      averageScore.value = (score || 0) + "%";
+      totalRevisionTimeFormatted.value = time || "0m";
+      localStorage.setItem('averageScore', averageScore.value);
+      localStorage.setItem('totalRevisionTimeFormatted', totalRevisionTimeFormatted.value);
+    } catch {
+      averageScore.value = "0%";
+      totalRevisionTimeFormatted.value = "0m";
+    }
+  }
+
   return {
     user,
     token,
@@ -219,10 +256,11 @@ export const useUserStore = defineStore("user", () => {
     fetchCustomerInfo,
     updateUser,
     setAvatar,
-    quizCount: 0,
-    setQuizCount(count: number) {
-      this.quizCount = count;
-    },
+    quizCount,
+    fetchQuizCount,
     setSubscriptionTier,
+    averageScore,
+    totalRevisionTimeFormatted,
+    fetchKpis,
   };
 });

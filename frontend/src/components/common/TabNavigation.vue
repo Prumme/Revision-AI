@@ -46,12 +46,3 @@ function emitTab(key: string) {
   emit('update:activeTab', key);
 }
 </script>
-
-<style scoped>
-.border-primary {
-  border-color: var(--color-primary);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-</style>

@@ -14,6 +14,7 @@ import type { SubscriptionInfo } from "@/types/subscriptionInfo";
 import type { CheckoutData } from "@/composables/useCheckoutFlow";
 import type { SubscribePayload } from "@/types/subscribe";
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
+import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 
 const router = useRouter();
 const checkout = useCheckoutFlow();
@@ -243,14 +244,15 @@ onUnmounted(() => {
           Précédent
         </button>
 
-        <button
+        <ButtonComponent
           v-if="!checkout.isLastStep.value"
           @click="handleNext"
+          tracking_event="next_subscription_upgrade"
           :disabled="!checkout.canGoNext.value || isPaymentStepLoading"
-          class="bg-primary hover:bg-primary/90 text-black font-outfit font-medium px-6 py-2 rounded-lg border-2 border-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[4px] active:shadow-[0_0px_0_#000] transition-all duration-75 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_0_#000]"
+          class="text-black font-outfit font-medium  transition-all duration-75 ease-in-out"
         >
           Suivant
-        </button>
+        </ButtonComponent>
       </div>
     </div>
   </section>

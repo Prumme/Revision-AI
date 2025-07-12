@@ -186,4 +186,15 @@ export class QuizController {
       throw new HttpException('Quiz non trouvé', HttpStatus.NOT_FOUND);
     }
   }
+
+  @Get('count/:userId')
+  @ApiOperation({ summary: 'Compter le nombre de quiz créés par un utilisateur' })
+  @ApiResponse({ status: 200, description: 'Nombre de quiz', type: Number })
+  async countByUserId(@Param('userId') userId: string): Promise<{ count: number }> {
+    if (!userId) {
+      throw new HttpException('userId requis', HttpStatus.BAD_REQUEST);
+    }
+    const count = await this.quizService.countByUserId(userId);
+    return { count };
+  }
 }

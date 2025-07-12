@@ -2,7 +2,7 @@ import { Quiz } from '@entities/quiz.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { QuizRepository } from '@repositories/quiz.repository';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { QuizDocument } from './quiz.schema';
 
 @Injectable()
