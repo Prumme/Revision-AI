@@ -130,22 +130,6 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
         ),
       )
     ).filter(Boolean);
-
-    if (parsedFiles.length !== files.length) {
-      //si il y a des fichiers à parser on les parse
-      const alreadyParsedChecksums = parsedFiles.map((file) => file.checksum);
-      const filesToParse: FileToParseDTO[] = files
-        .filter((file) => !alreadyParsedChecksums.includes(file.checksum))
-        .map(({ fileIdentifier, checksum }) => ({
-          bucketName: _fileService.getBucketName(),
-          objectKey: fileIdentifier,
-          fileName: fileIdentifier,
-          checksum,
-        }));
-
-      for (const file of filesToParse)
-        await _fileToParseQueueProvider.send(file);
-    }
     
     const quiz = QuizEntity.createQuiz(
       createQuizDto.title,
