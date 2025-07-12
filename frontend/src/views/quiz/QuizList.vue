@@ -16,6 +16,7 @@ import {useDialogStore} from "@/stores/dialog";
 import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 import { debounce } from "lodash-es";
 import QuizCard from "@/components/cards/QuizCard.vue";
+import caracterBlue from "@/assets/caracters/caracterBlue.webp";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -229,7 +230,9 @@ onMounted(async () => {
         v-else-if="quizzes.length === 0"
         class="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg shadow-inner"
       >
-        <div class="text-5xl mb-4">📚</div>
+        <div class="text-5xl mb-4">
+          <img :src="caracterBlue" alt="Aucun quiz" class="w-16 h-16 mx-auto"/>
+        </div>
         <h2 class="text-xl font-semibold mb-2">Aucun quiz trouvé</h2>
         <p class="text-gray-600">Créez votre premier quiz pour commencer !</p>
       </div>
