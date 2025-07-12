@@ -56,7 +56,7 @@ describe('CreateQuizUseCase', () => {
       .mockImplementation((...args) => ({ id: 'quiz-id-123', ...args }) as any);
     jest
       .spyOn(QuizJobEntity, 'createQuizGenerationJob')
-      .mockImplementation((...args) => ({ files: [], ...args }) as any);
+      .mockImplementation((...args) => ({ files: [], ...args, events: [] }) as any);
     jest
       .spyOn(QuizJobEntity, 'markFileAsParsed')
       .mockImplementation((job) => job);
@@ -422,8 +422,8 @@ describe('HandleParsedFileUseCase', () => {
   it('refuse la génération si le quota tokens est dépassé', async () => {
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
     mockPolicy.canUseTokensForGeneration.mockReturnValue({ allowed: false, reason: 'quota tokens' });
-    
-    const fakeJob = { id: 'job-1', quizId: 'quiz-1', files: [{ identifier: 'file-key-123', parsed: false }] };
+
+    const fakeJob = { id: 'job-1', quizId: 'quiz-1', files: [{ identifier: 'file-key-123', parsed: false }], events: [] };
     const fakeQuiz = { id: 'quiz-1', questionsNumbers: 10, userId: 'user-1' };
     const fakeUser = { id: 'user-1', subscriptionTier: 'free' };
     const fakeGeneratedDto = { identifier: 'quiz-1', filesContents: [{ fileContent: 'abc' }] };
