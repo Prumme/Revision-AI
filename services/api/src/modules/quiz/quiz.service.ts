@@ -2,7 +2,11 @@ import { Quiz } from '@entities/quiz.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { MinioService } from '@modules/minio/minio.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { QuizFilters, QuizRepository } from '@repositories/quiz.repository';
+import {
+  NullPaginationOptions,
+  QuizFilters,
+  QuizRepository,
+} from '@repositories/quiz.repository';
 import {
   PaginatedResult,
   PaginationOptions,
@@ -57,7 +61,7 @@ export class QuizService {
 
   async findAll(
     filters?: QuizFilters,
-    pagination?: PaginationOptions,
+    pagination?: PaginationOptions | NullPaginationOptions,
   ): Promise<PaginatedResult<Quiz>> {
     return this.quizRepository.findAll(filters, pagination);
   }
@@ -201,7 +205,7 @@ export class QuizService {
         {
           userId: { id: userId },
         },
-        undefined,
+        { ignore: true },
       );
 
       if (userQuizzes.data.length === 0) {

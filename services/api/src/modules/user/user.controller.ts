@@ -202,10 +202,14 @@ export class UserController {
     }
 
     // Récupérer les quiz publics de l'utilisateur
-    const quizzes = await this.quizService.findAllByUserId(user.id, {
-      isPublic: true,
-      ready: true,
-    });
+    const quizzes = await this.quizService.findAll(
+      {
+        userId: { id: user.id },
+        isPublic: true,
+        ready: true,
+      },
+      { ignore: true },
+    );
 
     // Retourner seulement les informations publiques
     return {
@@ -216,7 +220,7 @@ export class UserController {
         avatar: user.avatar,
         createdAt: user.createdAt,
       },
-      quizzes: quizzes.map((quiz) => ({
+      quizzes: quizzes.data.map((quiz) => ({
         id: quiz.id,
         title: quiz.title,
         description: quiz.description,

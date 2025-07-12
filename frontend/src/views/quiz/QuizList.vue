@@ -58,27 +58,6 @@ watch(search, (value) => {
   updateSearch(value);
 });
 
-const quizzes = ref<Quiz[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
-
-const quizCount = ref(0);
-
-const quizTabs = computed(() => [
-  { key: "my", label: "Mes quiz", badge: quizCount.value },
-  { key: "shared", label: "Quiz de la communauté" },
-]);
-const activeTab = ref("my");
-
-const page = ref(1);
-const limit = ref(8);
-const total = ref(0);
-const totalPages = ref(1);
-
-function goToQuizDetail(quiz: Quiz) {
-  router.push(`/quiz/${quiz.id}`);
-}
-
 async function fetchQuizzes() {
   loading.value = true;
   try {
