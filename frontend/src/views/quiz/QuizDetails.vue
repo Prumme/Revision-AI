@@ -324,8 +324,13 @@ function handlePauseSession() {
         :rowKey="'id'"
         :filters="sessionFilters"
         :initial-filters="sessionTableFilters"
-        empty-message="Aucune session trouvée pour ce quiz."
+        :sort="sessionTableSort"
+        :pagination="sessionTablePagination"
         @update:filters="handleSessionTableFilters"
+        @update:sort="handleSessionTableSort"
+        @update:page="handleSessionTablePage"
+        @update:items-per-page="handleSessionTableItemsPerPage"
+        empty-message="Aucune session trouvée pour ce quiz."
       />
     </section>
   </MotionLayout>
