@@ -60,6 +60,7 @@ describe('CreateQuizUseCase', () => {
     const createQuizDto: CreateQuizDto = {
       title: '',
       userId: '',
+      username: '',
       medias: ['file1.pdf', 'file2.txt'],
     };
 
@@ -117,6 +118,7 @@ describe('CreateQuizUseCase', () => {
     const createQuizDto: CreateQuizDto = {
       title: '',
       userId: '',
+      username: '',
       medias: ['file1.pdf'],
     };
 

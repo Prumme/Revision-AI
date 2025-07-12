@@ -1,7 +1,15 @@
 import { AdminGuard } from '@common/guards/admin.guard';
 import { ReqUser } from '@common/types/request';
+import {
+  ActiveSubscriptionUseCaseFactory,
+  InactiveSubscriptionUseCaseFactory,
+} from '@domain/usecases/SubscriptionUsecases';
+import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
+import { CustomerAndUser } from '@entities/customer.entity';
 import { User } from '@entities/user.entity';
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
+import { QuizService } from '@modules/quiz/quiz.service';
+import { UserService } from '@modules/user/user.service';
 import {
   Body,
   Controller,
@@ -9,6 +17,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -16,9 +25,9 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  Inject,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -28,24 +37,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  ActiveSubscriptionUseCase,
-  ActiveSubscriptionUseCaseFactory,
-  InactiveSubscriptionUseCase,
-  InactiveSubscriptionUseCaseFactory,
-} from '@domain/usecases/SubscriptionUsecases';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserFiltersDto } from './dto/user-filters.dto';
-import { Request } from 'express';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
-import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
-import { UserService } from '@modules/user/user.service';
+import { Request } from 'express';
 import { UserData } from '../../common/types/user-data';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserFiltersDto } from './dto/user-filters.dto';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -53,6 +52,7 @@ import { UserData } from '../../common/types/user-data';
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly quizService: QuizService,
     @Inject('CustomerRepository')
     private readonly customerRepository: CustomerRepository,
     @Inject('MailerService')
@@ -152,6 +152,77 @@ export class UserController {
       throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
     }
     return user;
+  }
+
+  @Get('profile/:username')
+  @ApiOperation({
+    summary: "Récupérer le profil public d'un utilisateur par son username",
+  })
+  @ApiParam({ name: 'username', description: "Username de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Le profil public de l'utilisateur a été trouvé.",
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            username: { type: 'string' },
+            bio: { type: 'string', nullable: true },
+            avatar: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        quizzes: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              title: { type: 'string' },
+              description: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async findPublicProfile(@Param('username') username: string) {
+    const user = await this.userService.findByUsername(username);
+    if (!user || user.deleted || user.blocked) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+
+    // Récupérer les quiz publics de l'utilisateur
+    const quizzes = await this.quizService.findAllByUserId(user.id, {
+      isPublic: true,
+      ready: true,
+    });
+
+    // Retourner seulement les informations publiques
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        bio: user.bio,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+      },
+      quizzes: quizzes.map((quiz) => ({
+        id: quiz.id,
+        title: quiz.title,
+        description: quiz.description,
+        createdAt: quiz.createdAt,
+        category: quiz.category,
+      })),
+    };
   }
 
   @Get(':id/customer')

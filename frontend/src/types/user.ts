@@ -1,3 +1,5 @@
+import type { Quiz } from "./quiz";
+
 export interface User {
   id: string;
   username: string;
@@ -22,4 +24,18 @@ export interface User {
     postal_code?: string;
     country?: string;
   };
+}
+
+// Types pour le profil public
+export interface PublicUser extends Partial<User> {
+  id: string;
+  username: string;
+  bio?: string;
+  avatar?: string;
+  createdAt: string;
+}
+
+export interface PublicProfileData {
+  user: PublicUser;
+  quizzes: Quiz[];
 }

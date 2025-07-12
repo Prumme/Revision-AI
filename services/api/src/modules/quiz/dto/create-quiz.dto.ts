@@ -53,6 +53,14 @@ export class CreateQuizDto {
   userId: string;
 
   @ApiProperty({
+    description: 'Nom d’utilisateur',
+    example: 'John Doe',
+  })
+  @IsString()
+  @IsOptional()
+  username: string;
+
+  @ApiProperty({
     description: 'Titre du quiz',
     example: "Mon super quiz d'histoire",
   })

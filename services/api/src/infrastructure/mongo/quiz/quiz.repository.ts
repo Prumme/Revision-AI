@@ -32,7 +32,8 @@ export class MongoQuizRepository implements QuizRepository {
         query.category = filters.category;
       }
       if (filters.isPublic !== undefined) {
-        query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
+        query.isPublic =
+          filters.isPublic === 'true' || filters.isPublic === true;
       }
       if (filters.userId) {
         query.userId = { $ne: filters.userId };
@@ -47,7 +48,7 @@ export class MongoQuizRepository implements QuizRepository {
     return documents.map(this.documentToQuiz);
   }
 
-  async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
+  async findAllByUserId(userId: string, filters: any = null): Promise<Quiz[]> {
     const query: any = { userId };
     if (filters) {
       if (filters.ready) {
@@ -93,6 +94,7 @@ export class MongoQuizRepository implements QuizRepository {
     return {
       id: document._id.toString(),
       userId: document.userId,
+      username: document.username,
       title: document.title,
       category: document.category,
       questions: document.questions.map((q) => ({

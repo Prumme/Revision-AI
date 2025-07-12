@@ -61,6 +61,10 @@ export class UserService {
     return this.userRepository.findByEmail(email);
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findByUsername(username);
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {

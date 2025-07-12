@@ -13,6 +13,7 @@ import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
 import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
+import PublicProfilePage from "@/views/Profile/PublicProfilePage.vue";
 import QuizForm from "@/views/quiz/QuizForm.vue";
 import QuizList from "@/views/quiz/QuizList.vue";
 import QuizDetails from "@/views/quiz/QuizDetails.vue";
@@ -63,6 +64,11 @@ const router = createRouter({
           path: "/profile",
           name: "profile",
           component: ProfilePage,
+        },
+        {
+          path: "/profil/:username",
+          name: "public-profile",
+          component: PublicProfilePage,
         },
         {
           path: "/subscription",

@@ -11,7 +11,7 @@ import { MongoCustomerRepository } from '@mongo/user/customer.repository';
 import { MailerServiceProvider } from '@services/MailerService';
 import { QuizRepositoryProvider } from '@repositories/quiz.repository';
 import { QuizSchema } from '@mongo/quiz/quiz.schema';
-
+import { QuizService } from '@modules/quiz/quiz.service';
 
 @Module({
   imports: [
@@ -25,6 +25,7 @@ import { QuizSchema } from '@mongo/quiz/quiz.schema';
   controllers: [UserController],
   providers: [
     UserService,
+    QuizService,
     UserRepositoryProvider,
     CustomerRepositoryProvider,
     MongoCustomerRepository,
@@ -33,4 +34,4 @@ import { QuizSchema } from '@mongo/quiz/quiz.schema';
   ],
   exports: [UserService, UserRepositoryProvider],
 })
-export class UserModule { }
+export class UserModule {}

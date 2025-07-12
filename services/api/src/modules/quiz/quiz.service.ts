@@ -37,18 +37,18 @@ export class QuizService {
     if (!quiz) return null;
     return {
       ...quiz,
-      questions: (quiz.questions || []).map(q => ({
+      questions: (quiz.questions || []).map((q) => ({
         q: q.q,
-        answers: (q.answers || []).map(a => ({
+        answers: (q.answers || []).map((a) => ({
           a: a.a,
           c: typeof a.c === 'boolean' ? a.c : false,
-        }))
-      }))
+        })),
+      })),
     };
   }
 
   async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
-    if (userId) filters = { ...filters, userId };
+    // if (userId) filters = { ...filters, userId };
     return this.quizRepository.findAll(filters, undefined);
   }
 
@@ -81,6 +81,7 @@ export class QuizService {
     }
 
     quiz.medias = medias;
+    quiz.username = foundUser.username;
 
     const useCase = CreateQuizUseCaseFactory(
       this.quizRepository,

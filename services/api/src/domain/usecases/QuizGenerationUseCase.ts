@@ -116,6 +116,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       createQuizDto.questionsNumbers,
       createQuizDto.isPublic,
       createQuizDto.userId,
+      createQuizDto.username,
       createQuizDto.medias,
     );
 
