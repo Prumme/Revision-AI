@@ -2,6 +2,7 @@ import { Document, Schema, Types } from 'mongoose';
 
 export const QuizSchema = new Schema({
   userId: { type: String, required: true },
+  username: { type: String, required: true },
   title: { type: String, required: true },
   category: { type: String, default: '' },
   questions: [
@@ -31,6 +32,7 @@ export const QuizSchema = new Schema({
 export interface QuizDocument extends Document {
   _id: Types.ObjectId;
   userId: string;
+  username: string;
   title: string;
   category: string;
   questions: {

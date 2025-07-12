@@ -1,10 +1,17 @@
 import { Quiz } from '@entities/quiz.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { NullPaginationOptions, QuizFilters, QuizRepository } from '@repositories/quiz.repository';
+import {
+  NullPaginationOptions,
+  QuizFilters,
+  QuizRepository,
+} from '@repositories/quiz.repository';
 import { Model, Types } from 'mongoose';
 import { QuizDocument } from './quiz.schema';
-import { PaginatedResult, PaginationOptions } from '@repositories/user.repository';
+import {
+  PaginatedResult,
+  PaginationOptions,
+} from '@repositories/user.repository';
 
 @Injectable()
 export class MongoQuizRepository implements QuizRepository {
@@ -18,7 +25,6 @@ export class MongoQuizRepository implements QuizRepository {
     if (!document) return null;
     return this.documentToQuiz(document);
   }
-
 
   private _createQuery(filters?: QuizFilters): any {
     const query: any = {};
@@ -37,10 +43,11 @@ export class MongoQuizRepository implements QuizRepository {
         query.category = filters.category;
       }
       if (filters.isPublic !== undefined) {
-        query.isPublic = filters.isPublic === 'true' || filters.isPublic === true;
+        query.isPublic =
+          filters.isPublic === 'true' || filters.isPublic === true;
       }
       if (filters.userId) {
-        if(filters.userId.exclude){
+        if (filters.userId.exclude) {
           query.userId = { $ne: new Types.ObjectId(filters.userId.id) };
         } else {
           query.userId = { $eq: new Types.ObjectId(filters.userId.id) };
@@ -50,7 +57,10 @@ export class MongoQuizRepository implements QuizRepository {
     return query;
   }
 
-  async findAll(filters?: QuizFilters, pagination?: PaginationOptions | NullPaginationOptions): Promise<PaginatedResult<Quiz>> {
+  async findAll(
+    filters?: QuizFilters,
+    pagination?: PaginationOptions | NullPaginationOptions,
+  ): Promise<PaginatedResult<Quiz>> {
     const query = this._createQuery({
       ...filters,
       ready: true, //want only quizzes that are parsed and has questions
@@ -59,9 +69,11 @@ export class MongoQuizRepository implements QuizRepository {
     let mongoQuery = this.quizModel.find(query);
 
     if (!('ignore' in pagination)) {
-      mongoQuery = mongoQuery.skip((pagination.page - 1) * pagination.limit).limit(pagination.limit);
+      mongoQuery = mongoQuery
+        .skip((pagination.page - 1) * pagination.limit)
+        .limit(pagination.limit);
     }
-    const [documents,total] = await Promise.all([
+    const [documents, total] = await Promise.all([
       mongoQuery.exec(),
       this.quizModel.countDocuments(query).exec(),
     ]);
@@ -74,7 +86,7 @@ export class MongoQuizRepository implements QuizRepository {
         limit: -1,
         totalPages: 1,
       };
-    }else{
+    } else {
       return {
         data: documents.map(this.documentToQuiz.bind(this)),
         total: total,
@@ -123,6 +135,7 @@ export class MongoQuizRepository implements QuizRepository {
     return {
       id: document._id.toString(),
       userId: document.userId,
+      username: document.username,
       title: document.title,
       category: document.category,
       questions: document.questions.map((q) => ({

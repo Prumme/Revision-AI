@@ -159,13 +159,19 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
+        const { message } = await response.json();
+        if (message && message === "Un utilisateur avec cet email existe déjà") {
+          throw new Error("Un utilisateur avec cet email existe déjà");
+        }
+        if (message && message === "Un utilisateur avec ce nom d'utilisateur existe déjà") {
+          throw new Error("Un utilisateur avec ce nom d'utilisateur existe déjà");
+        }
         throw new Error("Erreur lors de l'inscription");
       }
 
       const data: AuthResponse = await response.json();
       return data;
     } catch (error) {
-      console.error("Erreur lors de l'inscription:", error);
       throw error;
     }
   }

@@ -1,7 +1,15 @@
 import { AdminGuard } from '@common/guards/admin.guard';
 import { ReqUser } from '@common/types/request';
+import {
+  ActiveSubscriptionUseCaseFactory,
+  InactiveSubscriptionUseCaseFactory,
+} from '@domain/usecases/SubscriptionUsecases';
+import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
+import { CustomerAndUser } from '@entities/customer.entity';
 import { User } from '@entities/user.entity';
 import { CurrentUser } from '@modules/auth/decorators/current-user.decorator';
+import { QuizService } from '@modules/quiz/quiz.service';
+import { UserService } from '@modules/user/user.service';
 import {
   Body,
   Controller,
@@ -9,6 +17,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -16,9 +25,10 @@ import {
   Req,
   UploadedFile,
   UseGuards,
-  Inject,
   UseInterceptors,
+  ConflictException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -28,24 +38,14 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  ActiveSubscriptionUseCase,
-  ActiveSubscriptionUseCaseFactory,
-  InactiveSubscriptionUseCase,
-  InactiveSubscriptionUseCaseFactory,
-} from '@domain/usecases/SubscriptionUsecases';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserFiltersDto } from './dto/user-filters.dto';
-import { Request } from 'express';
-import { UpdatePasswordDto } from './dto/update-password.dto';
-import { CustomerAndUser } from '@entities/customer.entity';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { MailerService } from '@services/MailerService';
-import { SubscriptionTier } from '@domain/value-objects/subscriptionTier';
-import { UserService } from '@modules/user/user.service';
+import { Request } from 'express';
 import { UserData } from '../../common/types/user-data';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserFiltersDto } from './dto/user-filters.dto';
 
 @ApiTags('Utilisateurs')
 @ApiBearerAuth('JWT-auth')
@@ -53,6 +53,7 @@ import { UserData } from '../../common/types/user-data';
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly quizService: QuizService,
     @Inject('CustomerRepository')
     private readonly customerRepository: CustomerRepository,
     @Inject('MailerService')
@@ -154,6 +155,81 @@ export class UserController {
     return user;
   }
 
+  @Get('profile/:username')
+  @ApiOperation({
+    summary: "Récupérer le profil public d'un utilisateur par son username",
+  })
+  @ApiParam({ name: 'username', description: "Username de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "Le profil public de l'utilisateur a été trouvé.",
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            username: { type: 'string' },
+            bio: { type: 'string', nullable: true },
+            avatar: { type: 'string', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        quizzes: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              title: { type: 'string' },
+              description: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
+  async findPublicProfile(@Param('username') username: string) {
+    const user = await this.userService.findByUsername(username);
+    if (!user || user.deleted || user.blocked) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+
+    // Récupérer les quiz publics de l'utilisateur
+    const quizzes = await this.quizService.findAll(
+      {
+        userId: { id: user.id },
+        isPublic: true,
+        ready: true,
+      },
+      { ignore: true },
+    );
+
+    // Retourner seulement les informations publiques
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        bio: user.bio,
+        avatar: user.avatar,
+        createdAt: user.createdAt,
+      },
+      quizzes: quizzes.data.map((quiz) => ({
+        id: quiz.id,
+        title: quiz.title,
+        description: quiz.description,
+        createdAt: quiz.createdAt,
+        category: quiz.category,
+      })),
+    };
+  }
+
   @Get(':id/customer')
   @ApiOperation({ summary: 'Récupérer un utilisateur par son ID' })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
@@ -190,8 +266,36 @@ export class UserController {
     @CurrentUser() user: ReqUser,
   ): Promise<User> {
     try {
+      // Récupérer l'utilisateur actuel pour vérifier si le username a changé
+      const currentUser = await this.userService.findById(user.sub);
+      if (!currentUser) {
+        throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+      }
+
+      // Vérifier si le username a changé
+      if (
+        updateUserDto.username &&
+        updateUserDto.username !== currentUser.username
+      ) {
+        // Mettre à jour le username dans tous les quiz de l'utilisateur
+        await this.quizService.updateUsernameInUserQuizzes(
+          user.sub,
+          updateUserDto.username,
+        );
+      }
+
       return await this.userService.update(user.sub, updateUserDto);
     } catch (error) {
+      if (error.message?.includes("nom d'utilisateur existe déjà")) {
+        throw new ConflictException(
+          "Un utilisateur avec ce nom d'utilisateur existe déjà",
+        );
+      }
+      if (error.message?.includes('email existe déjà')) {
+        throw new ConflictException(
+          'Un utilisateur avec cet email existe déjà',
+        );
+      }
       throw new HttpException(
         "Erreur lors de la mise à jour de l'utilisateur",
         HttpStatus.NOT_FOUND,
@@ -221,8 +325,36 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
+      // Récupérer l'utilisateur actuel pour vérifier si le username a changé
+      const currentUser = await this.userService.findById(id);
+      if (!currentUser) {
+        throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+      }
+
+      // Vérifier si le username a changé
+      if (
+        updateUserDto.username &&
+        updateUserDto.username !== currentUser.username
+      ) {
+        // Mettre à jour le username dans tous les quiz de l'utilisateur
+        await this.quizService.updateUsernameInUserQuizzes(
+          id,
+          updateUserDto.username,
+        );
+      }
+
       return await this.userService.update(id, updateUserDto);
     } catch (error) {
+      if (error.message?.includes("nom d'utilisateur existe déjà")) {
+        throw new ConflictException(
+          "Un utilisateur avec ce nom d'utilisateur existe déjà",
+        );
+      }
+      if (error.message?.includes('email existe déjà')) {
+        throw new ConflictException(
+          'Un utilisateur avec cet email existe déjà',
+        );
+      }
       throw new HttpException(
         "Erreur lors de la mise à jour de l'utilisateur",
         HttpStatus.NOT_FOUND,

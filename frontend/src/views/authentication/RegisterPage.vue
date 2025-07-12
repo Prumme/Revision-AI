@@ -58,8 +58,11 @@ const handleRegister = async () => {
     // Redirection vers la page d'accueil
     router.push("/email-send");
   } catch (e) {
-    error.value = "Une erreur est survenue lors de l'inscription";
-    console.error(e);
+    if (e instanceof Error) {
+      error.value = e.message;
+    } else {
+      error.value = "Une erreur est survenue lors de l'inscription";
+    }
   }
 };
 </script>

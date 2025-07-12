@@ -2,8 +2,16 @@ import { Quiz } from '@entities/quiz.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { MinioService } from '@modules/minio/minio.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { QuizFilters, QuizRepository } from '@repositories/quiz.repository';
-import { PaginatedResult, PaginationOptions, UserRepository } from '@repositories/user.repository';
+import {
+  NullPaginationOptions,
+  QuizFilters,
+  QuizRepository,
+} from '@repositories/quiz.repository';
+import {
+  PaginatedResult,
+  PaginationOptions,
+  UserRepository,
+} from '@repositories/user.repository';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { CreateQuizUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
@@ -41,17 +49,20 @@ export class QuizService {
     if (!quiz) return null;
     return {
       ...quiz,
-      questions: (quiz.questions || []).map(q => ({
+      questions: (quiz.questions || []).map((q) => ({
         q: q.q,
-        answers: (q.answers || []).map(a => ({
+        answers: (q.answers || []).map((a) => ({
           a: a.a,
           c: typeof a.c === 'boolean' ? a.c : false,
-        }))
-      }))
+        })),
+      })),
     };
   }
 
-  async findAll(filters?: QuizFilters, pagination?: PaginationOptions): Promise<PaginatedResult<Quiz>> {
+  async findAll(
+    filters?: QuizFilters,
+    pagination?: PaginationOptions | NullPaginationOptions,
+  ): Promise<PaginatedResult<Quiz>> {
     return this.quizRepository.findAll(filters, pagination);
   }
 
@@ -80,6 +91,7 @@ export class QuizService {
     }
 
     quiz.medias = medias;
+    quiz.username = foundUser.username;
 
     const userTier = (foundUser.subscriptionTier || 'free') as SubscriptionTier;
 
@@ -91,15 +103,13 @@ export class QuizService {
       this.fileUploadedQueueProvider,
       this.quizGenerationQueueProvider,
       this.subscriptionPolicyService,
-      userTier
+      userTier,
     );
 
     const createdQuiz = await useCase(quiz);
 
     if (createdQuiz instanceof ForbiddenException) {
-      this.logger.error(
-        `Création de quiz interdite: ${createdQuiz.message}`,
-      );
+      this.logger.error(`Création de quiz interdite: ${createdQuiz.message}`);
       throw createdQuiz;
     }
 
@@ -179,6 +189,47 @@ export class QuizService {
 
   async delete(id: string): Promise<boolean> {
     return this.quizRepository.delete(id);
+  }
+
+  async updateUsernameInUserQuizzes(
+    userId: string,
+    newUsername: string,
+  ): Promise<void> {
+    this.logger.log(
+      `Mise à jour du username dans tous les quiz pour l'utilisateur ${userId}`,
+    );
+
+    try {
+      // Récupérer tous les quiz de l'utilisateur
+      const userQuizzes = await this.quizRepository.findAll(
+        {
+          userId: { id: userId },
+        },
+        { ignore: true },
+      );
+
+      if (userQuizzes.data.length === 0) {
+        this.logger.log(`Aucun quiz trouvé pour l'utilisateur ${userId}`);
+        return;
+      }
+
+      // Mettre à jour chaque quiz avec le nouveau username
+      const updatePromises = userQuizzes.data.map((quiz) =>
+        this.quizRepository.update(quiz.id, { username: newUsername }),
+      );
+
+      await Promise.all(updatePromises);
+
+      this.logger.log(
+        `Username mis à jour dans ${userQuizzes.data.length} quiz(s) pour l'utilisateur ${userId}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Erreur lors de la mise à jour du username dans les quiz pour l'utilisateur ${userId}:`,
+        error,
+      );
+      throw error;
+    }
   }
 
   async countByUserId(userId: string): Promise<number> {

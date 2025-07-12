@@ -7,6 +7,9 @@ export class Quiz {
   @ApiProperty({ description: "ID de l'utilisateur" })
   userId: string;
 
+  @ApiProperty({ description: "Nom d'utilisateur" })
+  username: string;
+
   @ApiProperty({ description: 'Titre du quiz' })
   title: string;
 
@@ -48,11 +51,13 @@ export function createQuiz(
   questionsNumbers: number,
   isPublic: boolean,
   userId: string,
+  username: string,
   media: string[] = [],
 ): Quiz {
   return {
     id: '',
     userId,
+    username,
     title,
     category,
     questions: [],
