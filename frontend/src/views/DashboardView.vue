@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
 import { useUserStore } from "@/stores/user";
-import KPICard from '@/components/cards/KPICard.vue';
-import { onMounted, ref, watch } from 'vue';
-import { QuizService } from '@/services/quiz.service';
-import QuizCard from '@/components/cards/QuizCard.vue';
-import MediaList from '@/components/cards/MediaList.vue';
-import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
+import KPICard from "@/components/cards/KPICard.vue";
+import { onMounted, ref, watch } from "vue";
+import { QuizService } from "@/services/quiz.service";
+import QuizCard from "@/components/cards/QuizCard.vue";
+import MediaList from "@/components/cards/MediaList.vue";
+import { ArrowRight, Calendar, FileQuestion } from "lucide-vue-next";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const user = userStore.user;
 const quizCount = ref(0);
-const averageScore = ref('0%');
-const totalRevisionTime = ref('0m');
+const averageScore = ref("0%");
+const totalRevisionTime = ref("0m");
 
 const userQuizzes = ref([]);
 const loadingUserQuizzes = ref(false);
@@ -25,14 +25,20 @@ onMounted(async () => {
   await userStore.fetchKpis();
   averageScore.value = userStore.averageScore;
   totalRevisionTime.value = userStore.totalRevisionTimeFormatted;
-  try {
-    const res = await QuizService.getUserQuizzes(user?.id);
-    userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : (res?.data?.slice(0, 5) || []);
-  } catch {
+
+  // S'assurer que user existe avant d'essayer d'accéder à user.id
+  if (user?.id) {
+    try {
+      const res = await QuizService.getUserQuizzes(user.id);
+      userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : res?.data?.slice(0, 5) || [];
+    } catch {
+      userQuizzes.value = [];
+    }
+  } else {
     userQuizzes.value = [];
-  } finally {
-    loadingUserQuizzes.value = false;
   }
+
+  loadingUserQuizzes.value = false;
 });
 
 const animatedStats = ref([
@@ -42,12 +48,15 @@ const animatedStats = ref([
   { label: "Temps de révision", value: 0, color: "pale-green" },
 ]);
 
-watch([quizCount, averageScore, totalRevisionTime], ([newQuizCount, newAverageScore, newTotalRevisionTime]) => {
-  animateNumber(animatedStats.value[0], newQuizCount);
-  animateNumber(animatedStats.value[1], 16);
-  animateNumber(animatedStats.value[2], parseInt(newAverageScore));
-  animatedStats.value[3].value = newTotalRevisionTime; // For time, just update directly
-});
+watch(
+  [quizCount, averageScore, totalRevisionTime],
+  ([newQuizCount, newAverageScore, newTotalRevisionTime]) => {
+    animateNumber(animatedStats.value[0], newQuizCount);
+    animateNumber(animatedStats.value[1], 16);
+    animateNumber(animatedStats.value[2], parseInt(newAverageScore));
+    animatedStats.value[3].value = newTotalRevisionTime; // For time, just update directly
+  },
+);
 
 function animateNumber(stat, target) {
   const start = Number(stat.value) || 0;
@@ -73,7 +82,6 @@ function animateNumber(stat, target) {
   step();
 }
 
-
 const stats = [
   { label: "Quiz disponibles", value: quizCount, color: "pale-yellow" },
   { label: "Cours importés", value: 16, color: "pale-red" },
@@ -90,60 +98,48 @@ function goToQuizDetail(id: string) {
 <template>
   <MotionLayout>
     <section class="flex flex-col w-full mt-20 gap-10">
-
       <!-- Welcome Section -->
       <section
         id="welcome"
         class="bg-gradient-to-r from-primary/50 to-primary/60 text-black rounded-2xl flex flex-col md:flex-row items-center relative overflow-visible min-h-0 p-10 gap-6"
       >
-        <div class="flex-1 z-10 flex flex-col justify-center  gap-3">
-          <h1 class="text-5xl font-extrabold drop-shadow mb-2">Bienvenue, <span class="blend text-black">{{ user.username }}</span> !</h1>
+        <div class="flex-1 z-10 flex flex-col justify-center gap-3">
+          <h1 class="text-5xl font-extrabold drop-shadow mb-2">
+            Bienvenue, <span class="blend text-black">{{ user?.username || "Utilisateur" }}</span> !
+          </h1>
           <p class="text-xl font-medium opacity-90">Prêt à réviser aujourd'hui&nbsp;?</p>
           <div class="flex gap-4 mt-4 items-center">
-        <router-link
-          to="/quiz"
-        >
-          <ButtonComponent>
-          Commencer un quiz
-
-          </ButtonComponent>
-        </router-link>
-        <div class="ml-5">
-          <router-link
-          to="/courses"
-          class="text-black/90 font-medium text-base hover:text-primary transition-colors duration-200"
-        >
-          Voir mes documents
-        </router-link>
-        </div>
-       </div>
-        
+            <router-link to="/quiz">
+              <ButtonComponent> Commencer un quiz </ButtonComponent>
+            </router-link>
+            <div class="ml-5">
+              <router-link
+                to="/courses"
+                class="text-black/90 font-medium text-base hover:text-primary transition-colors duration-200"
+              >
+                Voir mes documents
+              </router-link>
+            </div>
+          </div>
         </div>
         <div class="flex-1 flex justify-end relative z-20">
           <img
-          src="@/assets/images/illustration_dashboard.png"
-          alt="Welcome Image"
-          class="w-3/4 min-w-[220px] max-w-[380px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
+            src="@/assets/images/illustration_dashboard.png"
+            alt="Welcome Image"
+            class="w-3/4 min-w-[220px] max-w-[380px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
           />
         </div>
       </section>
 
       <!-- Statistics Section -->
-      <section
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"
-      >
-        <div
-          v-for="(stat, i) in stats"
-          :key="i"
-        >
+      <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div v-for="(stat, i) in stats" :key="i">
           <KPICard :label="stat.label" :value="stat.value" :color="stat.color" />
         </div>
       </section>
 
       <!-- Documents & QCM -->
-      <section
-        class="grid grid-cols-2 gap-15"
-      >
+      <section class="grid grid-cols-2 gap-15">
         <div class="col-span-2 md:col-span-1">
           <MediaList />
         </div>
@@ -157,16 +153,26 @@ function goToQuizDetail(id: string) {
                 :key="quiz.id"
                 class="min-w-[260px] max-w-[320px] flex-shrink-0"
               >
-                <QuizCard :category="quiz.category" :date="quiz.createdAt" :questionsCount="quiz.questionsNumbers" @click="goToQuizDetail(quiz.id!)">
+                <QuizCard
+                  :quiz="quiz"
+                  :category="quiz.category"
+                  :date="quiz.createdAt"
+                  :questionsCount="quiz.questionsNumbers"
+                  @click="goToQuizDetail(quiz.id!)"
+                >
                   <template #title>
                     <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
                   </template>
                   <template #description>
-                    <span class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">{{ quiz.description || 'Aucune description' }}</span>
+                    <span class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">{{
+                      quiz.description || "Aucune description"
+                    }}</span>
                   </template>
                   <template #meta="{ getCategoryLabel, formatDate }">
-                    <span class="px-3 py-1 rounded-full font-bold shadow text-base bg-white/80 border border-black/10 text-gray-900 whitespace-nowrap">
-                        {{ getCategoryLabel(quiz.category) }}
+                    <span
+                      class="px-3 py-1 rounded-full font-bold shadow text-base bg-white/80 border border-black/10 text-gray-900 whitespace-nowrap"
+                    >
+                      {{ getCategoryLabel(quiz.category) }}
                     </span>
                     <span class="flex items-center gap-1 text-gray-600">
                       <FileQuestion class="w-4 h-4" />
@@ -178,20 +184,41 @@ function goToQuizDetail(id: string) {
                     </span>
                   </template>
                   <template #status>
-                  <span :class="['text-xs font-medium px-2 py-1 rounded-full', quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600']">
-                    {{ quiz.isPublic ? 'Public' : 'Privé' }}
-                  </span>
+                    <span
+                      :class="[
+                        'text-xs font-medium px-2 py-1 rounded-full',
+                        quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600',
+                      ]"
+                    >
+                      {{ quiz.isPublic ? "Public" : "Privé" }}
+                    </span>
                   </template>
                   <template #action>
-                  <span class="text-sm text-black/50 flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
-                    Voir le quiz
-                    <ArrowRight class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
+                    <span
+                      class="text-sm text-black/50 flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all"
+                    >
+                      Voir le quiz
+                      <ArrowRight
+                        class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                      />
+                    </span>
                   </template>
                   <template #badge>
-                    <span v-if="quiz.status === 'pending'" class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">En attente</span>
-                    <span v-else-if="quiz.status === 'published'" class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full">Publié</span>
-                    <span v-else-if="quiz.status === 'draft'" class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full">Brouillon</span>
+                    <span
+                      v-if="quiz.status === 'pending'"
+                      class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+                      >En attente</span
+                    >
+                    <span
+                      v-else-if="quiz.status === 'published'"
+                      class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
+                      >Publié</span
+                    >
+                    <span
+                      v-else-if="quiz.status === 'draft'"
+                      class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
+                      >Brouillon</span
+                    >
                   </template>
                 </QuizCard>
               </div>
@@ -201,7 +228,9 @@ function goToQuizDetail(id: string) {
                 to="/quiz"
                 class="text-primary font-semibold text-base group flex items-center transition-all"
               >
-                <span class="transition-colors text-black group-hover:text-primary">Voir tous mes quiz</span>
+                <span class="transition-colors text-black group-hover:text-primary"
+                  >Voir tous mes quiz</span
+                >
                 <ArrowRight
                   class="transition-colors w-5 h-5 inline-block mr-1 transform transition-transform group-hover:translate-x-1 ml-1 group-hover:text-primary text-black transition-colors"
                 />

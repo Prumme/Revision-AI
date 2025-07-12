@@ -61,6 +61,7 @@ const handleUserClick = () => {
     class="flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none cursor-pointer"
     :class="aspectRatioClass"
     @click="handleCardClick"
+    v-if="quiz"
   >
     <!-- Dropdown de signalement -->
     <div v-if="showReportButton" class="absolute top-2 right-2 z-10" @click.stop>
