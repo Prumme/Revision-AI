@@ -197,7 +197,12 @@ export class QuizService {
 
     try {
       // Récupérer tous les quiz de l'utilisateur
-      const userQuizzes = await this.quizRepository.findAllByUserId(userId);
+      const userQuizzes = await this.quizRepository.findAll(
+        {
+          userId: { id: userId },
+        },
+        undefined,
+      );
 
       if (userQuizzes.length === 0) {
         this.logger.log(`Aucun quiz trouvé pour l'utilisateur ${userId}`);
