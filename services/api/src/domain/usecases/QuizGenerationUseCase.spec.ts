@@ -73,6 +73,7 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       medias: ['file1.pdf', 'file2.txt'],
+      isPublic: true,
     };
 
     mockFileService.getFile
@@ -132,6 +133,7 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       medias: ['file1.pdf'],
+      isPublic: true,
     };
 
     // Tous les fichiers sont trouvés en cache
@@ -191,7 +193,7 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: [] });
+    const result = await useCase({ title: '', userId: '', medias: [], isPublic: true });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota total');
     expect(mockPolicy.canCreateQuiz).toHaveBeenCalled();
@@ -210,7 +212,7 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: [] });
+    const result = await useCase({ title: '', userId: '', medias: [], isPublic: true });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota daily');
     expect(mockPolicy.canGenerateToday).toHaveBeenCalled();
@@ -229,7 +231,7 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: ['a', 'b', 'c'] });
+    const result = await useCase({ title: '', userId: '', medias: ['a', 'b', 'c'], isPublic: true });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota fichiers');
     expect(mockPolicy.canUseFilesForGeneration).toHaveBeenCalled();
@@ -254,7 +256,7 @@ describe('CreateQuizUseCase', () => {
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
-    const result = await useCase({ title: '', userId: '', medias: ['a'] });
+    const result = await useCase({ title: '', userId: '', medias: ['a'], isPublic : true });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota tokens');
     expect(mockPolicy.canUseTokensForGeneration).toHaveBeenCalled();
@@ -277,7 +279,7 @@ describe('CreateQuizUseCase', () => {
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
-    const result = await useCase({ title: '', userId: '', medias: ['a'] });
+    const result = await useCase({ title: '', userId: '', medias: ['a'] , isPublic: true });
     expect(result).not.toBeInstanceOf(Error);
     expect(mockPolicy.canCreateQuiz).toHaveBeenCalled();
     expect(mockPolicy.canGenerateToday).toHaveBeenCalled();
