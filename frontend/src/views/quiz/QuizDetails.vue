@@ -16,6 +16,11 @@ import {useToastStore} from "@/stores/toast.ts";
 import { ArrowLeftIcon } from "lucide-vue-next";
 import TabNavigation from '@/components/common/TabNavigation.vue';
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
+import { launchConfetti } from '@/utils/confetti';
+import caracterRed from "@/assets/caracters/caracterRed.png";
+import caracterBlue from "@/assets/caracters/caracterBlue.png";
+import caracterYellow from "@/assets/caracters/caracterYellow.png";
+import caracterOrange from "@/assets/caracters/caracterOrange.png";
 
 const toast = useToastStore();
 const route = useRoute();
@@ -92,6 +97,35 @@ function handlePauseSession() {
   activeTab.value = 'sessions';
   toast.showToast("warning", "Session mise en pause. Vous pouvez reprendre plus tard.");
 }
+
+function getResultMessage(score: number, total: number) {
+  const ratio = score / total;
+  if (ratio === 1) return "Incroyable ! Score parfait 🎉 Tu es un(e) champion(ne) !";
+  if (ratio > 0.8) return "Bravo ! Excellente performance !";
+  if (ratio > 0.5) return "Bien joué ! Tu progresses, continue comme ça.";
+  if (ratio > 0.2) return "Courage ! Tu peux t'améliorer, persévère.";
+  return "Ne te décourage pas, chaque erreur est une leçon !";
+}
+
+function getCharacter(score: number, total: number) {
+  const ratio = score / total;
+
+  if (ratio === 1) return caracterBlue;
+  if (ratio > 0.8) return caracterYellow;
+  if (ratio > 0.5) return caracterOrange;
+  if (ratio > 0.2) return caracterRed;
+  return caracterRed;
+}
+
+function goToSessions() {
+  activeTab.value = 'sessions';
+}
+
+watch(quizFinished, (finished) => {
+  if (finished) {
+    launchConfetti(quizScore.value, quiz.value.questions.length);
+  }
+});
 </script>
 
 <template>
@@ -288,9 +322,28 @@ function handlePauseSession() {
       <div v-else class="text-center py-10">
         <div class="text-2xl font-bold mb-4">Résultat du quiz</div>
         <div class="text-lg mb-2">Score : {{ quizScore }} / {{ quiz.questions.length }}</div>
-        <Button class="mt-4" @click="() => { currentStep = 0; quizFinished = false; userAnswers = {}; quizScore = 0; showCorrection.value = false; isStarted = false; }">
-          Recommencer le quiz
-        </Button>
+        <div class="mb-4">
+          <img
+            :src="getCharacter(quizScore, quiz.questions.length)"
+            alt="Character based on performance"
+            class="mx-auto w-24 h-24 object-cover"
+          />
+        </div>
+        <div class="text-md text-black-transparent mb-6">
+          {{ getResultMessage(quizScore, quiz.questions.length) }}
+        </div>
+        <div class="flex justify-center gap-2 items-center">
+          <Button class="mt-4" @click="() => { currentStep = 0; quizFinished = false; userAnswers = {}; quizScore = 0; showCorrection.value = false; isStarted = false; }">
+            Recommencer le quiz
+          </Button>
+          <Button
+            class="mt-4"
+            @click="goToSessions"
+            variant="outline"
+          >
+            Retourner aux sessions
+          </Button>
+        </div>
       </div>
     </section>
 
@@ -325,8 +378,13 @@ function handlePauseSession() {
         :rowKey="'id'"
         :filters="sessionFilters"
         :initial-filters="sessionTableFilters"
-        empty-message="Aucune session trouvée pour ce quiz."
+        :sort="sessionTableSort"
+        :pagination="sessionTablePagination"
         @update:filters="handleSessionTableFilters"
+        @update:sort="handleSessionTableSort"
+        @update:page="handleSessionTablePage"
+        @update:items-per-page="handleSessionTableItemsPerPage"
+        empty-message="Aucune session trouvée pour ce quiz."
       />
     </section>
   </MotionLayout>

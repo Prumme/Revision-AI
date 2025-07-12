@@ -14,7 +14,9 @@ import {Motion} from "@motionone/vue";
 import TabNavigation from "@/components/common/TabNavigation.vue";
 import {useDialogStore} from "@/stores/dialog";
 import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
+import { debounce } from "lodash-es";
 import QuizCard from "@/components/cards/QuizCard.vue";
+import caracterBlue from "@/assets/caracters/caracterBlue.webp";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -24,6 +26,15 @@ const user = userStore.user;
 const search = ref("");
 const selectedCategory = ref("");
 const isPublic = ref<null | boolean>(null);
+
+const debouncedSearch = ref("");
+const updateSearch = debounce((value: string) => {
+  debouncedSearch.value = value;
+}, 500);
+
+watch(search, (value) => {
+  updateSearch(value);
+});
 
 const quizzes = ref<Quiz[]>([]);
 const loading = ref(false);
@@ -51,7 +62,7 @@ async function fetchQuizzes() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 600));
     const filters: Record<string, unknown> = {};
-    if (search.value) filters.search = search.value;
+    if (debouncedSearch.value) filters.search = debouncedSearch.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
     if (isPublic.value !== null) filters.isPublic = isPublic.value;
     const pagination = {page: page.value, limit: limit.value};
@@ -92,7 +103,7 @@ async function fetchQuizzes() {
   }
 }
 
-watch([search, selectedCategory, isPublic, page, limit, activeTab], async () => {
+watch([debouncedSearch, selectedCategory, isPublic, page, limit, activeTab], async () => {
   await fetchQuizzes();
 });
 
@@ -219,7 +230,9 @@ onMounted(async () => {
         v-else-if="quizzes.length === 0"
         class="flex flex-col items-center justify-center py-12 bg-gray-100 rounded-lg shadow-inner"
       >
-        <div class="text-5xl mb-4">📚</div>
+        <div class="text-5xl mb-4">
+          <img :src="caracterBlue" alt="Aucun quiz" class="w-16 h-16 mx-auto"/>
+        </div>
         <h2 class="text-xl font-semibold mb-2">Aucun quiz trouvé</h2>
         <p class="text-gray-600">Créez votre premier quiz pour commencer !</p>
       </div>

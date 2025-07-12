@@ -74,6 +74,43 @@ export class MongoSessionRepository implements SessionRepository {
     }
 
     /**
+     * Finds all sessions for a specific quiz and user.
+     * @param quizId - The ID of the quiz.
+     * @param userId - The ID of the user.
+     * @param options
+     * @returns An array of sessions associated with the quiz and user.
+     */
+    async findAllByQuizIdAndUserId(quizId: string, userId: string, options?: { page?: number; limit?: number; scoreMin?: number; scoreMax?: number; status?: string }): Promise<PaginatedResult<Session>> {
+        if (!quizId || !userId || userId === 'undefined') {
+            return { data: [], total: 0, page: 1, limit: 10, totalPages: 1 };
+        }
+        const query: any = { quizId, userId };
+        if (options?.status) {
+            query.status = options.status;
+        }
+        if (typeof options?.scoreMin === 'number') {
+            query.score = { ...query.score, $gte: options.scoreMin };
+        }
+        if (typeof options?.scoreMax === 'number') {
+            query.score = { ...query.score, $lte: options.scoreMax };
+        }
+        const page = options?.page ?? 1;
+        const limit = options?.limit ?? 10;
+        const skip = (page - 1) * limit;
+        const [total, documents] = await Promise.all([
+            this.sessionModel.countDocuments(query),
+            this.sessionModel.find(query).skip(skip).limit(limit).exec()
+        ]);
+        return {
+            data: documents.map(this.documentToSession),
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit)
+        };
+    }
+
+    /**
      * Creates a new session.
      * @param session - The session data to create.
      * @returns The created session.
