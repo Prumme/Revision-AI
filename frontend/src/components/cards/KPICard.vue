@@ -1,19 +1,19 @@
 <template>
   <div
-    class="relative group rounded-xl shadow-md hover:shadow-lg transition-all  flex flex-col h-full min-h-[110px] overflow-hidden"
+    class="relative group rounded-xl  transition-all flex flex-col h-full min-h-[110px] overflow-hidden  bg-white/70 border border-gray-200"
     :style="gradientStyle"
   >
-    <div class="flex flex-row items-center gap-4 p-5 flex-1 z-10 relative">
+    <div class="flex flex-row items-center gap-3 p-4 flex-1 z-10 relative">
       <div class="flex flex-col flex-1">
-        <div class="text-xs font-semibold mb-1 text-gray-700 uppercase tracking-wide opacity-80">
+        <div class="text-[11px] font-semibold mb-0.5 text-gray-600 uppercase tracking-widest opacity-80 ">
           {{ label }}
         </div>
-        <div class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+        <div class="text-xl md:text-2xl font-bold text-gray-800 leading-snug ">
           <Motion
             v-if="isAnimated"
-            :initial="{ opacity: 0, y: 20 }"
+            :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
-            transition="{ duration: 0.5 }"
+            transition="{ duration: 0.4 }"
           >
             {{ animatedDisplayValue }}
           </Motion>
@@ -22,7 +22,12 @@
           </template>
         </div>
       </div>
-      <slot name="icon"></slot>
+      <div class="relative flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full blur-md opacity-30" :style="{ background: iconHaloColor }"></div>
+        <div class="relative z-10">
+          <slot name="icon"></slot>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -41,16 +46,25 @@ const props = defineProps({
 });
 
 const colorMap = {
-  'pale-green': ['#e6fbe9', '#9effbb'],
-  'pale-yellow': ['#fffbe6', '#ffec9e'],
-  'pale-purple': ['#f3f0ff', '#a89eff'],
-  'pale-red': ['#ffeaea', '#ff9ea0'],
+  'pale-green': ['#f8fdfa', '#e6f4ed'],
+  'pale-yellow': ['#fefdf8', '#fdf6e6'],
+  'pale-purple': ['#fafaff', '#ececf6'],
+  'pale-red': ['#fffafa', '#ffecec'],
+};
+
+const iconHaloMap = {
+  'pale-green': 'radial-gradient(circle, #a7f3d0 0%, #d1fae5 80%, transparent 100%)',
+  'pale-yellow': 'radial-gradient(circle, #fde68a 0%, #fef9c3 80%, transparent 100%)',
+  'pale-purple': 'radial-gradient(circle, #c4b5fd 0%, #ede9fe 80%, transparent 100%)',
+  'pale-red': 'radial-gradient(circle, #fca5a5 0%, #fee2e2 80%, transparent 100%)',
 };
 
 const gradientStyle = computed(() => {
   const colors = colorMap[props.color] || colorMap['pale-green'];
-  return `background: linear-gradient(90deg, ${colors[0]}, ${colors[1]})`;
+  return `background: linear-gradient(120deg, ${colors[0]}, ${colors[1]})`;
 });
+
+const iconHaloColor = computed(() => iconHaloMap[props.color] || iconHaloMap['pale-green']);
 
 const displayValue = computed(() => {
   if (typeof props.value === 'object' && props.value !== null && 'value' in props.value) {
@@ -95,3 +109,12 @@ function animateCounter(from, to) {
   step();
 }
 </script>
+
+<style scoped>
+.group:hover {
+  /* Adoucir le hover */
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.07), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+  background-color: rgba(255,255,255,0.85) !important;
+  border-color: #d1d5db !important;
+}
+</style>

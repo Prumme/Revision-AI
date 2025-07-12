@@ -7,6 +7,8 @@ import { QuizService } from '@/services/quiz.service';
 import QuizCard from '@/components/cards/QuizCard.vue';
 import MediaList from '@/components/cards/MediaList.vue';
 import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
+import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const user = userStore.user;
@@ -79,7 +81,10 @@ const stats = [
   { label: "Temps de révision", value: totalRevisionTime, color: "pale-green" },
 ];
 
-console.log(stats);
+const router = useRouter();
+function goToQuizDetail(id: string) {
+  router.push(`/quiz/${id}`);
+}
 </script>
 
 <template>
@@ -89,15 +94,37 @@ console.log(stats);
       <!-- Welcome Section -->
       <section
         id="welcome"
-        class="bg-primary text-primary-content rounded-lg shadow flex flex-row items-center relative overflow-visible min-h-0 p-10"
+        class="bg-gradient-to-r from-primary/50 to-primary/60 text-black rounded-2xl flex flex-col md:flex-row items-center relative overflow-visible min-h-0 p-10 gap-6"
       >
-        <div class="flex-1 z-10 h-1/2 gap-2 flex flex-col justify-center">
-          <h1 class="text-4xl font-bold">Bienvenue {{user.username}}</h1>
-          <p class="text-lg">Prêt à réviser aujourd'hui ?</p>
+        <div class="flex-1 z-10 flex flex-col justify-center  gap-3">
+          <h1 class="text-5xl font-extrabold drop-shadow mb-2">Bienvenue, <span class="blend text-black">{{ user.username }}</span> !</h1>
+          <p class="text-xl font-medium opacity-90">Prêt à réviser aujourd'hui&nbsp;?</p>
+          <div class="flex gap-4 mt-4 items-center">
+        <router-link
+          to="/quiz"
+        >
+          <ButtonComponent>
+          Commencer un quiz
+
+          </ButtonComponent>
+        </router-link>
+        <div class="ml-5">
+          <router-link
+          to="/courses"
+          class="text-black/90 font-medium text-base hover:text-primary transition-colors duration-200"
+        >
+          Voir mes documents
+        </router-link>
+        </div>
+       </div>
+        
         </div>
         <div class="flex-1 flex justify-end relative z-20">
-          <img src="@/assets/images/illustration_dashboard.png" alt="Welcome Image"
-            class="w-2/3 min-w-[200px] max-w-[350px] absolute right-[-40px] -top-12.5 -translate-y-1/2 pointer-events-none select-none z-20" />
+          <img
+          src="@/assets/images/illustration_dashboard.png"
+          alt="Welcome Image"
+          class="w-3/4 min-w-[220px] max-w-[380px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
+          />
         </div>
       </section>
 
@@ -130,7 +157,7 @@ console.log(stats);
                 :key="quiz.id"
                 class="min-w-[260px] max-w-[320px] flex-shrink-0"
               >
-                <QuizCard :category="quiz.category" :date="quiz.createdAt" :questionsCount="quiz.questionsNumbers">
+                <QuizCard :category="quiz.category" :date="quiz.createdAt" :questionsCount="quiz.questionsNumbers" @click="goToQuizDetail(quiz.id!)">
                   <template #title>
                     <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
                   </template>
@@ -156,7 +183,7 @@ console.log(stats);
                   </span>
                   </template>
                   <template #action>
-                  <span class="text-sm text-primary flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
+                  <span class="text-sm text-black/50 flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
                     Voir le quiz
                     <ArrowRight class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>

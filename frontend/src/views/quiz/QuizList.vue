@@ -324,7 +324,7 @@ onMounted(async () => {
           >
 
             <QuizCard :category="quiz.category" :date="quiz.createdAt"
-                      :questionsCount="quiz.questionsNumbers" @click="goToQuizDetail(quiz.id!)">
+                      :questionsCount="quiz.questionsNumbers" @click="goToQuizDetail(quiz.id!)" class="aspect-square cursor-pointer">
               <template #title>
                 <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
               </template>
@@ -353,32 +353,33 @@ onMounted(async () => {
                       {{ quiz.isPublic ? 'Public' : 'Privé' }}
                     </span>
               </template>
-              <template #action>
-                    <span
-                      class="text-sm text-primary flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
-                      Voir le quiz
-                      <ArrowRight
-                        class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"/>
-                    </span>
-
-                <div class="absolute top-2 right-2 z-10" @click.stop>
-                  <DropdownInput position="top-right">
+                <template #action>
+                <div class="flex items-center justify-between relative">
+                  <span
+                  class="text-sm text-black/50 flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all">
+                  Voir le quiz
+                  <ArrowRight
+                    class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"/>
+                  </span>
+                  <div class="ml-2">
+                  <DropdownInput position="top-right" @click.stop>
                     <template #trigger>
-                      <MoreVertical class="w-5 h-5 text-gray-600"/>
+                    <MoreVertical class="w-5 h-5 text-gray-600"/>
                     </template>
                     <template #menus>
-                      <div class="py-1">
-                        <button
-                          @click="handleReport(quiz)"
-                          class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          Signaler ce quiz
-                        </button>
-                      </div>
+                    <div class="py-1">
+                      <button
+                      @click="handleReport(quiz)"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      >
+                      Signaler ce quiz
+                      </button>
+                    </div>
                     </template>
                   </DropdownInput>
+                  </div>
                 </div>
-              </template>
+                </template>
               <template #badge>
                 <span v-if="quiz.status === 'pending'"
                       class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">En attente</span>

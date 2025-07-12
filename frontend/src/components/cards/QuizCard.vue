@@ -1,35 +1,45 @@
 <template>
   <div
-    :class="['relative group bg-white rounded-2xl flex flex-col h-full aspect-square overflow-hidden transition-all duration-100 shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:cursor-pointer hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none border-2 hover:border-black focus-within:border-black/40', gradientClass]"
+    :class="[
+      'relative group rounded-xl flex flex-col h-full  transition-all duration-200 border-1 border-black/40 hover:border-white',
+      gradientClass
+    ]"
+    style="background-blend-mode: multiply;"
   >
-    <!-- Badge en haut à droite -->
-    <div class="absolute top-0 right-0 m-2 z-20">
-      <slot name="badge"></slot>
-    </div>
-    <!-- Titre -->
-    <div class="px-4 pt-4 flex items-center gap-2">
-      <slot name="icon"></slot>
-      <h3 class="font-bold text-xl text-gray-900 truncate">
+    
+
+    <!-- Titre et icône -->
+    <div class="relative z-10 px-6 pt-4 flex-col items-center gap-4">
+    <div>
+        <span
+        class="inline-block rounded-full px-3 py-1 mb-3 text-xs font-bold shadow bg-white/80 border border-white/60 text-gray-900"
+        >
+        <TagIcon :size="16" class="inline-block mr-1 text-gray-500" />
+        {{ getCategoryLabel(category) }}
+      </span>
+      </div>
+      <h3 class="font-extrabold text-2xl text-gray-900  tracking-tight truncate">
         <slot name="title"></slot>
       </h3>
     </div>
-    <div class="px-4 pt-1 pb-2 flex items-center gap-3 text-xs text-gray-600">
-      <span class="inline-block rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-primary shadow">{{ getCategoryLabel(category) }}</span>
+    <!-- Infos principales -->
+    <div class="relative z-10 px-7 pt-3 pb-4 flex flex-col gap-2 text-xs text-black font-semibold opacity-80">
+      
       <span v-if="date" class="flex items-center gap-1">
-        <CalendarIcon :size="16" class="text-gray-500" />
+        <CalendarIcon :size="16" />
         {{ formatDateSlot(date) }}
       </span>
       <span class="flex items-center gap-1">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-list text-gray-500"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+        <List :size="16"/>
         {{ questionsCount }} questions
       </span>
     </div>
     <!-- Description -->
-    <div class="px-4 flex-1 flex items-center justify-center text-gray-700 text-sm text-center">
+    <div class="relative z-10 px-7 flex-1 flex items-start text-gray-900 text-base font-medium">
       <slot name="description"></slot>
     </div>
     <!-- Actions et statut -->
-    <div class="flex justify-between items-center px-4 py-3 bg-gray-50 rounded-b-2xl border-t border-gray-100">
+    <div class="relative z-10 flex justify-between items-center px-7 py-5 rounded-b-xl border-t border-white/40 bg-white/60 backdrop-blur-md mt-2">
       <slot name="status"></slot>
       <slot name="action"></slot>
     </div>
@@ -38,7 +48,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { CalendarIcon } from "lucide-vue-next";
+import { CalendarIcon, List, TagIcon } from "lucide-vue-next";
 
 const props = defineProps({
   category: {
@@ -94,4 +104,5 @@ function formatDateSlot(date: string | Date | undefined): string {
 const gradientClass = computed(() => {
   return categoryGradientClass[props.category || 'default'] || categoryGradientClass.default;
 });
+console.log('Gradient class:', gradientClass.value);
 </script>
