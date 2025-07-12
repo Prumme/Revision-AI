@@ -197,6 +197,7 @@ export class MongoUserRepository implements UserRepository {
       subscriptionTier: document.subscriptionTier,
       deleted: document.deleted,
       blocked: document.blocked,
+      TOTPSecret: document?.TOTPSecret ?? undefined
     };
   }
 }

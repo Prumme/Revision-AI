@@ -9,6 +9,7 @@ import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
+import Active2FACard from "@/components/cards/Active2FACard.vue";
 
 const userStore = useUserStore();
 const { showToast } = useToastStore();
@@ -84,7 +85,7 @@ const handleSubmit = async () => {
 
 <template>
   <MotionLayout>
-    <section class="flex flex-col gap-1.5 w-full">
+    <section class="flex flex-col gap-5 w-full">
       <p class="font-outfit text-lg text-black-transparent">
         Modifiez vos informations personnelles et vos préférences de compte.
       </p>
@@ -137,12 +138,13 @@ const handleSubmit = async () => {
         <div class="flex flex-col gap-4">
           <PasswordChangeCard />
         </div>
-
-        <DeleteAccountCard />
       </div>
 
-      <DownloadDataCard />
-
+      <div class="flex flex-col lg:flex-row gap-4">
+        <Active2FACard class="flex-1" />
+        <DownloadDataCard class="flex-1" />
+      </div>
+      
       <DeleteAccountCard />
     </section>
   </MotionLayout>

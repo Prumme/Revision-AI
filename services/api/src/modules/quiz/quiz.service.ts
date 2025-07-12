@@ -2,8 +2,12 @@ import { Quiz } from '@entities/quiz.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { MinioService } from '@modules/minio/minio.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { QuizRepository } from '@repositories/quiz.repository';
-import { UserRepository } from '@repositories/user.repository';
+import { QuizFilters, QuizRepository } from '@repositories/quiz.repository';
+import {
+  PaginatedResult,
+  PaginationOptions,
+  UserRepository,
+} from '@repositories/user.repository';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import { CreateQuizUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
@@ -51,14 +55,13 @@ export class QuizService {
     };
   }
 
-  async findAll(filters?: any, userId?: string): Promise<Quiz[]> {
-    // if (userId) filters = { ...filters, userId };
-    return this.quizRepository.findAll(filters, undefined);
+  async findAll(
+    filters?: QuizFilters,
+    pagination?: PaginationOptions,
+  ): Promise<PaginatedResult<Quiz>> {
+    return this.quizRepository.findAll(filters, pagination);
   }
 
-  async findAllByUserId(userId: string, filters?: any): Promise<Quiz[]> {
-    return this.quizRepository.findAllByUserId(userId, filters);
-  }
   async create(
     quiz: CreateQuizDto,
     files: Express.Multer.File[],
@@ -142,10 +145,6 @@ export class QuizService {
       this.logger.log(
         `Nombre de réponses: ${quiz.questions[0].answers.length}`,
       );
-    }
-
-    if (quiz.status) {
-      this.logger.log(`Statut du quiz mis à jour: ${quiz.status}`);
     }
 
     return this.quizRepository.update(id, quiz);

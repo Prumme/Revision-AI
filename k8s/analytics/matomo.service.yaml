@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: matomo-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: matomo-deploy
+  ports:
+    - port: 8080
+      targetPort: 80
+      protocol: TCP
+      name: http

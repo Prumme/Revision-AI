@@ -38,7 +38,7 @@ import { Motion } from '@motionone/vue';
               :animate="{ opacity: 1, scale: 1 }"
               transition="{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }"
             >
-              <ButtonComponent variant="primary"> Commencer gratuitement !</ButtonComponent>
+              <ButtonComponent variant="primary" tracking_event="start_free_trial"> Commencer gratuitement !</ButtonComponent>
             </Motion>
           </RouterLink>
         </Motion>

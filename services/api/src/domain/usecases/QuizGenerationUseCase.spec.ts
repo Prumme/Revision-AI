@@ -76,6 +76,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: ['file1.pdf', 'file2.txt'],
+      isPublic: true,
     };
 
     mockFileService.getFile
@@ -136,6 +137,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: ['file1.pdf'],
+      isPublic: true,
     };
 
     // Tous les fichiers sont trouvés en cache
@@ -203,6 +205,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: [],
+      isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota total');
@@ -230,6 +233,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: [],
+      isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota daily');
@@ -257,6 +261,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: ['a', 'b', 'c'],
+      isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota fichiers');
@@ -292,6 +297,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: ['a'],
+      isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota tokens');
@@ -322,6 +328,7 @@ describe('CreateQuizUseCase', () => {
       userId: '',
       username: '',
       medias: ['a'],
+      isPublic: true,
     });
     expect(result).not.toBeInstanceOf(Error);
     expect(mockPolicy.canCreateQuiz).toHaveBeenCalled();

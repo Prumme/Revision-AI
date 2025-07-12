@@ -175,7 +175,7 @@ const handleRegister = async () => {
 
             <template #actions>
               <div class="flex flex-col gap-2 w-full px-12">
-                <Button variant="primary" @click="handleRegister"> S'enregistrer </Button>
+                <Button variant="primary" @click="handleRegister" tracking_event="register_account"> S'enregistrer </Button>
               </div>
             </template>
 

@@ -4,10 +4,10 @@ import SearchBarComponent from "@/components/inputs/SearchBarComponent.vue";
 import Select from "@/components/inputs/SelectComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import QuizLoadingSpinner from "@/components/loaders/QuizLoadingSpinner.vue";
-import { Quiz, QuizService } from "@/services/quiz.service";
+import { type Quiz, QuizService, type PaginatedQuizResponse } from "@/services/quiz.service";
 import { useQuizLoadingStore } from "@/stores/quizLoading";
 import { useUserStore } from "@/stores/user";
-import { PlusIcon } from "lucide-vue-next";
+import { PlusIcon, MoreVertical, ArrowRight, Calendar, FileQuestion } from "lucide-vue-next";
 import { onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Motion } from "@motionone/vue";
@@ -16,6 +16,7 @@ import { useDialogStore } from "@/stores/dialog";
 import { debounce } from "lodash-es";
 import QuizCard from "@/components/cards/QuizCard.vue";
 import caracterBlue from "@/assets/caracters/caracterBlue.webp";
+import PaginatorComponent from "@/components/ui/PaginatorComponent.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -23,9 +24,30 @@ const quizLoadingStore = useQuizLoadingStore();
 const dialogStore = useDialogStore();
 const user = userStore.user;
 
+const quizzes = ref<Quiz[]>([]);
+const quizCount = ref(0);
+
+const quizKeys = {
+  my: Symbol("my"),
+  shared: Symbol("shared"),
+};
+
+const activeTab = ref(quizKeys.my);
+const quizTabs = computed(() => [
+  { key: quizKeys.my, label: "Mes quiz", badge: quizCount.value },
+  { key: quizKeys.shared, label: "Quiz de la communauté" },
+]);
+
+const page = ref(1);
+const limit = ref(8);
+const total = ref(0);
+const totalPages = ref(1);
+
+const loading = ref(false);
+const error = ref<string | null>(null);
 const search = ref("");
 const selectedCategory = ref("");
-const isPublic = ref<null | boolean>(null);
+const isPublic = ref<boolean>(false);
 
 const debouncedSearch = ref("");
 const updateSearch = debounce((value: string) => {
@@ -64,38 +86,21 @@ async function fetchQuizzes() {
     const filters: Record<string, unknown> = {};
     if (debouncedSearch.value) filters.search = debouncedSearch.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
-    if (isPublic.value !== null) filters.isPublic = isPublic.value;
+    if (isPublic.value) filters.isPublic = isPublic.value;
     const pagination = { page: page.value, limit: limit.value };
-    let res;
-    if (activeTab.value === "shared") {
+    let res: PaginatedQuizResponse;
+    if (activeTab.value === quizKeys.shared) {
       res = await QuizService.getAllQuizzes(filters, pagination);
     } else {
       if (!user?.id) {
-        quizzes.value = [];
-        total.value = 0;
-        totalPages.value = 1;
-        quizCount.value = 0;
-        loading.value = false;
-        return;
+        throw new Error("User not found");
       }
       res = await QuizService.getUserQuizzes(user.id, filters, pagination);
     }
-    if (Array.isArray(res)) {
-      quizzes.value = res;
-      total.value = res.length;
-      totalPages.value = 1;
-      if (activeTab.value === "my") quizCount.value = res.length;
-    } else if (res && Array.isArray(res.data)) {
-      quizzes.value = res.data;
-      total.value = res.total ?? res.data.length ?? 0;
-      totalPages.value = res.totalPages ?? 1;
-      if (activeTab.value === "my") quizCount.value = res.total ?? res.data.length ?? 0;
-    } else {
-      quizzes.value = [];
-      total.value = 0;
-      totalPages.value = 1;
-      if (activeTab.value === "my") quizCount.value = 0;
-    }
+    quizzes.value = res.data;
+    total.value = res.total;
+    totalPages.value = res.totalPages;
+    if (activeTab.value === quizKeys.my) quizCount.value = res.total;
   } catch {
     error.value = "Impossible de charger les quiz. Veuillez réessayer plus tard.";
   } finally {
@@ -112,7 +117,7 @@ watch(
   (newStatus) => {
     if (newStatus === "completed") {
       fetchQuizzes();
-    } else if (newStatus === "error") {
+    } else if (newStatus === "failed") {
       error.value = "Une erreur est survenue lors du chargement des quiz.";
     }
   },
@@ -125,12 +130,16 @@ const handleReport = (quiz: Quiz) => {
   });
 };
 
-watch(quizCount, (newCount) => {
-  quizTabs.value[0].badge = newCount;
-});
-
 onMounted(async () => {
   await fetchQuizzes();
+});
+
+watch(search, (value) => {
+  updateSearch(value);
+});
+
+watch(quizCount, (newCount) => {
+  quizTabs.value[0].badge = newCount;
 });
 </script>
 
@@ -163,10 +172,7 @@ onMounted(async () => {
         <div class="flex gap-4 mb-4">
           <Select
             v-model="selectedCategory"
-            :options="[
-              { label: 'Toutes les catégories', value: '' },
-              ...Object.values(QuizService.categories || {}),
-            ]"
+            :options="[{ label: 'Toutes les catégories', value: '' }, ...QuizService.categories]"
             placeholder="Catégorie"
             id="category"
           />
@@ -177,17 +183,19 @@ onMounted(async () => {
 
     <TabNavigation :tabs="quizTabs" v-model:activeTab="activeTab" class="mb-6" />
 
+    <QuizLoadingSpinner
+      v-if="quizLoadingStore.isLoading"
+      class="fixed bottom-6 right-6 z-50 bg-primary border-2 border-black shadow-[0_4px_0_#000] rounded-lg p-4 flex items-center justify-center"
+    />
+
     <Motion
       :initial="{ opacity: 0, y: 40 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }"
     >
-      <!-- Spinner -->
-      <QuizLoadingSpinner v-if="quizLoadingStore.isLoading" />
-
       <!-- Loading Skeleton -->
       <div
-        v-else-if="loading"
+        v-if="loading"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5 animate-pulse"
       >
         <div
@@ -232,44 +240,112 @@ onMounted(async () => {
 
       <!-- Quiz list -->
       <div v-else>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
-          <QuizCard
-            v-for="quiz in quizzes"
-            :key="quiz.id"
-            :quiz="quiz"
-            :show-report-button="true"
-            :show-status-badge="true"
-            :show-visibility-info="true"
-            aspect-ratio="square"
-            @click="goToQuizDetail(quiz)"
-            @report="handleReport(quiz)"
-          />
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7">
+          <div v-for="quiz in quizzes" :key="quiz.id" class="flex flex-col">
+            <QuizCard
+              :category="quiz.category"
+              :date="quiz.createdAt"
+              :questionsCount="quiz.questionsNumbers"
+              @click="goToQuizDetail(quiz.id!)"
+              class="aspect-square cursor-pointer"
+            >
+              <template #title>
+                <span class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</span>
+              </template>
+              <template #description>
+                <span class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">{{
+                  quiz.description || "Aucune description"
+                }}</span>
+              </template>
+              <template #meta="{ getCategoryLabel, formatDate }">
+                <span
+                  class="px-3 py-1 rounded-full font-bold shadow text-base bg-white/80 border border-black/10 text-gray-900 whitespace-nowrap"
+                >
+                  {{ getCategoryLabel(quiz.category) }}
+                </span>
+                <span class="flex items-center gap-1 text-gray-600">
+                  <FileQuestion class="w-4 h-4" />
+                  <span>{{ quiz.questionsNumbers || 0 }} questions</span>
+                </span>
+                <span class="flex items-center gap-1 text-gray-600">
+                  <Calendar class="w-4 h-4" />
+                  <span>{{ formatDate(quiz.createdAt) }}</span>
+                </span>
+              </template>
+              <template #status>
+                <span
+                  :class="[
+                    'text-xs font-medium px-2 py-1 rounded-full',
+                    quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600',
+                  ]"
+                >
+                  {{ quiz.isPublic ? "Public" : "Privé" }}
+                </span>
+              </template>
+              <template #action>
+                <div class="flex items-center justify-between relative">
+                  <span
+                    class="text-sm text-black/50 flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all"
+                  >
+                    Voir le quiz
+                    <ArrowRight
+                      class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </span>
+                  <div class="ml-2">
+                    <DropdownInput position="top-right" @click.stop>
+                      <template #trigger>
+                        <MoreVertical class="w-5 h-5 text-gray-600" />
+                      </template>
+                      <template #menus>
+                        <div class="py-1">
+                          <button
+                            @click="handleReport(quiz)"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                          >
+                            Signaler ce quiz
+                          </button>
+                        </div>
+                      </template>
+                    </DropdownInput>
+                  </div>
+                </div>
+              </template>
+              <template #badge>
+                <span
+                  v-if="quiz.status === 'pending'"
+                  class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+                  >En attente</span
+                >
+                <span
+                  v-else-if="quiz.status === 'published'"
+                  class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
+                  >Publié</span
+                >
+                <span
+                  v-else-if="quiz.status === 'draft'"
+                  class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
+                  >Brouillon</span
+                >
+              </template>
+            </QuizCard>
+          </div>
         </div>
 
         <!-- Pagination -->
-        <div class="flex justify-center mt-8" v-if="totalPages > 1">
-          <button
-            class="px-3 py-1 mx-1 rounded border border-gray-300 bg-white text-black font-medium"
-            :disabled="page === 1"
-            @click="page--"
-          >
-            Précédent
-          </button>
-          <span class="px-3 py-1 mx-1">Page {{ page }} / {{ totalPages }}</span>
-          <button
-            class="px-3 py-1 mx-1 rounded border border-gray-300 bg-white text-black font-medium"
-            :disabled="page === totalPages"
-            @click="page++"
-          >
-            Suivant
-          </button>
-        </div>
+        <PaginatorComponent
+          :pagination="{
+            currentPage: page,
+            totalPages: totalPages,
+            totalItems: total,
+            itemsPerPage: limit,
+          }"
+          hide-items-per-page
+          class="mt-6"
+          @update:page="page = $event"
+          @update:itemsPerPage="limit = $event"
+        />
       </div>
-
-      <QuizLoadingSpinner
-        v-if="quizLoadingStore.isLoading"
-        class="fixed bottom-6 right-6 z-50 bg-primary border-2 border-black shadow-[0_4px_0_#000] rounded-lg p-4 flex items-center justify-center"
-      />
     </Motion>
   </section>
 </template>

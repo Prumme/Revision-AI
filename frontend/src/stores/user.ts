@@ -12,6 +12,17 @@ import {useRouter} from "vue-router";
 import {QuizService} from '@/services/quiz.service';
 import { KpiService } from '@/services/kpi.service';
 
+interface LoginFunctionResponse{
+  totpRequired: boolean;
+}
+
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
+
 export const useUserStore = defineStore("user", () => {
   const router = useRouter();
   const user = ref<User | null>(null);
@@ -165,7 +176,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  async function login(credentials: LoginCredentials) {
+  async function login(credentials: LoginCredentials) : Promise<LoginFunctionResponse> {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -178,15 +189,22 @@ export const useUserStore = defineStore("user", () => {
       if (!response.ok) {
         const {message} = await response.json();
         if (message && message === "Email not verified") {
-          throw new Error("Email not verified, please verify your email");
+          throw new AuthError("Email not verified");
         }
-        throw new Error("Erreur lors de la connexion");
+        if(message && message === "Invalid TOTP code") {
+          throw new AuthError("Code de vérification invalide");
+        }
+        throw new AuthError("Erreur lors de la connexion, veuillez vérifier vos identifiants");
       }
 
-      const data: LoginResponse = await response.json();
+      const data : LoginResponse = await response.json();
+      
+      if("needTOTP" in data) {
+        return { totpRequired: true };
+      }
       setUser(data.user);
       setToken(data.access_token);
-      return data;
+      return { totpRequired: false };
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       throw error;

@@ -1,4 +1,3 @@
-import StripePaymentMethodInput from "@/components/inputs/StripePaymentMethodInput.vue";
 import UserSidenav from "@/components/UserSidenav.vue";
 import { useUserStore } from "@/stores/user";
 import AdminUserView from "@/views/admin/AdminUserView.vue";
@@ -131,10 +130,6 @@ const router = createRouter({
       name: "email-send",
       component: EmailSend,
       meta: { requiresGuest: true },
-    },
-    {
-      path: "/test",
-      component: StripePaymentMethodInput,
     },
     {
       path: "/:pathMatch(.*)*",

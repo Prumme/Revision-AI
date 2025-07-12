@@ -1,49 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
-  ArrayMinSize,
-  IsArray,
   IsBoolean,
   IsNumber,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 
-class AnswerDto {
-  @ApiProperty({
-    description: 'Texte de la réponse',
-    example: 'En 1638',
-  })
-  @IsString()
-  a: string;
 
-  @ApiProperty({
-    description: 'Indique si cette réponse est la bonne',
-    example: true,
-  })
-  @IsBoolean()
-  correct: boolean;
-}
-
-class QuestionDto {
-  @ApiProperty({
-    description: 'Texte de la question',
-    example: 'Quand est né Louis XIV ?',
-  })
-  @IsString()
-  q: string;
-
-  @ApiProperty({
-    description: 'Liste des réponses possibles à la question',
-    type: [AnswerDto],
-  })
-  @IsArray()
-  @ArrayMinSize(1)
-  @ValidateNested({ each: true })
-  @Type(() => AnswerDto)
-  answers: AnswerDto[];
-}
 
 export class CreateQuizDto {
   @ApiProperty({
@@ -99,11 +63,26 @@ export class CreateQuizDto {
     description: 'Définit si le quiz est accessible publiquement',
     example: false,
     required: false,
+    default: false,
   })
   @IsOptional()
   @IsBoolean()
-  @Type(() => Boolean)
-  isPublic?: boolean;
+  @ApiProperty({
+    description: 'Définit si le quiz est accessible publiquement',
+    example: false,
+    required: false,
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return Boolean(value);
+  })
+  isPublic: boolean = false;
+
 
   @ApiProperty({
     description: 'URL du média associé au quiz (image, vidéo, etc.)',

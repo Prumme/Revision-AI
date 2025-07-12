@@ -24,6 +24,14 @@ export interface User {
     postal_code?: string;
     country?: string;
   };
+  TOTPSecret?: TOTPSecret;
+}
+
+export interface TOTPSecret {
+  secret: string;
+  otpauth_url: string;
+  userId: string;
+  active: boolean;
 }
 
 // Types pour le profil public

@@ -257,8 +257,8 @@ export class UserService {
         : undefined;
 
     // Récupérer tous les quiz de l'utilisateur
-    const quizzes = await this.quizRepository.findAll();
-    const userQuizzes = quizzes.filter((quiz) => quiz.userId === userId);
+    const quizzes = await this.quizRepository.findAll({},{ignore: true});
+    const userQuizzes = quizzes.data.filter((quiz) => quiz.userId === userId);
 
     return {
       user,

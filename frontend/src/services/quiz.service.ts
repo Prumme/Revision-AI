@@ -34,7 +34,7 @@ export interface Quiz {
   userId: string;
   title: string;
   category?: string;
-  questions?: QuizQuestion[];
+  questions: QuizQuestion[];
   questionsNumbers?: number;
   description?: string;
   isPublic?: boolean;
@@ -45,6 +45,14 @@ export interface Quiz {
 }
 
 export class QuizService {
+  public static categories: { label: string; value: string }[] = [
+    { label: "Histoire générale", value: "general_history" },
+    { label: "Géographie", value: "geography" },
+    { label: "Sciences", value: "sciences" },
+    { label: "Mathématiques", value: "mathematics" },
+    { label: "Littérature", value: "literature" },
+  ]
+
   static buildQueryParams(filters: Record<string, unknown>): string[] {
     const queryParams: string[] = [];
     for (const [key, value] of Object.entries(filters)) {
@@ -65,6 +73,7 @@ export class QuizService {
     const queryParams = this.buildQueryParams({ ...filters, ...pagination });
     const endpoint = `/quizzes${queryParams.length > 0 ? `?${queryParams.join("&")}` : ""}`;
     const response = await ApiService.get<PaginatedQuizResponse>(endpoint);
+    console.log("response", response);
     return response.data;
   }
 
@@ -161,7 +170,7 @@ export class QuizService {
    * @param quiz - L'objet quiz contenant les nouvelles données
    * @returns Promise resolving to the updated quiz object
    */
-  static async updateQuiz(quizId: string, quiz: Quiz): Promise<Quiz> {
+  static async updateQuiz(quizId: string, quiz: Partial<Quiz>): Promise<Quiz> {
     // Conversion des questions du format frontend vers backend si besoin
     const payload = { ...quiz };
     if (quiz.questions && quiz.questions.length > 0 && quiz.questions[0].question) {
