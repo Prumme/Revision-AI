@@ -31,7 +31,8 @@ onMounted(async () => {
     if(!user?.id) {
       throw new Error("User not found");
     }
-    const res = await QuizService.getUserQuizzes(user?.id,undefined, {limit: 5}) as any;
+    const res = await QuizService.getUserQuizzes(user?.id,undefined, {limit: 5});
+    //@ts-expect-error error
     userQuizzes.value = res.data
   } catch {
     userQuizzes.value = [];
