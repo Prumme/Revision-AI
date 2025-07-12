@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Download, FileText } from "lucide-vue-next";
+import { ApiService } from "@/services/api.service";
 import CardComponent from "@/components/cards/CardComponent.vue";
 
 // Pour l'instant on accepte soit des strings (chemins) soit des objets avec une propriété path
@@ -16,9 +17,23 @@ const getFileName = (item: string): string => {
   return item.split("/").pop() || item;
 };
 
-// Fonction pour obtenir le chemin complet
-const getFullPath = (item: string): string => {
-  return item;
+const downloadFile = async (item: string) => {
+  const response = await ApiService.getFile(`/files/${item}`);
+  //ouvrir le fichier dans un nouvel onglet
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+
+  // Tu peux récupérer le nom depuis les headers, ou définir un nom fixe :
+  const disposition = response.headers.get("content-disposition");
+  const match = disposition?.match(/filename="(.+)"/);
+  a.download = match ? match[1] : "fichier.pdf";
+
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
 };
 </script>
 
@@ -54,12 +69,7 @@ const getFullPath = (item: string): string => {
               </div>
             </div>
             <button
-              @click="
-                () => {
-                  // Pour l'instant on log juste le chemin, on implémentera le download plus tard
-                  console.log('Download document:', getFullPath(document));
-                }
-              "
+              @click="downloadFile(document)"
               class="text-gray-500 hover:text-gray-700 ml-4 p-1 rounded-md hover:bg-gray-100"
               :title="`Télécharger ${getFileName(document)}`"
             >
