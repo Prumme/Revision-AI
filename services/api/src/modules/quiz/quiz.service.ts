@@ -28,7 +28,7 @@ export class QuizService {
     private readonly cachedFileParsedRepository: CachedFileParsedRepository, // TODO: Replace with actual type
     @Inject('UserRepository')
     private readonly userRepository: UserRepository,
-    private readonly minioService: MinioService,
+    private readonly fileService: MinioService,
     @Inject('FileUploadedQueueProvider')
     private readonly fileUploadedQueueProvider: QueueProvider<FileToParseDTO>,
     @Inject('QuizGenerationQueueProvider')
@@ -80,7 +80,7 @@ export class QuizService {
         .digest('hex');
       const objectName = `${quiz.userId}/quiz-${hashedFileName}.${fileExtension}`;
       const fullPath = 'documents/' + objectName;
-      await this.minioService.uploadFile(file, fullPath);
+      await this.fileService.uploadFile(file, fullPath);
       medias.push(fullPath);
     }
 
