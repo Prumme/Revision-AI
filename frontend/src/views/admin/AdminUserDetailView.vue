@@ -33,7 +33,6 @@ const showBlockDialog = ref(false);
 const showPasswordResetDialog = ref(false);
 const actionLoading = ref(false);
 
-
 // Computed
 const userId = computed(() => route.params.id as string);
 
@@ -192,7 +191,7 @@ onMounted(() => {
           :invoices="userInvoices"
           @refresh="handleSubscriptionUpdate"
         />
-        <UserQuizzes :quizzes="userQuizzes" />
+        <UserQuizzes class="col-span-2" :quizzes="userQuizzes" />
         <UserDocuments :documents="userDocuments" />
       </div>
 
