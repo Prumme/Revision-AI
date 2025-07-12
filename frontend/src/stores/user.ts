@@ -170,7 +170,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  async function login(credentials: LoginCredentials) : LoginFunctionResponse {
+  async function login(credentials: LoginCredentials) : Promise<LoginFunctionResponse> {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",

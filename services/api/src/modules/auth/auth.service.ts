@@ -147,7 +147,6 @@ export class AuthService {
     } else if (!enable) {
       // Disable TOTP
       user.TOTPSecret = null;
-      this.usersService.update(user.id, user); 
     }
     return this.usersService.update(user.id, user); 
 
