@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "lodash-es": "^4.17.21",
     "prettier": "^3.6.2"
   },
   "scripts": {
