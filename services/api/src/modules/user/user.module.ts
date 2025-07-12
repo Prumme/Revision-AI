@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -9,28 +9,22 @@ import { MailModule } from '@infrastructure/resend/mail.module';
 import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongoCustomerRepository } from '@mongo/user/customer.repository';
 import { MailerServiceProvider } from '@services/MailerService';
-import { QuizRepositoryProvider } from '@repositories/quiz.repository';
-import { QuizSchema } from '@mongo/quiz/quiz.schema';
-import { QuizService } from '@modules/quiz/quiz.service';
+import { QuizModule } from '@modules/quiz/quiz.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: 'User', schema: UserSchema },
-      { name: 'Quiz', schema: QuizSchema },
-    ]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     MinioModule,
     MailModule,
+    forwardRef(() => QuizModule),
   ],
   controllers: [UserController],
   providers: [
     UserService,
-    QuizService,
     UserRepositoryProvider,
     CustomerRepositoryProvider,
     MongoCustomerRepository,
     MailerServiceProvider,
-    QuizRepositoryProvider,
   ],
   exports: [UserService, UserRepositoryProvider],
 })
