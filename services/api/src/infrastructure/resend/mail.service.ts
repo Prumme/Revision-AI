@@ -15,16 +15,20 @@ import { cancelSubscriptionTemplate } from './templates/cancel-subscription';
 import { newPasswordNeededTemplate } from './templates/new-password-needed';
 import { deleteAccountTemplate } from './templates/delete-account';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 @Injectable()
 export class MailService {
+  private resend: Resend;
+  constructor() {
+    this.resend = new Resend(process.env.RESEND_API_KEY);
+  }
+
   private async send(
     to: string,
     subject: string,
     html: string,
   ): Promise<CreateEmailResponseSuccess> {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await this.resend.emails.send({
       from: 'Contact <contact@revision-ai.com>',
       to: [to],
       subject: subject,

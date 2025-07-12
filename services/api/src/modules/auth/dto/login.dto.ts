@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
@@ -19,4 +19,14 @@ export class LoginDto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
+
+  @ApiProperty({
+    description: 'Code TOTP pour l\'authentification à deux facteurs (facultatif)',
+    example: '123456',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @Matches(/^[0-9]{6}$/, { message: 'TOTP code must be a 6-digit numeric string' })
+  totpCode?: string; // Optional TOTP code for two-factor authentication
 }

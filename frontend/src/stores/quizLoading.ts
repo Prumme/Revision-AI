@@ -1,6 +1,7 @@
 import { QuizService } from "@/services/quiz.service";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { useToastStore } from "./toast";
 
 enum QuizGenerationJobStatus {
   PENDING = "pending",
@@ -26,10 +27,16 @@ export const useQuizLoadingStore = defineStore("quizLoading", () => {
         : QuizGenerationJobStatus.PENDING;
       fileParsingProgress.value = data.parsingFileProgress;
       isLoading.value =
-        data.status === QuizGenerationJobStatus.COMPLETED ||
-        data.status === QuizGenerationJobStatus.FAILED;
-      if (isLoading.value) {
+        !(data.status === QuizGenerationJobStatus.COMPLETED ||
+        data.status === QuizGenerationJobStatus.FAILED);
+      if (!isLoading.value) {
+        useToastStore().showToast(data.status === QuizGenerationJobStatus.COMPLETED ?'success' : 'error',
+          data.status === QuizGenerationJobStatus.COMPLETED ?
+          "Votre quiz a été généré avec succès!" :
+          "La génération de votre quiz a échoué. Veuillez réessayer."
+        );
         return close();
+        
       }
     }).then();
   }

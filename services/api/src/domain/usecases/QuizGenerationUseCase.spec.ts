@@ -56,7 +56,9 @@ describe('CreateQuizUseCase', () => {
       .mockImplementation((...args) => ({ id: 'quiz-id-123', ...args }) as any);
     jest
       .spyOn(QuizJobEntity, 'createQuizGenerationJob')
-      .mockImplementation((...args) => ({ files: [], ...args, events: [] }) as any);
+      .mockImplementation(
+        (...args) => ({ files: [], ...args, events: [] }) as any,
+      );
     jest
       .spyOn(QuizJobEntity, 'markFileAsParsed')
       .mockImplementation((job) => job);
@@ -72,7 +74,9 @@ describe('CreateQuizUseCase', () => {
     const createQuizDto: CreateQuizDto = {
       title: '',
       userId: '',
+      username: '',
       medias: ['file1.pdf', 'file2.txt'],
+      isPublic: true,
     };
 
     mockFileService.getFile
@@ -131,7 +135,9 @@ describe('CreateQuizUseCase', () => {
     const createQuizDto: CreateQuizDto = {
       title: '',
       userId: '',
+      username: '',
       medias: ['file1.pdf'],
+      isPublic: true,
     };
 
     // Tous les fichiers sont trouvés en cache
@@ -152,7 +158,7 @@ describe('CreateQuizUseCase', () => {
     const mockGenerateQuizGenerationDTO = jest.fn().mockResolvedValue({
       identifier: 'quiz-id-123',
       questionsNumbers: 10,
-      filesContents: [{ fileContent: 'sample content' }]
+      filesContents: [{ fileContent: 'sample content' }],
     });
 
     const useCase = CreateQuizUseCaseFactory(
@@ -179,7 +185,10 @@ describe('CreateQuizUseCase', () => {
   });
 
   it('refuse la création si le quota total de quiz est dépassé', async () => {
-    mockPolicy.canCreateQuiz.mockReturnValue({ allowed: false, reason: 'quota total' });
+    mockPolicy.canCreateQuiz.mockReturnValue({
+      allowed: false,
+      reason: 'quota total',
+    });
     const useCase = CreateQuizUseCaseFactory(
       mockQuizRepository,
       mockJobRepository,
@@ -191,14 +200,23 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: [] });
+    const result = await useCase({
+      title: '',
+      userId: '',
+      username: '',
+      medias: [],
+      isPublic: true,
+    });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota total');
     expect(mockPolicy.canCreateQuiz).toHaveBeenCalled();
   });
 
   it('refuse la création si le quota daily est dépassé', async () => {
-    mockPolicy.canGenerateToday.mockReturnValue({ allowed: false, reason: 'quota daily' });
+    mockPolicy.canGenerateToday.mockReturnValue({
+      allowed: false,
+      reason: 'quota daily',
+    });
     const useCase = CreateQuizUseCaseFactory(
       mockQuizRepository,
       mockJobRepository,
@@ -210,14 +228,23 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: [] });
+    const result = await useCase({
+      title: '',
+      userId: '',
+      username: '',
+      medias: [],
+      isPublic: true,
+    });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota daily');
     expect(mockPolicy.canGenerateToday).toHaveBeenCalled();
   });
 
   it('refuse la création si le quota fichiers est dépassé', async () => {
-    mockPolicy.canUseFilesForGeneration.mockReturnValue({ allowed: false, reason: 'quota fichiers' });
+    mockPolicy.canUseFilesForGeneration.mockReturnValue({
+      allowed: false,
+      reason: 'quota fichiers',
+    });
     const useCase = CreateQuizUseCaseFactory(
       mockQuizRepository,
       mockJobRepository,
@@ -229,18 +256,29 @@ describe('CreateQuizUseCase', () => {
       userTier,
       jest.fn(),
     );
-    const result = await useCase({ title: '', userId: '', medias: ['a', 'b', 'c'] });
+    const result = await useCase({
+      title: '',
+      userId: '',
+      username: '',
+      medias: ['a', 'b', 'c'],
+      isPublic: true,
+    });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota fichiers');
     expect(mockPolicy.canUseFilesForGeneration).toHaveBeenCalled();
   });
 
   it('refuse la création si le quota tokens est dépassé', async () => {
-    mockPolicy.canUseTokensForGeneration.mockReturnValue({ allowed: false, reason: 'quota tokens' });
+    mockPolicy.canUseTokensForGeneration.mockReturnValue({
+      allowed: false,
+      reason: 'quota tokens',
+    });
     // On force le job à être prêt pour déclencher la vérification des tokens
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
     const fakeQuizGenerationDTO = { filesContents: [{ fileContent: 'abc' }] };
-    const fakeGenerateQuizGenerationDTO = jest.fn().mockResolvedValue(fakeQuizGenerationDTO);
+    const fakeGenerateQuizGenerationDTO = jest
+      .fn()
+      .mockResolvedValue(fakeQuizGenerationDTO);
     const useCase = CreateQuizUseCaseFactory(
       mockQuizRepository,
       mockJobRepository,
@@ -254,7 +292,13 @@ describe('CreateQuizUseCase', () => {
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
-    const result = await useCase({ title: '', userId: '', medias: ['a'] });
+    const result = await useCase({
+      title: '',
+      userId: '',
+      username: '',
+      medias: ['a'],
+      isPublic: true,
+    });
     expect(result).toBeInstanceOf(Error);
     expect((result as Error).message).toContain('quota tokens');
     expect(mockPolicy.canUseTokensForGeneration).toHaveBeenCalled();
@@ -263,7 +307,9 @@ describe('CreateQuizUseCase', () => {
   it('autorise la création si tous les quotas sont respectés', async () => {
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
     const fakeQuizGenerationDTO = { filesContents: [{ fileContent: 'abc' }] };
-    const fakeGenerateQuizGenerationDTO = jest.fn().mockResolvedValue(fakeQuizGenerationDTO);
+    const fakeGenerateQuizGenerationDTO = jest
+      .fn()
+      .mockResolvedValue(fakeQuizGenerationDTO);
     const useCase = CreateQuizUseCaseFactory(
       mockQuizRepository,
       mockJobRepository,
@@ -277,7 +323,13 @@ describe('CreateQuizUseCase', () => {
     );
     mockQuizRepository.create.mockResolvedValue({ id: 'quiz-id-123' } as any);
     mockJobRepository.putJob.mockResolvedValue(true);
-    const result = await useCase({ title: '', userId: '', medias: ['a'] });
+    const result = await useCase({
+      title: '',
+      userId: '',
+      username: '',
+      medias: ['a'],
+      isPublic: true,
+    });
     expect(result).not.toBeInstanceOf(Error);
     expect(mockPolicy.canCreateQuiz).toHaveBeenCalled();
     expect(mockPolicy.canGenerateToday).toHaveBeenCalled();
@@ -393,7 +445,10 @@ describe('HandleParsedFileUseCase', () => {
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
 
     mockQuizRepository.findById.mockResolvedValue(fakeQuiz as any);
-    mockUserRepository.findById.mockResolvedValue({ id: 'user-1', subscriptionTier: 'free' } as any);
+    mockUserRepository.findById.mockResolvedValue({
+      id: 'user-1',
+      subscriptionTier: 'free',
+    } as any);
     mockGenerateQuizGenerationDTO.mockResolvedValue(fakeGeneratedDto);
 
     const useCase = HandleParsedFileUseCaseFactory(
@@ -421,13 +476,24 @@ describe('HandleParsedFileUseCase', () => {
 
   it('refuse la génération si le quota tokens est dépassé', async () => {
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
-    mockPolicy.canUseTokensForGeneration.mockReturnValue({ allowed: false, reason: 'quota tokens' });
+    mockPolicy.canUseTokensForGeneration.mockReturnValue({
+      allowed: false,
+      reason: 'quota tokens',
+    });
 
-    const fakeJob = { id: 'job-1', quizId: 'quiz-1', files: [{ identifier: 'file-key-123', parsed: false }], events: [] };
+    const fakeJob = {
+      id: 'job-1',
+      quizId: 'quiz-1',
+      files: [{ identifier: 'file-key-123', parsed: false }],
+      events: [],
+    };
     const fakeQuiz = { id: 'quiz-1', questionsNumbers: 10, userId: 'user-1' };
     const fakeUser = { id: 'user-1', subscriptionTier: 'free' };
-    const fakeGeneratedDto = { identifier: 'quiz-1', filesContents: [{ fileContent: 'abc' }] };
-    
+    const fakeGeneratedDto = {
+      identifier: 'quiz-1',
+      filesContents: [{ fileContent: 'abc' }],
+    };
+
     mockJobRepository.findProcessingJobs.mockResolvedValue([fakeJob as any]);
     mockQuizRepository.findById.mockResolvedValue(fakeQuiz as any);
     mockUserRepository.findById.mockResolvedValue(fakeUser as any);
@@ -456,12 +522,19 @@ describe('HandleParsedFileUseCase', () => {
   it('autorise la génération si le quota tokens est respecté', async () => {
     jest.spyOn(QuizJobEntity, 'isReadyForGeneration').mockReturnValue(true);
     mockPolicy.canUseTokensForGeneration.mockReturnValue({ allowed: true });
-    
-    const fakeJob = { id: 'job-1', quizId: 'quiz-1', files: [{ identifier: 'file-key-123', parsed: false }] };
+
+    const fakeJob = {
+      id: 'job-1',
+      quizId: 'quiz-1',
+      files: [{ identifier: 'file-key-123', parsed: false }],
+    };
     const fakeQuiz = { id: 'quiz-1', questionsNumbers: 10, userId: 'user-1' };
     const fakeUser = { id: 'user-1', subscriptionTier: 'free' };
-    const fakeGeneratedDto = { identifier: 'quiz-1', filesContents: [{ fileContent: 'abc' }] };
-    
+    const fakeGeneratedDto = {
+      identifier: 'quiz-1',
+      filesContents: [{ fileContent: 'abc' }],
+    };
+
     mockJobRepository.findProcessingJobs.mockResolvedValue([fakeJob as any]);
     mockQuizRepository.findById.mockResolvedValue(fakeQuiz as any);
     mockUserRepository.findById.mockResolvedValue(fakeUser as any);

@@ -40,9 +40,11 @@
     "express": "^5.1.0",
     "mongoose": "^8.15.1",
     "multer": "^1.4.5-lts.2",
+    "qrcode": "^1.5.4",
     "reflect-metadata": "^0.1.13",
     "resend": "^4.5.2",
     "rxjs": "^7.8.1",
+    "speakeasy": "^2.0.0",
     "stripe": "^18.2.1",
     "swagger-ui-express": "^5.0.1",
     "zod": "^3.25.74"
@@ -88,8 +90,9 @@
       "^@entities/(.*)$": "<rootDir>/domain/entities/$1",
       "^@modules/(.*)$": "<rootDir>/modules/$1",
       "^@repositories/(.*)$": "<rootDir>/domain/repositories/$1",
-      "^@services/(.*)$": "<rootDir>/services/$1",
-      "^@common/(.*)$": "<rootDir>/common/$1"
+      "^@services/(.*)$": "<rootDir>/domain/services/$1",
+      "^@common/(.*)$": "<rootDir>/common/$1",
+      "^@infrastructure/(.*)$": "<rootDir>/infrastructure/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

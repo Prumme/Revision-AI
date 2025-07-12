@@ -22,6 +22,12 @@ export class MongoUserRepository implements UserRepository {
     return this.documentToUser(document);
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    const document = await this.userModel.findOne({ username }).exec();
+    if (!document) return null;
+    return this.documentToUser(document);
+  }
+
   async findById(id: string): Promise<User | null> {
     const document = await this.userModel.findById(id).exec();
     if (!document) return null;
@@ -191,6 +197,7 @@ export class MongoUserRepository implements UserRepository {
       subscriptionTier: document.subscriptionTier,
       deleted: document.deleted,
       blocked: document.blocked,
+      TOTPSecret: document?.TOTPSecret ?? undefined
     };
   }
 }

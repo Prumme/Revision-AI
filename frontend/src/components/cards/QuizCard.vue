@@ -1,108 +1,173 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
+import { MoreVertical, FileQuestion, Calendar, ArrowRight, User } from "lucide-vue-next";
+import { getCategoryColor, getCategoryLabel } from "@/helpers/quizCategory";
+import { formatDate } from "@/helpers/dateFormat";
+import type { Quiz } from "@/types/quiz";
+
+interface Props {
+  quiz: Quiz;
+  showReportButton?: boolean;
+  showStatusBadge?: boolean;
+  showVisibilityInfo?: boolean;
+  aspectRatio?: "square" | "auto";
+  maxDescriptionLength?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  showReportButton: false,
+  showStatusBadge: false,
+  showVisibilityInfo: false,
+  aspectRatio: "square",
+  maxDescriptionLength: 100,
+});
+
+const emit = defineEmits<{
+  click: [quiz: Quiz];
+  report: [quiz: Quiz];
+}>();
+
+const router = useRouter();
+
+const aspectRatioClass = computed(() => {
+  return props.aspectRatio === "square" ? "aspect-square" : "";
+});
+
+const truncatedDescription = computed(() => {
+  const description = props.quiz.description || "Aucune description";
+  if (description.length <= props.maxDescriptionLength) {
+    return description;
+  }
+  return description.substring(0, props.maxDescriptionLength).trim() + "...";
+});
+
+const handleCardClick = () => {
+  emit("click", props.quiz);
+};
+
+const handleReport = () => {
+  emit("report", props.quiz);
+};
+
+const handleUserClick = (username: string, event: Event) => {
+  event.preventDefault();
+  router.push(`/profil/${username}`);
+};
+</script>
+
 <template>
   <div
-    :class="[
-      'relative group rounded-xl flex flex-col h-full  transition-all duration-200 border-1 border-black/40 hover:border-white',
-      gradientClass
-    ]"
-    style="background-blend-mode: multiply;"
+    class="flex flex-col border-2 border-black rounded-2xl bg-white group overflow-hidden relative transition-all duration-75 ease-in-out shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-none cursor-pointer"
+    :class="aspectRatioClass"
+    @click="handleCardClick"
+    v-if="quiz"
   >
-    
+    <!-- Dropdown de signalement -->
+    <div v-if="showReportButton" class="absolute top-2 right-2 z-10" @click.stop>
+      <DropdownInput position="top-right">
+        <template #trigger>
+          <MoreVertical class="w-5 h-5 text-gray-600" />
+        </template>
+        <template #menus>
+          <div class="py-1">
+            <button
+              @click="handleReport"
+              class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+            >
+              Signaler ce quiz
+            </button>
+          </div>
+        </template>
+      </DropdownInput>
+    </div>
 
-    <!-- Titre et icône -->
-    <div class="relative z-10 px-6 pt-4 flex-col items-center gap-4">
-    <div>
+    <!-- Contenu principal -->
+    <div
+      class="flex flex-col flex-1 p-6 rounded-t-2xl"
+      :style="{
+        background: `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)`,
+      }"
+    >
+      <h3 class="text-2xl font-bold mb-1 truncate">{{ quiz.title }}</h3>
+      <p class="text-sm text-gray-700 line-clamp-3 mb-4 flex-grow">
+        {{ truncatedDescription }}
+      </p>
+
+      <div class="flex flex-wrap items-center gap-2 mt-auto text-xs">
         <span
-        class="inline-block rounded-full px-3 py-1 mb-3 text-xs font-bold shadow bg-white/80 border border-white/60 text-gray-900"
+          class="px-2 py-1 rounded-full font-semibold shadow"
+          :style="{ backgroundColor: getCategoryColor(quiz.category), color: '#333' }"
         >
-        <TagIcon :size="16" class="inline-block mr-1 text-gray-500" />
-        {{ getCategoryLabel(category) }}
-      </span>
+          {{ getCategoryLabel(quiz.category) }}
+        </span>
+
+        <div v-if="quiz.questionsNumbers" class="flex items-center gap-1 text-gray-600">
+          <FileQuestion class="w-4 h-4" />
+          <span>{{ quiz.questionsNumbers || 0 }} questions</span>
+        </div>
+
+        <div class="flex items-center gap-1 text-gray-600">
+          <Calendar class="w-4 h-4" />
+          <span>{{ formatDate(quiz.createdAt) }}</span>
+        </div>
+
+        <div v-if="quiz.username" class="flex items-center gap-1 text-gray-600">
+          <User class="w-4 h-4" />
+          <button
+            @click.stop="handleUserClick(quiz.username, $event)"
+            class="text-primary hover:text-primary-dark hover:underline transition-colors font-medium"
+          >
+            {{ quiz.username }}
+          </button>
+        </div>
       </div>
-      <h3 class="font-extrabold text-2xl text-gray-900  tracking-tight truncate">
-        <slot name="title"></slot>
-      </h3>
     </div>
-    <!-- Infos principales -->
-    <div class="relative z-10 px-7 pt-3 pb-4 flex flex-col gap-2 text-xs text-black font-semibold opacity-80">
-      
-      <span v-if="date" class="flex items-center gap-1">
-        <CalendarIcon :size="16" />
-        {{ formatDateSlot(date) }}
+
+    <!-- Footer -->
+    <div
+      class="flex justify-between items-center px-4 py-3 bg-gray-50 rounded-b-2xl border-t border-gray-100"
+    >
+      <span
+        v-if="showVisibilityInfo"
+        :class="[
+          'text-xs font-medium px-2 py-1 rounded-full',
+          quiz.isPublic ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600',
+        ]"
+      >
+        {{ quiz.isPublic ? "Public" : "Privé" }}
       </span>
-      <span class="flex items-center gap-1">
-        <List :size="16"/>
-        {{ questionsCount }} questions
+      <div v-else></div>
+
+      <div
+        class="text-sm text-primary flex items-center gap-1 font-semibold group-hover:underline group-hover:translate-x-1 transition-all"
+      >
+        Voir le quiz
+        <ArrowRight class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+      </div>
+    </div>
+
+    <!-- Badge de statut -->
+    <div v-if="showStatusBadge" class="absolute top-0 right-0 m-2">
+      <span
+        v-if="quiz.status === 'pending'"
+        class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+      >
+        En attente
       </span>
-    </div>
-    <!-- Description -->
-    <div class="relative z-10 px-7 flex-1 flex items-start text-gray-900 text-base font-medium">
-      <slot name="description"></slot>
-    </div>
-    <!-- Actions et statut -->
-    <div class="relative z-10 flex justify-between items-center px-7 py-5 rounded-b-xl border-t border-white/40 bg-white/60 backdrop-blur-md mt-2">
-      <slot name="status"></slot>
-      <slot name="action"></slot>
+      <span
+        v-else-if="quiz.status === 'published'"
+        class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full"
+      >
+        Publié
+      </span>
+      <span
+        v-else-if="quiz.status === 'draft'"
+        class="bg-gray-300 text-gray-700 text-xs px-2 py-1 rounded-full"
+      >
+        Brouillon
+      </span>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { computed } from 'vue';
-import { CalendarIcon, List, TagIcon } from "lucide-vue-next";
-
-const props = defineProps({
-  category: {
-    type: String,
-    default: '',
-  },
-  date: {
-    type: [String, Date],
-    default: undefined,
-  },
-  questionsCount: {
-    type: Number,
-    default: undefined,
-  },
-});
-
-const categoryGradientClass: Record<string, string> = {
-  history: 'bg-gradient-to-br from-blue-100 to-blue-300',
-  sciences: 'bg-gradient-to-br from-green-100 to-green-300',
-  geography: 'bg-gradient-to-br from-green-100 to-green-300',
-  mathematics: 'bg-gradient-to-br from-rose-100 to-rose-300',
-  literature: 'bg-gradient-to-br from-violet-100 via-purple-200 to-purple-400',
-  arts: 'bg-gradient-to-br from-pink-100 to-pink-300',
-  sports: 'bg-gradient-to-br from-red-100 to-orange-200',
-  default: 'bg-gradient-to-br from-gray-100 to-gray-300',
-};
-
-const categoryLabels: Record<string, string> = {
-  history: "Histoire",
-  sciences: "Sciences",
-  geography: "Géographie",
-  mathematics: "Mathématiques",
-  literature: "Littérature",
-  arts: "Arts",
-  sports: "Sports",
-  "": "Non classé",
-};
-
-function getCategoryLabel(category?: string): string {
-  return categoryLabels[category || ""] || category || "Non classé";
-}
-
-function formatDateSlot(date: string | Date | undefined): string {
-  if (!date) return "-";
-  const d = new Date(date);
-  return new Intl.DateTimeFormat("fr-FR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  }).format(d);
-}
-
-const gradientClass = computed(() => {
-  return categoryGradientClass[props.category || 'default'] || categoryGradientClass.default;
-});
-console.log('Gradient class:', gradientClass.value);
-</script>

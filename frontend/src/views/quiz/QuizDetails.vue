@@ -4,8 +4,8 @@ import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import { QuizService } from "@/services/quiz.service";
-import { onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { useQuizDetails } from '@/composables/useQuizDetails';
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
@@ -21,18 +21,21 @@ import caracterRed from "@/assets/caracters/caracterRed.png";
 import caracterBlue from "@/assets/caracters/caracterBlue.png";
 import caracterYellow from "@/assets/caracters/caracterYellow.png";
 import caracterOrange from "@/assets/caracters/caracterOrange.png";
+import { arrayQuizMediaToContentMedia } from "@/utils/quizMediaToContentMedia";
+import AutoFileIcon from "@/components/icons/AutoFileIcon.vue";
+import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 
 const toast = useToastStore();
 const route = useRoute();
 const quizId = route.params.id as string;
 const quizDetails = useQuizDetails(quizId);
 const sessionStore = useSessionStore();
+const navigate = useRouter().push;
 
 const {
   quiz,
   loading,
   error,
-  orderChanged,
   showAllAnswers,
   activeTab,
   currentStep,
@@ -48,7 +51,7 @@ const {
   actions,
   onQuestionsOrderChange,
   toggleAllAnswers,
-  saveOrder,
+  saveQuiz,
   startQuizSession,
   nextStep,
   endSession,
@@ -64,6 +67,11 @@ const {
   fetchAllUserSessions,
   totalUniqueParticipants,
 } = quizDetails;
+
+
+const medias = computed(()=>{
+  return arrayQuizMediaToContentMedia(quiz.value?.media || []) ;
+})
 
 onMounted(async () => {
   try {
@@ -213,7 +221,6 @@ watch(quizFinished, (finished) => {
             <section class="grid grid-cols-1 gap-2 mb-5">
               <Input
                 id="title"
-                :disabled="true"
                 v-model="quiz.title"
                 label="Titre du quiz"
                 type="text"
@@ -230,7 +237,6 @@ watch(quizFinished, (finished) => {
                 label="Catégorie"
                 :options="categoryOptions"
                 placeholder="Sélectionnez une catégorie"
-                :disabled="true"
               />
               <Input
                 id="questionsNumbers"
@@ -239,9 +245,9 @@ watch(quizFinished, (finished) => {
                 type="number"
                 placeholder="Nombre de questions"
                 class="col-span-1"
+                disabled
                 :min="1"
                 :max="20"
-                :disabled="true"
               />
             </section>
             <Input
@@ -251,7 +257,6 @@ watch(quizFinished, (finished) => {
               type="textarea"
               placeholder="Description du quiz"
               class="col-span-1"
-              :disabled="true"
             />
             <div class="flex items-center gap-2">
               <Switch
@@ -261,7 +266,6 @@ watch(quizFinished, (finished) => {
                 description="Un quiz publique est accessible pour les autres quizzers"
                 v-model="quiz.isPublic"
                 class="mt-2"
-                :disabled="true"
               />
             </div>
           </template>
@@ -269,8 +273,8 @@ watch(quizFinished, (finished) => {
         <FormCard class="w-full mt-4" v-if="quiz.media && quiz.media.length">
           <template #title>Fichiers du quiz</template>
           <template #content>
-            <ul class="space-y-2">
-              <li v-for="(mediaPath, idx) in quiz.media" :key="idx">
+            <!-- <ul class="space-y-2">
+              <li v-for="(mediaPath, idx) in medias" :key="idx">
                 <a
                   :href="`/api/public/${mediaPath}`"
                   target="_blank"
@@ -279,12 +283,33 @@ watch(quizFinished, (finished) => {
                   {{ mediaPath.split('/').pop() }}
                 </a>
               </li>
+            </ul> -->
+            <ul class="divide-y divide-gray-200">
+              <li
+              v-for="mediaQuiz in medias"
+              :key="mediaQuiz.media"
+              class="flex items-center gap-4 py-3"
+              >
+              <AutoFileIcon :mime-type="mediaQuiz.mimeType" class="w-7 h-7 text-primary" />
+              <div class="flex-1 min-w-0">
+                <div class="text-xs text-gray-500 break-all">{{ mediaQuiz.media }}</div>
+              </div>
+              <ButtonComponent
+                :href="mediaQuiz.media"
+                @click.prevent="() => navigate(mediaQuiz.media)"
+                target="_blank"
+                rel="noopener"
+                class="ml-4  text-xs "
+              >
+                Ouvrir
+              </ButtonComponent>
+              </li>
             </ul>
           </template>
         </FormCard>
         <Button
-          v-if="orderChanged && quiz.questions && quiz.questions.length"
-          @click="saveOrder"
+          v-if="quiz.questions && quiz.questions.length"
+          @click="saveQuiz"
           class="btn btn-primary mt-4"
         >
           Sauvegarder l'ordre des questions

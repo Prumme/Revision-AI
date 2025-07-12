@@ -58,8 +58,11 @@ const handleRegister = async () => {
     // Redirection vers la page d'accueil
     router.push("/email-send");
   } catch (e) {
-    error.value = "Une erreur est survenue lors de l'inscription";
-    console.error(e);
+    if (e instanceof Error) {
+      error.value = e.message;
+    } else {
+      error.value = "Une erreur est survenue lors de l'inscription";
+    }
   }
 };
 </script>
@@ -172,7 +175,7 @@ const handleRegister = async () => {
 
             <template #actions>
               <div class="flex flex-col gap-2 w-full px-12">
-                <Button variant="primary" @click="handleRegister"> S'enregistrer </Button>
+                <Button variant="primary" @click="handleRegister" tracking_event="register_account"> S'enregistrer </Button>
               </div>
             </template>
 

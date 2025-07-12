@@ -1,8 +1,9 @@
+import { TOTPSecret } from '@domain/value-objects/TOTPSecret';
 import { Schema, Document, Types } from 'mongoose';
 
 export const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
-  username: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   lastUpdatedPassword: { type: Date, default: Date.now },
   emailVerified: { type: Boolean, default: false },
@@ -23,6 +24,12 @@ export const UserSchema = new Schema({
     postalCode: { type: String, required: false },
     country: { type: String, required: false },
   },
+  TOTPSecret: {
+    secret: { type: String, required: false },
+    otpauth_url: { type: String, required: false },
+    userId: { type: String, required: false },
+    active: { type: Boolean, default: false }
+  }
 });
 
 export interface UserDocument extends Document {
@@ -51,4 +58,5 @@ export interface UserDocument extends Document {
     postalCode: string;
     country: string;
   };
+  TOTPSecret?: TOTPSecret ;
 }

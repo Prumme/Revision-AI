@@ -31,6 +31,22 @@ export class UserService {
   ) {}
 
   async create(createUserDto: RegisterDto): Promise<User> {
+    // Vérifier l'unicité de l'email
+    const existingUserByEmail = await this.userRepository.findByEmail(
+      createUserDto.email,
+    );
+    if (existingUserByEmail) {
+      throw new Error('Un utilisateur avec cet email existe déjà');
+    }
+
+    // Vérifier l'unicité du username
+    const existingUserByUsername = await this.userRepository.findByUsername(
+      createUserDto.username,
+    );
+    if (existingUserByUsername) {
+      throw new Error("Un utilisateur avec ce nom d'utilisateur existe déjà");
+    }
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user: Omit<User, 'id'> = {
       ...createUserDto,
@@ -61,10 +77,37 @@ export class UserService {
     return this.userRepository.findByEmail(email);
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findByUsername(username);
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findById(id);
     if (!existingUser) {
       throw new Error('Utilisateur non trouvé');
+    }
+
+    // Si le username est en cours de modification, vérifier l'unicité
+    if (
+      updateUserDto.username &&
+      updateUserDto.username !== existingUser.username
+    ) {
+      const existingUserByUsername = await this.userRepository.findByUsername(
+        updateUserDto.username,
+      );
+      if (existingUserByUsername && existingUserByUsername.id !== id) {
+        throw new Error("Un utilisateur avec ce nom d'utilisateur existe déjà");
+      }
+    }
+
+    // Si l'email est en cours de modification, vérifier l'unicité
+    if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
+      const existingUserByEmail = await this.userRepository.findByEmail(
+        updateUserDto.email,
+      );
+      if (existingUserByEmail && existingUserByEmail.id !== id) {
+        throw new Error('Un utilisateur avec cet email existe déjà');
+      }
     }
 
     return this.userRepository.update(id, {
@@ -163,11 +206,12 @@ export class UserService {
 
     // Générer un email anonyme unique basé sur l'ID de l'utilisateur
     const anonymizedEmail = `deleted_${userId.slice(0, 8)}@deleted.com`;
+    const anonymizedUsername = `deleted_${userId.slice(0, 8)}`;
 
     // Mettre à jour l'utilisateur avec les données anonymisées
     const updatedUser = await this.userRepository.update(userId, {
       email: anonymizedEmail,
-      username: 'Utilisateur supprimé',
+      username: anonymizedUsername,
       bio: null,
       avatar: null,
       deleted: true,
@@ -213,8 +257,8 @@ export class UserService {
         : undefined;
 
     // Récupérer tous les quiz de l'utilisateur
-    const quizzes = await this.quizRepository.findAll();
-    const userQuizzes = quizzes.filter((quiz) => quiz.userId === userId);
+    const quizzes = await this.quizRepository.findAll({},{ignore: true});
+    const userQuizzes = quizzes.data.filter((quiz) => quiz.userId === userId);
 
     return {
       user,

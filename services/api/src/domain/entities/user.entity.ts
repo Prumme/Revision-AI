@@ -1,3 +1,5 @@
+import { TOTPSecret } from "@domain/value-objects/TOTPSecret";
+
 export interface User {
   id: string;
   email: string;
@@ -14,4 +16,11 @@ export interface User {
   bio?: string; // Biographie de l'utilisateur
   deleted?: boolean; // Indique si le compte a été supprimé/anonymisé
   blocked?: boolean; // Indique si le compte a été bloqué par un admin
+
+  TOTPSecret?: TOTPSecret; // Champ pour stocker des informations sensibles, comme un token de sécurité
+}
+
+
+export function hasTOTPEnabled(user: User): boolean {
+  return !!user.TOTPSecret && user.TOTPSecret.active;
 }
