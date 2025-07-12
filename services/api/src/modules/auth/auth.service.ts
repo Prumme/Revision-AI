@@ -43,7 +43,7 @@ export class AuthService {
     }
 
     if(UserEntity.hasTOTPEnabled(user)) {
-      if (!totpCode) {
+      if (totpCode === undefined) {
         return { needTOTP: true };
       }
       const isTotpValid = this.totpservice.verifyCode(totpCode, user.TOTPSecret);
