@@ -62,13 +62,11 @@ export function useQuizDetails(quizId: string) {
     {
       key: "startedAt",
       label: "Date de début",
-      sortable: true,
       formatter: (value: string) => value ? new Date(value).toLocaleString("fr-FR") : "-",
     },
     {
       key: "finishedAt",
       label: "Date de fin",
-      sortable: true,
       formatter: (value: string) => value ? new Date(value).toLocaleString("fr-FR") : "-",
     },
     {
@@ -80,13 +78,22 @@ export function useQuizDetails(quizId: string) {
         if (value === 'active') return h(StatusBadge, { variant: 'secondary' }, () => 'En cours');
         if (value === 'finished') return h(StatusBadge, { variant: 'success' }, () => 'Terminée');
         if (value === 'pending') return h(StatusBadge, { variant: 'info' }, () => 'En attente');
-        return h(StatusBadge, { variant: 'secondary' }, () => '-');
       },
+    },
+    {
+      key: "duration",
+      label: "Durée",
+        formatter: (value: number) => {
+            if (value == null) return "-";
+            const minutes = Math.floor(value / 60);
+            const seconds = value % 60;
+            return `${minutes} min ${seconds} sec`;
+        },
     },
     {
       key: "score",
       label: "Score",
-      sortable: true,
+      formatter: (value: number) => value != null ? `${value} / ${quiz.value?.questions.length || 0}` : "-",
     },
   ];
 

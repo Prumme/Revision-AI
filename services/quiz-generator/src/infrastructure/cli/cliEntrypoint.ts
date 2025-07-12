@@ -48,7 +48,7 @@ export const cliEntrypoint = async () => {
 
     const result = await useCase({
       filesContents: [fileContent],
-      questionsNumbers: 10,
+      questionsNumbers: 5,
     });
     if (result.success == false) {
       console.error("Error generating quiz:", result.error.message);

@@ -1,4 +1,5 @@
 import { UseCase, UseCaseFactory } from './IUseCase';
+import { ForbiddenException } from '@nestjs/common';
 import { QuizGeneratedDTO } from '../../types/QuizGeneratedDTO';
 import { FileContentDTO } from '../../types/FileContentDTO';
 import { CreateQuizDto } from '@modules/quiz/dto/create-quiz.dto';
@@ -13,6 +14,9 @@ import { CachedFileParsed } from '@entities/cached-file-parsed.entity';
 import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import { Quiz } from '@entities/quiz.entity';
 import { FileService } from '@services/FileService';
+import { SubscriptionPolicyService } from '../policies/SubscriptionPolicyService';
+import { SubscriptionTier } from '../policies/SubscriptionPolicy';
+import { UserRepository } from '@repositories/user.repository';
 
 async function generateQuizGenerationDTO(
   identifier: string,
@@ -55,7 +59,7 @@ export interface QuizIdentifier {
  *  It returns the created pending quiz or an error if something goes wrong
  */
 
-export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error>>;
+export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error | ForbiddenException>>;
 export const CreateQuizUseCaseFactory: UseCaseFactory<
   CreateQuizUseCase,
   [
@@ -65,7 +69,9 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     FileService, // @todo abstration is better but to complex with the current implemetentation
     QueueProvider<FileToParseDTO>,
     QueueProvider<QuizGenerationDTO>,
-    typeof generateQuizGenerationDTO?,
+    SubscriptionPolicyService,
+    SubscriptionTier,
+    typeof generateQuizGenerationDTO?
   ]
 > = (
   _quizRepository,
@@ -74,9 +80,25 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
   _fileService,
   _fileToParseQueueProvider,
   _quizGenerationQueueProvider,
+  _policyService,
+  _userTier,
   _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
 ) => {
   return async (createQuizDto) => {
+    // Vérification des quotas
+    const [totalQuizzes, quizzesToday] = await Promise.all([
+      _quizRepository.countByUserId(createQuizDto.userId),
+      _quizRepository.countCreatedToday(createQuizDto.userId)
+    ]);
+    const filesCount = createQuizDto.medias.length;
+    let totalTokens = 0;
+    const checkTotal = _policyService.canCreateQuiz(_userTier, totalQuizzes);
+    if (!checkTotal.allowed) return new ForbiddenException(checkTotal.reason);
+    const checkToday = _policyService.canGenerateToday(_userTier, quizzesToday);
+    if (!checkToday.allowed) return new ForbiddenException(checkToday.reason);
+    const checkFiles = _policyService.canUseFilesForGeneration(_userTier, filesCount);
+    if (!checkFiles.allowed) return new ForbiddenException(checkFiles.reason);
+
     type FileIdentifierWithChecksum = {
       fileIdentifier: string;
       checksum: string;
@@ -108,7 +130,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
         ),
       )
     ).filter(Boolean);
-
+    
     const quiz = QuizEntity.createQuiz(
       createQuizDto.title,
       createQuizDto.description,
@@ -152,7 +174,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
     const inserted = await _quizGenerationJobRepository.putJob(job);
     if (!inserted) return new Error('Failed to create quiz generation job');
-
+      
     if (needGenerating) {
       const quizGenerationDTO = await _generateQuizGenerationDTO(
         createdQuiz.id,
@@ -161,6 +183,22 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
         _cachedFileParsedRepository,
       );
       if (quizGenerationDTO instanceof Error) return quizGenerationDTO;
+
+      const allParsedFiles = quizGenerationDTO.filesContents
+      for (const file of allParsedFiles) {
+         let jsonString = JSON.stringify(file);
+         totalTokens += jsonString.length;
+      }
+      const checkTokens = _policyService.canUseTokensForGeneration(
+        _userTier,
+        totalTokens,
+      );
+      if (!checkTokens.allowed) {
+        QuizJobEntity.failJob(job, checkTokens.reason);
+        await _quizGenerationJobRepository.putJob(job, job.id);
+        return new ForbiddenException(checkTokens.reason);
+      }
+
       await _quizGenerationQueueProvider.send(quizGenerationDTO);
     }
 
@@ -181,7 +219,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
 export type HandleParsedFileUseCase = UseCase<
   FileContentDTO,
-  Promise<void | Error>
+  Promise<void | Error | ForbiddenException>
 >;
 
 export const HandleParsedFileUseCaseFactory: UseCaseFactory<
@@ -191,6 +229,8 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
     QuizGenerationJobRepository,
     CachedFileParsedRepository,
     QueueProvider<QuizGenerationDTO>,
+    SubscriptionPolicyService,
+    UserRepository,
     typeof generateQuizGenerationDTO?, // Injected for testing purposes
   ]
 > = (
@@ -198,9 +238,12 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
   _quizGenerationJobRepository,
   _cachedFileParsedRepository,
   _quizGenerationQueueProvider,
+  _policyService,
+  _userRepository,
   _generateQuizGenerationDTO = generateQuizGenerationDTO, // Injected for testing purposes
 ) => {
   return async (fileContent) => {
+    let totalTokens = 0;
     // Sauvegarder le fichier parsé dans la base de données pour éviter de le parser à nouveau plus tard
     const cachedFile: CachedFileParsed = {
       fileContent,
@@ -238,17 +281,42 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           console.error(error);
           continue;
         }
+
+        const user = await _userRepository.findById(quiz.userId);
+        if (!user) {
+          error = new Error('User not found for the quiz');
+          console.error(error);
+          continue;
+        }
+
         const quizGenerationDTO = await _generateQuizGenerationDTO(
           quiz.id,
           quiz.questionsNumbers,
           job.files.map((file) => file.identifier),
           _cachedFileParsedRepository,
         );
+
         if (quizGenerationDTO instanceof Error) {
           error = quizGenerationDTO;
           console.error('Error generating quiz generation DTO:', error);
           continue;
         }
+
+        const allParsedFiles = quizGenerationDTO.filesContents
+        for (const file of allParsedFiles) {
+          let jsonString = JSON.stringify(file);
+          totalTokens += jsonString.length;
+        }
+        const checkTokens = _policyService.canUseTokensForGeneration(
+          user.subscriptionTier as SubscriptionTier || "free",
+          totalTokens,
+        );
+        if (!checkTokens.allowed) {
+          QuizJobEntity.failJob(job, checkTokens.reason);
+          await _quizGenerationJobRepository.putJob(job, job.id);
+          return new ForbiddenException(checkTokens.reason);
+        }
+
         await _quizGenerationQueueProvider.send(quizGenerationDTO);
       }
     }

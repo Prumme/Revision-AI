@@ -24,6 +24,9 @@ export class Session {
   @ApiProperty({ description: 'Score obtenu' })
   score: number;
 
+  @ApiProperty({ description: 'Durée de la session en secondes', required: false })
+  duration?: number;
+
   @ApiProperty({ description: 'Date de début de la session' })
   startedAt: Date;
 

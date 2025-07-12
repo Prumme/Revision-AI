@@ -13,6 +13,7 @@ import { useQuizLoadingStore } from "@/stores/quizLoading";
 import { useToastStore } from "@/stores/toast";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
+import type { ApiError } from "@/types/apiError";
 
 // Router pour la redirection après création
 const router = useRouter();
@@ -92,9 +93,13 @@ const generateQuiz = async () => {
 
       // La redirection vers la page détaillée du quiz se fera automatiquement
       // grâce au mécanisme de polling dans le quizLoadingStore
-    } catch (error) {
-      console.error("Erreur lors de la création du quiz:", error);
-      toast.showToast("error", "Une erreur est survenue lors de la création du quiz");
+    } catch (error: unknown) {
+      const apiError = error as ApiError;
+      if (apiError.statusCode === 403) {
+        toast.showToast("error", apiError.message);
+      } else {
+        toast.showToast("error", "Une erreur est survenue lors de la création du quiz");
+      }
       isLoading.value = false;
     }
     // une fois la génération terminée grâce à l'observateur dans QuizList

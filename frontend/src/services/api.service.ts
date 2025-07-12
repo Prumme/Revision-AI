@@ -67,7 +67,7 @@ export class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Une erreur est survenue");
+        throw data; // data contient tout l'objet d'erreur
       }
 
       return {
@@ -76,9 +76,6 @@ export class ApiService {
         statusText: response.statusText,
       };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Erreur API: ${error.message}`);
-      }
       throw error;
     }
   }

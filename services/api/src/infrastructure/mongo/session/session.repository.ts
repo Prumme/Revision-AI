@@ -140,10 +140,14 @@ export class MongoSessionRepository implements SessionRepository {
      * @returns The updated session, or null if not found.
      */
     async endSession(id: string, finishedAt: Date, score: number, answers: SessionAnswer[]): Promise<Session | null> {
+        const existing = await this.sessionModel.findById(id).exec();
+        if (!existing) return null;
+        const startedAt = existing.startedAt;
+        const duration = startedAt && finishedAt ? Math.round((+finishedAt - +startedAt) / 1000) : undefined;
         const session = await this.sessionModel.findByIdAndUpdate(
             id,
-            {finishedAt, score, answers},
-            {new: true}
+            { finishedAt, score, answers, duration },
+            { new: true }
         ).exec();
         if (!session) return null;
         return this.documentToSession(session);
@@ -225,6 +229,7 @@ export class MongoSessionRepository implements SessionRepository {
             quizId: document.quizId.toString(),
             userId: document.userId.toString(),
             score: document.score,
+            duration: document.duration,
             startedAt: document.startedAt,
             finishedAt: document.finishedAt,
             answers: (document.answers || []).map((a: any) => ({
