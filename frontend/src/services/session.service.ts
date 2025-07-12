@@ -19,6 +19,11 @@ export const sessionService = {
         return data;
     },
 
+    async findAllByQuizIdAndUserId(quizId: string, userId: string): Promise<Session[]> {
+        const {data} = await ApiService.get<Session[]>(`/sessions/quiz/${quizId}/user/${userId}`);
+        return data;
+    },
+
     async createSession(payload: { userId: string; quizId: string }): Promise<Session> {
         const {data} = await ApiService.post<Session>('/sessions/create', payload);
         return data;

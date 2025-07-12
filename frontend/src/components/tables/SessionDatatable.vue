@@ -17,6 +17,12 @@ const props = defineProps<{
   loading?: boolean,
   rowKey?: string,
   emptyMessage?: string,
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  },
 }>();
 
 const filters = ref<SessionDatatableFilter>({});
@@ -48,5 +54,6 @@ const filteredData = computed(() => {
     :rowKey="props.rowKey || 'id'"
     :searchable="false"
     :empty-message="props.emptyMessage || 'Aucune session trouvée pour ce quiz.'"
+    :pagination="props.pagination"
   />
 </template>
