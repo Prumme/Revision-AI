@@ -196,7 +196,7 @@ describe('AuthService', () => {
       );
     });
 
-    it('should handle empty TOTP code as undefined', async () => {
+    it('should handle empty TOTP code as code', async () => {
       const email = 'test@example.com';
       const password = 'password123';
       const totpCode = '';
@@ -205,9 +205,13 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       jest.spyOn(UserEntity, 'hasTOTPEnabled').mockReturnValue(true);
 
-      const result = await service.signIn(email, password, totpCode);
-
-      expect(result).toEqual({ needTOTP: true });
+      await expect(service.signIn(email, password, totpCode)).rejects.toThrow(
+        new UnauthorizedException('Invalid TOTP code')
+      );
+      expect(totpService.verifyCode).toHaveBeenCalledWith(
+        totpCode,
+        mockUserWithTOTP.TOTPSecret
+      );
     });
   });
 });
