@@ -1,18 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: api-ingress
+  name: local-api-ingress
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - revision-ai.com
-      secretName: revkubectision-ai-com-tls
   rules:
-    - host: revision-ai.com
+    - host: api.revision-ai.local
       http:
         paths:
           - path: /

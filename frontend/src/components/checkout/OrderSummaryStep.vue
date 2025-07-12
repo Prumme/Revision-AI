@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<(event: "confirm-order") => void>();
 
 const handleConfirm = () => {
+  window._paq.push(['trackEvent', 'Button', "confirm_order"]);
   emit("confirm-order");
 };
 </script>

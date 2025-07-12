@@ -177,7 +177,7 @@ const generateQuiz = async () => {
       </FormCard>
 
       <div class="flex justify-center items-center w-fit">
-        <Button variant="primary" @click="generateQuiz" :disabled="isLoading">
+        <Button tracking_event="quiz_create" variant="primary" @click="generateQuiz" :disabled="isLoading">
           {{ isLoading ? "Génération en cours..." : "Générer le quiz" }}
         </Button>
       </div>

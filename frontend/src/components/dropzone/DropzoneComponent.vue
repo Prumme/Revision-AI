@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const acceptedFileTypes = ["image/*", "application/pdf"];
-const maxFileSize = 2 * 1024 * 1024;
+const maxFileSize = 5 * 1024 * 1024;
 // const maxTokenFileSize = 25 * 1024;
 const maxImageSize = { width: 100, height: 100 };
 
@@ -96,7 +96,7 @@ const handleFiles = (fileList: FileList) => {
     if (file.type.startsWith("image")) {
       const img = new Image();
       img.onload = () => {
-        if (img.width > maxImageSize.width || img.height > maxImageSize.height) {
+        if ((img.width > maxImageSize.width || img.height > maxImageSize.height) && false) {
           error.value = `L'image doit être de ${maxImageSize.width}x${maxImageSize.height} max.`;
           setErrorTimeout();
         } else {
