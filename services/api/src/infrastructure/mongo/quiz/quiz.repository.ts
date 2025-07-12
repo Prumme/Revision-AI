@@ -1,7 +1,7 @@
 import { Quiz } from '@entities/quiz.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { QuizFilters, QuizRepository } from '@repositories/quiz.repository';
+import { NullPaginationOptions, QuizFilters, QuizRepository } from '@repositories/quiz.repository';
 import { Model, Types } from 'mongoose';
 import { QuizDocument } from './quiz.schema';
 import { PaginatedResult, PaginationOptions } from '@repositories/user.repository';
@@ -50,27 +50,38 @@ export class MongoQuizRepository implements QuizRepository {
     return query;
   }
 
-  async findAll(filters?: QuizFilters, pagination?: PaginationOptions): Promise<PaginatedResult<Quiz>> {
+  async findAll(filters?: QuizFilters, pagination?: PaginationOptions | NullPaginationOptions): Promise<PaginatedResult<Quiz>> {
     const query = this._createQuery({
       ...filters,
       ready: true, //want only quizzes that are parsed and has questions
     });
 
     let mongoQuery = this.quizModel.find(query);
-    if (pagination) {
+
+    if (!('ignore' in pagination)) {
       mongoQuery = mongoQuery.skip((pagination.page - 1) * pagination.limit).limit(pagination.limit);
     }
     const [documents,total] = await Promise.all([
       mongoQuery.exec(),
       this.quizModel.countDocuments(query).exec(),
     ]);
-    
-    return {
-      data: documents.map(this.documentToQuiz.bind(this)),
-      total: total,
-      page: pagination?.page || 1,
-      limit: pagination?.limit || 10,
-      totalPages: Math.ceil(total / (pagination?.limit || 10)),
+
+    if ('ignore' in pagination) {
+      return {
+        data: documents.map(this.documentToQuiz.bind(this)),
+        total,
+        page: 1,
+        limit: -1,
+        totalPages: 1,
+      };
+    }else{
+      return {
+        data: documents.map(this.documentToQuiz.bind(this)),
+        total: total,
+        page: pagination.page,
+        limit: pagination?.limit || 10,
+        totalPages: Math.ceil(total / (pagination?.limit || 10)),
+      };
     }
   }
 

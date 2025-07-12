@@ -141,10 +141,6 @@ export class QuizService {
       );
     }
 
-    if (quiz.status) {
-      this.logger.log(`Statut du quiz mis à jour: ${quiz.status}`);
-    }
-
     return this.quizRepository.update(id, quiz);
   }
 

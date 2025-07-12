@@ -3,6 +3,10 @@ import { Quiz } from '../entities/quiz.entity';
 import {  PaginatedResult, PaginationOptions } from './user.repository';
 
 
+export interface NullPaginationOptions {
+  ignore: true;
+}
+
 export interface QuizFilters {
   includeDeleted?: boolean;
   userId?: {
@@ -21,7 +25,7 @@ export interface QuizRepository {
   findById(id: string): Promise<Quiz | null>;
   findAll(
     filters?: QuizFilters,
-    pagination?: PaginationOptions,
+    pagination?: PaginationOptions | NullPaginationOptions,
   ): Promise<PaginatedResult<Quiz>>;
   create(quiz: Omit<Quiz, 'id'>): Promise<Quiz>;
   update(id: string, quiz: Partial<Quiz>): Promise<Quiz>;
