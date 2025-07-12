@@ -5,6 +5,7 @@ import { useUserStore } from '@/stores/user';
 import AutoFileIcon from '../icons/AutoFileIcon.vue';
 import ButtonComponent from '../buttons/ButtonComponent.vue';
 import { useRouter } from 'vue-router';
+import { quizMediaToContentMedia } from '@/utils/quizMediaToContentMedia';
 
 const userStore = useUserStore();
 const user = userStore.user;
@@ -21,21 +22,7 @@ onMounted(async () => {
     const quizzes = Array.isArray(res) ? res : (res?.data || []);
     mediaQuizList.value = quizzes
       .filter(q => Array.isArray(q.media) && q.media.length > 0)
-      .flatMap(q => q.media.map((m : string) => {
-        const extToMime : Record<string, string> = {
-          "pdf": "application/pdf",
-          "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-          "txt": "text/plain",
-          "jpg": "image/jpeg",
-          "jpeg": "image/jpeg",
-          "png": "image/png", 
-        }
-        const ext = m.split('.').pop()?.toLowerCase();
-        const mimeType = extToMime[ext || ''] || 'application/octet-stream';
-        return { media: m, quizTitle: q.title, mimeType }
-      }));
+      .flatMap(q => q.media.map((m : string) => ({ ...quizMediaToContentMedia(m), quizTitle: q.title })));
 
       console.log('Media Quiz List:', mediaQuizList.value);
   } catch {

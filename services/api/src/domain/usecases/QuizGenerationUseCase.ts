@@ -125,11 +125,16 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     /** Verifier que les fichiers non pas déjà été parsés */
     const parsedFiles = (
       await Promise.all(
-        files.map(({ checksum }) =>
-          _cachedFileParsedRepository.getParsedFileByChecksum(checksum),
-        ),
-      )
-    ).filter(Boolean);
+        files.map(async ({ checksum,fileIdentifier}) =>{
+          let foundFile = await _cachedFileParsedRepository.getParsedFileByChecksum(checksum);
+          if(foundFile && fileIdentifier == foundFile.identifier) {
+            return foundFile;
+          }
+          return null; // Si le fichier n'est pas trouvé, retourner null
+        }
+      ),
+    )
+  ).filter(Boolean);
     
     const quiz = QuizEntity.createQuiz(
       createQuizDto.title,

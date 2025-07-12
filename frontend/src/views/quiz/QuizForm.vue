@@ -21,10 +21,10 @@ const toast = useToastStore();
 const quizLoadingStore = useQuizLoadingStore();
 
 // Quiz Data
-const formTitle = ref("Titre du quiz");
-const category = ref("");
+const formTitle = ref(`Test privé/public ${Date.now()}`);
+const category = ref("general_history"); // Valeur par défaut pour la catégorie
 const questionsNumbers = ref(5);
-const description = ref("");
+const description = ref("lorem");
 const isPublic = ref(false);
 const media = ref<File[] | null>(null);
 const isLoading = ref(false);
@@ -33,13 +33,7 @@ const generatedQuestions = ref([]);
 const hasQuestions = computed(() => generatedQuestions.value.length > 0);
 
 // Options de catégorie
-const categoryOptions = [
-  { label: "Histoire générale", value: "general_history" },
-  { label: "Géographie", value: "geography" },
-  { label: "Sciences", value: "sciences" },
-  { label: "Mathématiques", value: "mathematics" },
-  { label: "Littérature", value: "literature" },
-];
+const categoryOptions = QuizService.categories;
 
 /**
  * Génération et création du quiz
@@ -71,15 +65,16 @@ const generateQuiz = async () => {
       questionsNumbers: questionsNumbers.value,
       description: description.value || undefined,
       isPublic: isPublic.value,
-      status: "pending", // Définir le statut initial comme 'pending'
     };
 
-    console.log("Données du quiz à envoyer:", quizData);
 
     // Préparation des fichiers
     const files = !Array.isArray(media.value) ? [media.value] : media.value;
+    
     try {
       // Appel au service pour créer le quiz
+      console.log("Création du quiz avec les données:", quizData, "et les fichiers:", files);
+      //@ts-expect-error error
       const createdQuiz = await QuizService.createQuiz(quizData, files);
       console.log("Quiz créé:", createdQuiz);
 
@@ -246,8 +241,7 @@ const generateQuiz = async () => {
                 label="Visibilité du quiz"
                 placeholder="Titre du quiz"
                 description="Un quiz publique est accessible pour les autres quizzers"
-                :modelValue="isPublic"
-                @update:modelValue="isPublic = $event"
+                v-model="isPublic"
                 class="mt-2"
               />
             </div>
@@ -256,12 +250,11 @@ const generateQuiz = async () => {
 
         <!-- Document -->
         <FormCard class="w-full">
-          <template #title> Images </template>
+          <template #title> Médias </template>
           <template #content>
             <Dropzone class="mb-5" :multiple="true" variant="yellow" v-model="media" />
           </template>
         </FormCard>
-
         <div class="flex justify-center items-center w-fit">
           <Button variant="primary" @click="generateQuiz" :disabled="isLoading">
             {{ isLoading ? "Génération en cours..." : "Générer le quiz" }}

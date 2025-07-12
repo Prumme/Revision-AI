@@ -2,7 +2,7 @@
 import Button from "@/components/buttons/ButtonComponent.vue";
 import Label from "@/components/inputs/LabelComponent.vue";
 import { CloudUploadIcon, TrashIcon } from "lucide-vue-next";
-import { computed, ref, watch } from "vue";
+import { computed, ref, useTemplateRef } from "vue";
 import AutoFileIcon from "../icons/AutoFileIcon.vue";
 
 const props = withDefaults(
@@ -21,43 +21,34 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: File | File[] | null): void;
 }>();
 
+const fileInput = useTemplateRef("fileInput");
+const error = ref<string | null>(null);
 const acceptedFileTypes = ["image/*", "application/pdf"];
 const maxFileSize = 5 * 1024 * 1024;
 // const maxTokenFileSize = 25 * 1024;
 const maxImageSize = { width: 3000, height: 3000 };
 
-const files = ref<File[]>([]);
-const error = ref<string | null>(null);
-
-// Surveiller les changements de fichiers pour les émettre au parent
-watch(
-  files,
-  (newValue) => {
+const files = computed({
+  get: () => props.modelValue,
+  set: (newValue : File | File[] | null) => {
     if (props.multiple) {
+      if(!Array.isArray(newValue)) {
+        throw new Error("Pour le mode multiple, modelValue doit être un tableau de fichiers.");
+      }
       emit("update:modelValue", newValue.length > 0 ? [...newValue] : null);
     } else {
-      emit("update:modelValue", newValue.length > 0 ? newValue[0] : null);
-    }
-  },
-  { deep: true },
-);
-
-// Initialiser les fichiers depuis modelValue (si fourni)
-watch(
-  () => props.modelValue,
-  (newValue) => {
-    if (newValue) {
       if (Array.isArray(newValue)) {
-        files.value = [...newValue];
-      } else {
-        files.value = [newValue];
+        throw new Error("Pour le mode simple, modelValue doit être un seul fichier.");
       }
-    } else {
-      files.value = [];
+      emit("update:modelValue", newValue || null);
     }
   },
-  { immediate: true },
-);
+});
+
+const filesAsArray = computed(() => {
+  return Array.isArray(files.value) ? files.value : files.value ? [files.value] : [];
+});
+
 
 const handleDrop = (e: DragEvent) => {
   e.preventDefault();
@@ -67,9 +58,8 @@ const handleDrop = (e: DragEvent) => {
 };
 
 const handleFiles = (fileList: FileList) => {
-  if (!props.multiple && files.value.length + fileList.length > 1) {
-    error.value = "Un seul fichier est autorisé.";
-    setErrorTimeout();
+  if (!props.multiple && filesAsArray.value?.length + fileList.length > 1) {
+    setError("Un seul fichier est autorisé.");
     return;
   }
 
@@ -77,14 +67,12 @@ const handleFiles = (fileList: FileList) => {
     const file = fileList[i];
 
     if (!acceptedFileTypes.some((type) => file.type.match(new RegExp(type.replace("*", ".*"))))) {
-      error.value = "Ce type de fichier n'est pas accepté.";
-      setErrorTimeout();
+      setError("Ce type de fichier n'est pas accepté.");
       return;
     }
 
     if (file.size > maxFileSize) {
-      error.value = "Le fichier dépasse la taille maximale de 2MB.";
-      setErrorTimeout();
+      setError("Le fichier dépasse la taille maximale de 2MB.");
       return;
     }
 
@@ -98,23 +86,22 @@ const handleFiles = (fileList: FileList) => {
       const img = new Image();
       img.onload = () => {
         if (img.width > maxImageSize.width || img.height > maxImageSize.height) {
-          error.value = `L'image doit être de ${maxImageSize.width}x${maxImageSize.height} max.`;
-          setErrorTimeout();
+          setError(`L'image doit être de ${maxImageSize.width}x${maxImageSize.height} max.`);
         } else {
           if (!props.multiple) {
-            files.value = [file];
+            files.value = file;
           } else {
-            files.value.push(file);
+            files.value = Array.isArray(files.value) ? [...files.value, file] : [file];
           }
         }
       };
       img.src = URL.createObjectURL(file);
     } else {
       if (!props.multiple) {
-        files.value = [file];
-      } else {
-        files.value.push(file);
-      }
+            files.value = file;
+          } else {
+            files.value = Array.isArray(files.value) ? [...files.value, file] : [file];
+          }
     }
   }
 };
@@ -125,16 +112,27 @@ const handleFileInputChange = (e: Event) => {
   if (target.files) handleFiles(target.files);
 };
 
-// Remove file from the list
-const removeFile = (index: number) => {
-  files.value.splice(index, 1);
+
+const setError = (message: string) => {
+  error.value = message;
+  setTimeout(() => {
+      error.value = null;
+    }, 5000);
 };
 
-// Set error timeout to clear the error message after 5 seconds
-const setErrorTimeout = () => {
-  setTimeout(() => {
-    error.value = null;
-  }, 5000);
+
+// Remove file from the list
+const removeFile = (index: number) => {
+  if(!props.multiple) {
+    files.value = null; // Pour le mode simple, on remet à null
+    return;
+  }
+
+  const fileArray = Array.isArray(files.value) ? files.value : [];
+  files.value = [
+    ...fileArray.slice(0, index),
+    ...fileArray.slice(index + 1),
+  ];
 };
 
 // Computed class for dropzone based on variant
@@ -148,8 +146,9 @@ const dropzoneClasses = computed(() => {
 
 // If not multiple, block dropzone if a file is present
 const isDropzoneBlocked = computed(() => {
-  return !props.multiple && files.value.length > 0;
+  return !props.multiple && files;
 });
+
 </script>
 
 <template>
@@ -163,7 +162,7 @@ const isDropzoneBlocked = computed(() => {
       ]"
       @dragover.prevent="!isDropzoneBlocked && $event.preventDefault()"
       @drop="!isDropzoneBlocked && handleDrop($event)"
-      @click="!isDropzoneBlocked && $refs.fileInput.click()"
+      @click="!isDropzoneBlocked && fileInput?.click()"
     >
       <div class="flex flex-col items-center gap-2">
         <CloudUploadIcon
@@ -198,11 +197,11 @@ const isDropzoneBlocked = computed(() => {
     </div>
 
     <!-- File Preview -->
-    <div v-if="files.length > 0" class="bg-gray-50 p-4 rounded-lg border border-gray-300">
-      <Label>Fichiers renseignés</Label>
+    <div v-if="filesAsArray?.length > 0" class="bg-gray-50 p-4 rounded-lg border border-gray-300">
+      <Label for-id="file-list">Fichiers renseignés</Label>
       <ul class="divide-y divide-gray-200 mt-2">
         <li
-          v-for="(file, index) in files"
+          v-for="(file, index) in filesAsArray"
           :key="index"
           class="flex justify-between items-center py-2"
         >
