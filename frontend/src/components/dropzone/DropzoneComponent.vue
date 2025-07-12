@@ -96,7 +96,7 @@ const handleFiles = (fileList: FileList) => {
     if (file.type.startsWith("image")) {
       const img = new Image();
       img.onload = () => {
-        if ((img.width > maxImageSize.width || img.height > maxImageSize.height) && false) {
+        if (img.width > maxImageSize.width || img.height > maxImageSize.height) {
           error.value = `L'image doit être de ${maxImageSize.width}x${maxImageSize.height} max.`;
           setErrorTimeout();
         } else {
