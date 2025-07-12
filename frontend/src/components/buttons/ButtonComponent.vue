@@ -14,7 +14,22 @@ const props = defineProps<{
   withIcon?: boolean;
   disabled?: boolean;
   tooltip?: string;
+  tracking_event?: string;
 }>();
+
+const emit = defineEmits<{
+  (e: "click", event: MouseEvent): void;
+}>();
+
+const handleClick = (event: MouseEvent) => {
+  if (!props.disabled) {
+    if( props.tracking_event) {
+      //@ts-expect-error  unknown global variable
+      window._paq.push(['trackEvent', 'Button', props.tracking_event]);
+    }
+    emit("click", event);
+  }
+};
 
 // Ne pas destructurer les props pour conserver la réactivité
 const { type = "button" } = props;
@@ -25,6 +40,7 @@ const { type = "button" } = props;
     <button
       :type="type"
       :disabled="props.disabled"
+      @click="handleClick"
       :class="{
         'w-full inline-flex items-center justify-center font-outfit font-medium transition-all duration-75 ease-in-out border-2 border-black focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed': true,
 

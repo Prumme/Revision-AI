@@ -83,6 +83,15 @@ services:
     environment:
       - MONGO_INITDB_DATABASE=api
 
+  matomo:
+    image: matomo:latest
+    ports:
+      - "8080:80"
+    env_file: ".env"
+    volumes:
+      - matomo-data:/var/www/html/matomo
+
 volumes:
   grafana-storage:
   mongo-data:
+  matomo-data:

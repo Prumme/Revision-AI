@@ -22,7 +22,7 @@ const emit = defineEmits<{
 }>();
 
 const acceptedFileTypes = ["image/*", "application/pdf"];
-const maxFileSize = 2 * 1024 * 1024;
+const maxFileSize = 5 * 1024 * 1024;
 // const maxTokenFileSize = 25 * 1024;
 const maxImageSize = { width: 3000, height: 3000 };
 
