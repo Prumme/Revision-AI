@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { CustomerRepository } from '@repositories/customer.repository';
 import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dto/register.dto';
+import { TOTPService, TOTPServiceProvider } from '@services/TOTPService';
+import * as UserEntity from '@entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,12 +19,15 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private mailService: MailService,
+    @Inject(TOTPServiceProvider.provide)
+    private totpservice: TOTPService
   ) { }
 
   async signIn(
     email: string,
     pass: string,
-  ): Promise<{ access_token: string; user: User }> {
+    totpCode ?: string
+  ): Promise<{ access_token: string; user: User } | { needTOTP: boolean }> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException();
@@ -35,6 +40,16 @@ export class AuthService {
 
     if (!user.emailVerified) {
       throw new UnauthorizedException('Email not verified');
+    }
+
+    if(UserEntity.hasTOTPEnabled(user)) {
+      if (!totpCode) {
+        return { needTOTP: true };
+      }
+      const isTotpValid = this.totpservice.verifyCode(totpCode, user.TOTPSecret);
+      if (!isTotpValid) {
+        throw new UnauthorizedException('Invalid TOTP code');
+      }
     }
 
     const payload = { sub: user.id, username: user.email };
@@ -103,5 +118,27 @@ export class AuthService {
     const { password, lastUpdatedPassword, ...customer } =
       customerAndUser as CustomerAndUser;
     return customer;
+  }
+
+  async toogleTOTP(
+    reqUser: ReqUser,
+    enable: boolean,
+  ): Promise<User> {
+    const user = await this.usersService.findById(reqUser.sub);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    } else if (enable && !user.TOTPSecret) {
+      // Enable TOTP
+      const totpSecret = this.totpservice.generateSecret(user.id);
+      user.TOTPSecret = totpSecret;
+    }
+    else if (!enable && user.TOTPSecret) {
+      // Disable TOTP
+      user.TOTPSecret = undefined;
+    }
+    else {
+      throw new UnauthorizedException('TOTP already in the desired state');
+    }
+    return this.usersService.update(user.id, user); 
   }
 }

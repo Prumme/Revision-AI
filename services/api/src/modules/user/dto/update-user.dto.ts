@@ -28,4 +28,23 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   blocked?: boolean;
+
+  /**
+   * Informations relatives au secret TOTP de l'utilisateur pour l'authentification à deux facteurs.
+   *
+   * @property secret - La clé secrète utilisée pour générer les codes TOTP.
+   * @property otpauth_url - L'URL otpauth compatible avec les applications d'authentification.
+   * @property userId - L'identifiant de l'utilisateur associé à ce secret TOTP.
+   */
+  @ApiProperty({
+    description: "Informations relatives au secret TOTP de l'utilisateur pour l'authentification à deux facteurs.",
+    example: false,
+    required: false,
+  })
+  @IsOptional()
+  TOTPSecret?: {
+    secret: string;
+    otpauth_url: string;
+    userId: string;
+  };
 }
