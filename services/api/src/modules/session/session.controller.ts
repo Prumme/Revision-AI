@@ -164,4 +164,27 @@ export class SessionController {
   ): Promise<Session[]> {
     return this.sessionService.findAllByQuizId(quizId, user.sub);
   }
+
+  @Get('quiz/:quizId/user/:userId')
+  @ApiOperation({ summary: "Récupérer toutes les sessions d'un quiz pour un utilisateur spécifique avec filtres et pagination" })
+  @ApiParam({ name: 'quizId', description: 'ID du quiz' })
+  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiQuery({ name: 'status', required: false, enum: ['pending', 'active', 'paused', 'finished'], description: 'Filtrer par statut de session' })
+  @ApiQuery({ name: 'scoreMin', required: false, type: Number, description: 'Filtrer par score minimum' })
+  @ApiQuery({ name: 'scoreMax', required: false, type: Number, description: 'Filtrer par score maximum' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Numéro de page pour la pagination' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Nombre d\'éléments par page' })
+  async findAllByQuizIdAndUserId(
+    @Param('quizId') quizId: string,
+    @Param('userId') userId: string,
+    @Query() filters: SessionFiltersDto & { page?: number; limit?: number }
+  ): Promise<any> {
+    const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
+    return this.sessionService.findAllByQuizIdAndUserId(
+      quizId,
+      userId,
+      { scoreMin, scoreMax, status },
+      { page: Number(page), limit: Number(limit) }
+    );
+  }
 }

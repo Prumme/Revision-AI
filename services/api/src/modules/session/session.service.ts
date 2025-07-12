@@ -61,6 +61,21 @@ export class SessionService {
     }
 
     /**
+     * Retrieves all sessions for a specific quiz and user.
+     * @param quizId - The ID of the quiz.
+     * @param userId - The ID of the user.
+     * @param options
+     * @returns An array of sessions associated with the quiz and user.
+     */
+    async findAllByQuizIdAndUserId(
+        quizId: string,
+        userId: string,
+        options?: { page?: number; limit?: number; scoreMin?: number; scoreMax?: number; status?: string }
+    ): Promise<any> {
+        return this.sessionRepository.findAllByQuizIdAndUserId(quizId, userId, options);
+    }
+
+    /**
      * Creates a new session.
      * @param createSessionDto - The DTO containing session details.
      * @returns The created session.

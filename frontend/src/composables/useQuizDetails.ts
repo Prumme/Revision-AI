@@ -255,18 +255,19 @@ export function useQuizDetails(quizId: string) {
   async function fetchAllUserSessions() {
     sessionTableLoading.value = true;
     try {
-      // Reset page to 1 si un filtre change (hors pagination)
       if (fetchAllUserSessions._filterChanged) {
         sessionTablePagination.value.currentPage = 1;
         fetchAllUserSessions._filterChanged = false;
       }
-      const response = await sessionService.findAllByUserId(userId.value, {
+      const response = await sessionService.findAllByQuizIdAndUserId(quizId, userId.value, {
         page: sessionTablePagination.value.currentPage,
         limit: sessionTablePagination.value.itemsPerPage,
         status: sessionTableFilters.value.status !== 'all' ? sessionTableFilters.value.status : undefined,
         scoreMin: sessionTableFilters.value.scoreMin !== undefined ? sessionTableFilters.value.scoreMin : undefined,
         scoreMax: sessionTableFilters.value.scoreMax !== undefined ? sessionTableFilters.value.scoreMax : undefined,
       });
+
+      console.log(response);
       userSessions.value = response.data;
       sessionTablePagination.value.totalItems = response.total;
       sessionTablePagination.value.totalPages = response.totalPages;
