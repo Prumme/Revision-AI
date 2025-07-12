@@ -6,9 +6,11 @@ import { onMounted, ref, watch } from 'vue';
 import { QuizService } from '@/services/quiz.service';
 import QuizCard from '@/components/cards/QuizCard.vue';
 import MediaList from '@/components/cards/MediaList.vue';
-import {ArrowRight, Calendar, FileQuestion} from 'lucide-vue-next';
+import {ArrowRight, Calendar, FileQuestion, Plus} from 'lucide-vue-next';
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { useRouter } from "vue-router";
+
+import illu from "@/assets/caracters/home.webp";
 
 const userStore = useUserStore();
 const user = userStore.user;
@@ -92,38 +94,41 @@ function goToQuizDetail(id: string) {
     <section class="flex flex-col w-full mt-20 gap-10">
 
       <!-- Welcome Section -->
-      <section
+            <section
         id="welcome"
         class="bg-gradient-to-r from-primary/50 to-primary/60 text-black rounded-2xl flex flex-col md:flex-row items-center relative overflow-visible min-h-0 p-10 gap-6"
       >
-        <div class="flex-1 z-10 flex flex-col justify-center  gap-3">
-          <h1 class="text-5xl font-extrabold drop-shadow mb-2">Bienvenue, <span class="blend text-black">{{ user.username }}</span> !</h1>
-          <p class="text-xl font-medium opacity-90">Prêt à réviser aujourd'hui&nbsp;?</p>
+        <div class="flex-1 z-10 flex flex-col justify-center gap-3">
+          <h1 class="text-5xl font-extrabold drop-shadow mb-2">
+            Salut <span class="blend text-black">{{ user.username }}</span> ! 👋
+          </h1>
+          <p class="text-xl font-medium opacity-90">
+            Prêt à booster tes révisions avec l'IA ?
+          </p>
           <div class="flex gap-4 mt-4 items-center">
-        <router-link
-          to="/quiz"
-        >
-          <ButtonComponent>
-          Commencer un quiz
-
-          </ButtonComponent>
-        </router-link>
-        <div class="ml-5">
-          <router-link
-          to="/courses"
-          class="text-black/90 font-medium text-base hover:text-primary transition-colors duration-200"
-        >
-          Voir mes documents
-        </router-link>
-        </div>
-       </div>
-        
+            <router-link to="/quiz">
+              <ButtonComponent>
+                Lancer un quiz
+              </ButtonComponent>
+            </router-link>
+            <div class="ml-5">
+              <router-link
+                to="/quiz/create"
+                class="text-black/90 font-medium text-base hover:text-primary transition-colors duration-200"
+              >
+                <Plus class="w-4 h-4 inline-block mr-1" />
+                Créer ton quiz
+              </router-link>
+            </div>
+          </div>
         </div>
         <div class="flex-1 flex justify-end relative z-20">
-          <img
-          src="@/assets/images/illustration_dashboard.png"
-          alt="Welcome Image"
-          class="w-3/4 min-w-[220px] max-w-[380px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
+            <img
+            :src="illu"
+            alt="Welcome Image"
+            class="w-3/4 min-w-[220px] max-w-[400px] absolute right-[-30px] top-1/2 -translate-y-1/2 pointer-events-none select-none z-20"
+            style="filter: drop-shadow(0 2em 1em rgba(0,0,0,0.05));"
+            />
           />
         </div>
       </section>
