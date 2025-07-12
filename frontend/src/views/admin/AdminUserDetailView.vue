@@ -33,6 +33,7 @@ const showBlockDialog = ref(false);
 const showPasswordResetDialog = ref(false);
 const actionLoading = ref(false);
 
+
 // Computed
 const userId = computed(() => route.params.id as string);
 
@@ -73,8 +74,8 @@ const fetchUserDetails = async () => {
       throw new Error("Utilisateur non trouvé");
     }
 
-    userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value : [];
-    userDocuments.value = quizzesData.value.map((quiz) => quiz.media).flat();
+    userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value.data : [];
+    userDocuments.value = quizzesData.value.data.map((quiz) => quiz.media).flat();
   } catch (error) {
     console.error("Erreur lors du chargement des détails utilisateur:", error);
     toast.showToast("error", "Impossible de charger les détails de l'utilisateur");
