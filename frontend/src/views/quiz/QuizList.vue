@@ -125,10 +125,6 @@ const handleReport = (quiz: Quiz) => {
   });
 };
 
-const handleUserClick = (username: string) => {
-  router.push(`/profil/${username}`);
-};
-
 watch(quizCount, (newCount) => {
   quizTabs.value[0].badge = newCount;
 });
@@ -247,7 +243,6 @@ onMounted(async () => {
             aspect-ratio="square"
             @click="goToQuizDetail(quiz)"
             @report="handleReport(quiz)"
-            @userClick="handleUserClick"
           />
         </div>
 

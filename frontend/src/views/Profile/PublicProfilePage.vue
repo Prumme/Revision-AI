@@ -52,10 +52,6 @@ const handleQuizClick = (quiz: Quiz) => {
   router.push(`/quiz/${quiz.id}`);
 };
 
-const handleUserClick = (username: string) => {
-  router.push(`/profil/${username}`);
-};
-
 onMounted(() => {
   fetchPublicProfile();
 });
@@ -161,7 +157,6 @@ onMounted(() => {
                 :quiz="quiz"
                 :max-description-length="80"
                 @click="handleQuizClick(quiz)"
-                @userClick="handleUserClick"
               />
             </div>
           </template>

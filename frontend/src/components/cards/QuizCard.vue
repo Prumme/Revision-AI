@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 import { MoreVertical, FileQuestion, Calendar, ArrowRight, User } from "lucide-vue-next";
 import { getCategoryColor, getCategoryLabel } from "@/helpers/quizCategory";
@@ -26,8 +27,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   click: [quiz: Quiz];
   report: [quiz: Quiz];
-  userClick: [username: string];
 }>();
+
+const router = useRouter();
 
 const aspectRatioClass = computed(() => {
   return props.aspectRatio === "square" ? "aspect-square" : "";
@@ -49,10 +51,9 @@ const handleReport = () => {
   emit("report", props.quiz);
 };
 
-const handleUserClick = () => {
-  if (props.quiz.username) {
-    emit("userClick", props.quiz.username);
-  }
+const handleUserClick = (username: string, event: Event) => {
+  event.preventDefault();
+  router.push(`/profil/${username}`);
 };
 </script>
 
@@ -115,7 +116,7 @@ const handleUserClick = () => {
         <div v-if="quiz.username" class="flex items-center gap-1 text-gray-600">
           <User class="w-4 h-4" />
           <button
-            @click.stop="handleUserClick"
+            @click.stop="handleUserClick(quiz.username, $event)"
             class="text-primary hover:text-primary-dark hover:underline transition-colors font-medium"
           >
             {{ quiz.username }}
