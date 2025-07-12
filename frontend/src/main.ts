@@ -24,6 +24,15 @@ function setupMatomo() {
         // @ts-expect-error global variable
         g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
     })();
+
+    router.afterEach((to, from) => {
+        if (to.path !== from.path) {
+            // @ts-expect-error global variable
+            window._paq.push(['setCustomUrl', to.fullPath]);
+            // @ts-expect-error global variable
+            window._paq.push(['trackPageView']);
+        }
+    });
 }
 
 setupMatomo();

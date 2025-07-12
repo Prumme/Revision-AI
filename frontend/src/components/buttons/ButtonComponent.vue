@@ -25,7 +25,7 @@ const handleClick = (event: MouseEvent) => {
   if (!props.disabled) {
     if( props.tracking_event) {
       //@ts-expect-error  unknown global variable
-      //window._paq.push(['trackEvent', 'Button', props.tracking_event]);
+      window._paq.push(['trackEvent', 'Button', props.tracking_event]);
     }
     emit("click", event);
   }
