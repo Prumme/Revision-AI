@@ -105,8 +105,8 @@ export class AuthController {
       },
     },
   })
-  async enableTOTP(@Req() req: Request & { user: ReqUser }) {
-    const user = await this.authService.toogleTOTP(req.user, true) as { TOTPSecret: { otpauth_url: string } };
+  async enableTOTP(@Req() req: Request & { user: ReqUser }, @Body('totpCode') totpCode?: string): Promise<{ qrCode: string }> {
+    const user = await this.authService.toogleTOTP(req.user, true, totpCode) as { TOTPSecret: { otpauth_url: string } };
     const qrCode = await qrcode.toDataURL(user.TOTPSecret.otpauth_url);
     return { qrCode };
   }

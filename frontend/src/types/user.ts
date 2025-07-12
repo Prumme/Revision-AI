@@ -22,4 +22,5 @@ export interface User {
     postal_code?: string;
     country?: string;
   };
+  TOTPSecret? : any
 }

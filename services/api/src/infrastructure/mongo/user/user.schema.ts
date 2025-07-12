@@ -27,7 +27,8 @@ export const UserSchema = new Schema({
   TOTPSecret: {
     secret: { type: String, required: false },
     otpauth_url: { type: String, required: false },
-    userId: { type: String, required: false }
+    userId: { type: String, required: false },
+    active: { type: Boolean, default: false }
   }
 });
 

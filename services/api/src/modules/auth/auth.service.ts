@@ -101,6 +101,7 @@ export class AuthService {
         bio: user.bio,
         subscriptionTier: user.subscriptionTier,
         customerId: user.customerId,
+        TOTPSecret : user.TOTPSecret,
       },
     };
   }
@@ -123,22 +124,32 @@ export class AuthService {
   async toogleTOTP(
     reqUser: ReqUser,
     enable: boolean,
+    validateTOTPCode?: string
   ): Promise<User> {
     const user = await this.usersService.findById(reqUser.sub);
     if (!user) {
       throw new UnauthorizedException('User not found');
-    } else if (enable && !user.TOTPSecret) {
-      // Enable TOTP
-      const totpSecret = this.totpservice.generateSecret(user.id);
-      user.TOTPSecret = totpSecret;
-    }
-    else if (!enable && user.TOTPSecret) {
+    } else if (enable) {
+      
+      if(validateTOTPCode && user.TOTPSecret) {
+        const isTotpValid = this.totpservice.verifyCode(validateTOTPCode, user.TOTPSecret);
+        if (!isTotpValid) {
+          throw new UnauthorizedException('Invalid TOTP code');
+        }
+        // find the user and set the TOTPSecret to active
+        user.TOTPSecret.active = true;
+      }else{
+        // create a new TOTP secret not active
+        const totpSecret = this.totpservice.generateSecret(user.id);
+        user.TOTPSecret = totpSecret;
+      }
+  
+    } else if (!enable) {
       // Disable TOTP
-      user.TOTPSecret = undefined;
-    }
-    else {
-      throw new UnauthorizedException('TOTP already in the desired state');
+      user.TOTPSecret = null;
+      this.usersService.update(user.id, user); 
     }
     return this.usersService.update(user.id, user); 
+
   }
 }

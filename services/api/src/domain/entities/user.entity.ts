@@ -22,5 +22,5 @@ export interface User {
 
 
 export function hasTOTPEnabled(user: User): boolean {
-  return !!user.TOTPSecret;
+  return !!user.TOTPSecret && user.TOTPSecret.active;
 }

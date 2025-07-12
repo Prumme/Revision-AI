@@ -33,10 +33,11 @@ describe('AuthService', () => {
   const mockUserWithTOTP: User = {
     ...mockUser,
     TOTPSecret: {
-        secret: 'secret123',
-        otpauth_url: 'otpauth://totp/Example:test@example.com',
-        userId: mockUser.id,
-      },
+      active: false,
+      secret: 'secret123',
+      otpauth_url: 'otpauth://totp/Example:test@example.com',
+      userId: mockUser.id,
+    },
   };
 
   beforeEach(async () => {

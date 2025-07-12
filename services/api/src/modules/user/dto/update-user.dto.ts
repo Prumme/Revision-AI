@@ -46,5 +46,6 @@ export class UpdateUserDto {
     secret: string;
     otpauth_url: string;
     userId: string;
+    active: boolean;
   };
 }
