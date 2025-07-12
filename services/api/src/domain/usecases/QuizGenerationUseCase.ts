@@ -194,6 +194,8 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
         totalTokens,
       );
       if (!checkTokens.allowed) {
+        QuizJobEntity.failJob(job, checkTokens.reason);
+        await _quizGenerationJobRepository.putJob(job, job.id);
         return new ForbiddenException(checkTokens.reason);
       }
 
@@ -310,6 +312,8 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           totalTokens,
         );
         if (!checkTokens.allowed) {
+          QuizJobEntity.failJob(job, checkTokens.reason);
+          await _quizGenerationJobRepository.putJob(job, job.id);
           return new ForbiddenException(checkTokens.reason);
         }
 
