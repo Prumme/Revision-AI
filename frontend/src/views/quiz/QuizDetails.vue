@@ -266,6 +266,7 @@ function handlePauseSession() {
             :questions="[quiz.questions[currentStep]]"
             :showAllAnswers="quizFinished || showCorrection"
             :userSelection="{0: userAnswers[currentStep] || []}"
+            :total-questions="quiz.questions.length"
             @update:selection="(selection) => userAnswers[currentStep] = selection[0] || []"
             mode="quiz"
           />

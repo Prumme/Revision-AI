@@ -189,4 +189,8 @@ export class QuizService {
   async delete(id: string): Promise<boolean> {
     return this.quizRepository.delete(id);
   }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.quizRepository.countByUserId(userId);
+  }
 }
