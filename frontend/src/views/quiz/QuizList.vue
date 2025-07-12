@@ -14,6 +14,7 @@ import { Motion } from "@motionone/vue";
 import TabNavigation from "@/components/common/TabNavigation.vue";
 import { useDialogStore } from "@/stores/dialog";
 import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
+import { debounce } from "lodash-es";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -23,6 +24,15 @@ const user = userStore.user;
 const search = ref("");
 const selectedCategory = ref("");
 const isPublic = ref<null | boolean>(null);
+
+const debouncedSearch = ref("");
+const updateSearch = debounce((value: string) => {
+  debouncedSearch.value = value;
+}, 500);
+
+watch(search, (value) => {
+  updateSearch(value);
+});
 
 const quizzes = ref<Quiz[]>([]);
 const loading = ref(false);
@@ -99,7 +109,7 @@ async function fetchQuizzes() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 600));
     const filters: Record<string, unknown> = {};
-    if (search.value) filters.search = search.value;
+    if (debouncedSearch.value) filters.search = debouncedSearch.value;
     if (selectedCategory.value) filters.category = selectedCategory.value;
     if (isPublic.value !== null) filters.isPublic = isPublic.value;
     const pagination = {page: page.value, limit: limit.value};
@@ -140,7 +150,7 @@ async function fetchQuizzes() {
   }
 }
 
-watch([search, selectedCategory, isPublic, page, limit, activeTab], async () => {
+watch([debouncedSearch, selectedCategory, isPublic, page, limit, activeTab], async () => {
   await fetchQuizzes();
 });
 
@@ -389,4 +399,3 @@ onMounted(async () => {
     </Motion>
   </section>
 </template>
-
