@@ -33,7 +33,7 @@ jobs:
   test:
     name: Run backend tests
     runs-on: ubuntu-latest
-
+    needs: build
     defaults:
       run:
         working-directory: services
