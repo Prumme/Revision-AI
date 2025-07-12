@@ -26,6 +26,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  ConflictException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -261,8 +262,36 @@ export class UserController {
     @CurrentUser() user: ReqUser,
   ): Promise<User> {
     try {
+      // Récupérer l'utilisateur actuel pour vérifier si le username a changé
+      const currentUser = await this.userService.findById(user.sub);
+      if (!currentUser) {
+        throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+      }
+
+      // Vérifier si le username a changé
+      if (
+        updateUserDto.username &&
+        updateUserDto.username !== currentUser.username
+      ) {
+        // Mettre à jour le username dans tous les quiz de l'utilisateur
+        await this.quizService.updateUsernameInUserQuizzes(
+          user.sub,
+          updateUserDto.username,
+        );
+      }
+
       return await this.userService.update(user.sub, updateUserDto);
     } catch (error) {
+      if (error.message?.includes("nom d'utilisateur existe déjà")) {
+        throw new ConflictException(
+          "Un utilisateur avec ce nom d'utilisateur existe déjà",
+        );
+      }
+      if (error.message?.includes('email existe déjà')) {
+        throw new ConflictException(
+          'Un utilisateur avec cet email existe déjà',
+        );
+      }
       throw new HttpException(
         "Erreur lors de la mise à jour de l'utilisateur",
         HttpStatus.NOT_FOUND,
@@ -292,8 +321,36 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     try {
+      // Récupérer l'utilisateur actuel pour vérifier si le username a changé
+      const currentUser = await this.userService.findById(id);
+      if (!currentUser) {
+        throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+      }
+
+      // Vérifier si le username a changé
+      if (
+        updateUserDto.username &&
+        updateUserDto.username !== currentUser.username
+      ) {
+        // Mettre à jour le username dans tous les quiz de l'utilisateur
+        await this.quizService.updateUsernameInUserQuizzes(
+          id,
+          updateUserDto.username,
+        );
+      }
+
       return await this.userService.update(id, updateUserDto);
     } catch (error) {
+      if (error.message?.includes("nom d'utilisateur existe déjà")) {
+        throw new ConflictException(
+          "Un utilisateur avec ce nom d'utilisateur existe déjà",
+        );
+      }
+      if (error.message?.includes('email existe déjà')) {
+        throw new ConflictException(
+          'Un utilisateur avec cet email existe déjà',
+        );
+      }
       throw new HttpException(
         "Erreur lors de la mise à jour de l'utilisateur",
         HttpStatus.NOT_FOUND,
