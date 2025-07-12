@@ -26,8 +26,11 @@ onMounted(async () => {
   averageScore.value = userStore.averageScore;
   totalRevisionTime.value = userStore.totalRevisionTimeFormatted;
   try {
-    const res = await QuizService.getUserQuizzes(user?.id);
-    userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : (res?.data?.slice(0, 5) || []);
+    if(!user?.id) {
+      throw new Error("User not found");
+    }
+    const res = await QuizService.getUserQuizzes(user?.id,undefined, {limit: 5}) as any;
+    userQuizzes.value = res.data
   } catch {
     userQuizzes.value = [];
   } finally {

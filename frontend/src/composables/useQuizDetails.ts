@@ -1,11 +1,12 @@
 import { ref, computed, onMounted, watch, h } from "vue";
-import { QuizService } from "@/services/quiz.service";
+import { QuizService, type Quiz } from "@/services/quiz.service";
 import { useToastStore } from "@/stores/toast";
 import { useSessionStore } from "@/stores/session";
 import { useUserStore } from "@/stores/user";
 import { sessionService } from "@/services/session.service";
 import StatusBadge from "@/components/badges/StatusBadge.vue";
-import type { TableAction, TableColumn, TableFilter, TableSort, PaginationData, TableFilters } from "@/types/datatable";
+import type { TableAction, TableColumn, TableFilter, TableSort, TableFilters } from "@/types/datatable";
+import type { PaginationData } from "@/components/ui/PaginatorComponent.vue";
 
 export function useQuizDetails(quizId: string) {
   const toast = useToastStore();
@@ -139,14 +140,21 @@ export function useQuizDetails(quizId: string) {
     }
   });
 
-  const saveOrder = async () => {
-    if (!quiz.value) return;
+  const saveQuiz = async () => {
+    if (quiz.value === null) return;
     try {
       const questions = quiz.value.questions.map(q => ({
         ...q,
         answers: q.answers.map(a => ({ ...a }))
       }));
-      await QuizService.updateQuiz(quiz.value.id, { questions });
+      await QuizService.updateQuiz(quizId, { 
+        questions, 
+        title: quiz.value.title, 
+        description: quiz.value.description, 
+        category: quiz.value.category,
+        questionsNumbers: quiz.value.questionsNumbers,
+        isPublic: quiz.value.isPublic ,
+      });
       orderChanged.value = false;
       toast.showToast("success", "Ordre des questions sauvegardé !");
     } catch {
@@ -161,7 +169,7 @@ export function useQuizDetails(quizId: string) {
       loading.value = true;
       await new Promise(resolve => setTimeout(resolve, 0));
       await new Promise(resolve => setTimeout(resolve, 1200));
-      const session = await sessionStore.startSession(quiz.value.id, userId.value);
+      const session = await sessionStore.startSession(quizId, userId.value);
       if (!session || !session.id) {
         toast.showToast("error", "Erreur lors de la création de la session.");
         return;
@@ -419,7 +427,7 @@ export function useQuizDetails(quizId: string) {
     actions,
     onQuestionsOrderChange,
     toggleAllAnswers,
-    saveOrder,
+    saveQuiz,
     startQuizSession,
     nextStep,
     finishQuiz,
