@@ -210,7 +210,7 @@ watch(quizFinished, (finished) => {
             <p class="flex items-start gap-2">
               <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
               <span
-                >Si tu trouves que le de ce quiz contenu est inapproprié, n'hésite pas à le
+                >Si tu trouves que le contenu de ce quiz est inapproprié, n'hésite pas à le
                 signaler. Chez Revision AI, nous nous efforçons de maintenir un environnement calme
                 et propice à l'apprentissage.</span
               >
