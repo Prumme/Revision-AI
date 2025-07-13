@@ -3,7 +3,7 @@ name: Deploy to Scaleway Kapsule
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   build_and_push_images:
@@ -37,10 +37,37 @@ jobs:
           target: production
           tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/${{matrix.image}}:${{github.ref_name}}
 
+  build_frontend_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies and build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          target: production
+          tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/frontend:${{ github.ref_name }}
+
   deploy:
     runs-on: ubuntu-latest
     environment: production # Optional: Define a production environment in GitHub
-    needs: build_and_push_images
+    needs:
+      - build_and_push_images
+      - build_frontend_and_push
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -93,6 +120,7 @@ jobs:
           sed -i "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:${REF_NAME}|g" k8s/apps/api.deployement.yaml
           sed -i "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:${REF_NAME}|g" k8s/apps/file-parser.deployement.yml
           sed -i "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:${REF_NAME}|g" k8s/apps/quiz-generator.deployement.yml
+          sed -i "s|image: revision-ai/frontend:latest|image: ${IMAGE_TAG}/frontend:${REF_NAME}|g" k8s/apps/frontend.deployement.yaml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/api.deployement.yaml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/file-parser.deployement.yml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/quiz-generator.deployement.yml

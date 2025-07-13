@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend-nginx-deploy
+  name: frontend-nginx-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend-nginx-deploy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: frontend-nginx-deploy
+        debug: "true"
+    spec:
+      containers:
+        - image: revision-ai/frontend:latest
+          imagePullPolicy: IfNotPresent
+          name: frontend
+          resources:
+            limits:
+              cpu: 900m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          ports:
+            - containerPort: 80
+              protocol: TCP
