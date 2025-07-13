@@ -1,11 +1,11 @@
 import { UseCase, UseCaseFactory } from './IUseCase';
 import { SubscriptionTier } from '../value-objects/subscriptionTier';
-import { MailerService } from '@services/MailerService';
 import { CustomerRepository } from '@repositories/customer.repository';
 import { SubscriptionProvider } from '@services/SubscriptionProvider';
 import { SubscriptionError } from '../errors/SubscriptionError';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
 import { CustomerAndUser } from '@entities/customer.entity';
+import { MailService } from '@infrastructure/resend/mail.service';
 
 /**
  * UseCase to create a customer in the subscription service.
@@ -126,7 +126,7 @@ export type ActiveSubscriptionUseCase = UseCase<
 >;
 export const ActiveSubscriptionUseCaseFactory: UseCaseFactory<
   ActiveSubscriptionUseCase,
-  [MailerService, CustomerRepository]
+  [MailService, CustomerRepository]
 > = (_mailService, _customerRepository) => {
   return async ({ customerId, tier }) => {
     if (tier === SubscriptionTier.FREE)
@@ -154,9 +154,10 @@ export const ActiveSubscriptionUseCaseFactory: UseCaseFactory<
     }
 
     const sent = await _mailService.sendSubscriptionActivationEmail(
-      { to: response.email },
+      response.email,
       {
-        tier,
+        username: response.username,
+        articleName: 'Abonnement ' + tier,
       },
     );
     if (sent instanceof Error) return sent;
@@ -178,7 +179,7 @@ export type InactiveSubscriptionUseCase = UseCase<
 >;
 export const InactiveSubscriptionUseCaseFactory: UseCaseFactory<
   InactiveSubscriptionUseCase,
-  [MailerService, CustomerRepository]
+  [MailService, CustomerRepository]
 > = (_mailService, _customerRepository) => {
   return async ({ customerId }) => {
     // 1. update the user subscription status in the database
@@ -203,8 +204,10 @@ export const InactiveSubscriptionUseCaseFactory: UseCaseFactory<
     }
 
     const sent = await _mailService.sendSubscriptionDeactivationEmail(
-      { to: response.email },
-      {},
+      response.email,
+      {
+        username: response.username,
+      },
     );
 
     if (sent instanceof Error) return sent;

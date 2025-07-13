@@ -7,7 +7,7 @@ import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { UserSchema } from '@mongo/user/user.schema';
 import { AuthModule } from '@modules/auth/auth.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
-import { MailerServiceProvider } from '@services/MailerService';
+
 import { StripeSubscriptionProvider } from '@infrastructure/stripe/StripeSubscriptionProvider';
 import { UserModule } from '@modules/user/user.module';
 
@@ -22,7 +22,6 @@ import { UserModule } from '@modules/user/user.module';
   providers: [
     SubscriptionPrvProvider,
     CustomerRepositoryProvider,
-    MailerServiceProvider,
     StripeSubscriptionProvider,
   ],
 })

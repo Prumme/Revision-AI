@@ -194,13 +194,20 @@ router.beforeEach(async (to, from, next) => {
     } catch {
       // Si token invalide, tu peux le supprimer et rediriger
       localStorage.removeItem("token");
-      return next({ name: "login" });
+      return next({
+        name: "login",
+        query: { redirect: to.fullPath },
+      });
     }
   }
 
   // Auth required ?
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!token) return next({ name: "login" });
+    if (!token)
+      return next({
+        name: "login",
+        query: { redirect: to.fullPath },
+      });
     return next();
   }
 

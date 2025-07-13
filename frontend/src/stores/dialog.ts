@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, markRaw, shallowRef } from "vue";
 import ReportForm from "@/components/forms/ReportForm.vue";
+import BlockUserDialog from "@/components/admin/BlockUserDialog.vue";
+import type { User } from "@/types/user";
 
 interface DialogOptions {
   title: string;
@@ -18,8 +20,13 @@ interface ReportDialogOptions {
   userName?: string;
 }
 
-type DialogComponent = typeof ReportForm;
-type DialogComponentProps = ReportDialogOptions;
+interface BlockUserDialogOptions {
+  user: User | null;
+  loading?: boolean;
+}
+
+type DialogComponent = typeof ReportForm | typeof BlockUserDialog;
+type DialogComponentProps = ReportDialogOptions | BlockUserDialogOptions;
 
 export const useDialogStore = defineStore("dialog", () => {
   const isOpen = ref(false);
@@ -35,38 +42,61 @@ export const useDialogStore = defineStore("dialog", () => {
   const customComponent = shallowRef<DialogComponent | null>(null);
   const customComponentProps = ref<DialogComponentProps | null>(null);
 
-  const resolvePromise: { resolve: (value: boolean) => void } = { resolve: () => {} };
+  let currentResolver: ((value: boolean | string) => void) | null = null;
 
   const show = (dialogOptions: DialogOptions): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       options.value = {
         ...options.value,
         ...dialogOptions,
       };
       isOpen.value = true;
-      resolvePromise.resolve = resolve;
+      currentResolver = resolve as (value: boolean | string) => void;
       customComponent.value = null;
       customComponentProps.value = null;
     });
   };
 
   const showReport = (reportOptions: ReportDialogOptions): Promise<boolean> => {
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       isOpen.value = true;
-      resolvePromise.resolve = resolve;
+      currentResolver = resolve as (value: boolean | string) => void;
       customComponent.value = markRaw(ReportForm);
       customComponentProps.value = reportOptions;
     });
   };
 
+  const showBlockUser = (blockOptions: BlockUserDialogOptions): Promise<string | boolean> => {
+    return new Promise<string | boolean>((resolve) => {
+      isOpen.value = true;
+      currentResolver = resolve;
+      customComponent.value = markRaw(BlockUserDialog);
+      customComponentProps.value = blockOptions;
+    });
+  };
+
   const confirm = () => {
     isOpen.value = false;
-    resolvePromise.resolve(true);
+    if (currentResolver) {
+      currentResolver(true);
+      currentResolver = null;
+    }
+  };
+
+  const confirmWithData = (data: string | undefined) => {
+    isOpen.value = false;
+    if (currentResolver) {
+      currentResolver(data || true);
+      currentResolver = null;
+    }
   };
 
   const cancel = () => {
     isOpen.value = false;
-    resolvePromise.resolve(false);
+    if (currentResolver) {
+      currentResolver(false);
+      currentResolver = null;
+    }
   };
 
   return {
@@ -76,7 +106,9 @@ export const useDialogStore = defineStore("dialog", () => {
     customComponentProps,
     show,
     showReport,
+    showBlockUser,
     confirm,
+    confirmWithData,
     cancel,
   };
 });

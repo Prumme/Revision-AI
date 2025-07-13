@@ -1,6 +1,6 @@
 import { Controller, Headers, Inject, Post, Req } from '@nestjs/common';
+import { Request } from 'express';
 import Stripe from 'stripe';
-import { MailerService } from '@services/MailerService';
 import { CustomerRepository } from '@repositories/customer.repository';
 import {
   ActiveSubscriptionUseCaseFactory,
@@ -8,6 +8,7 @@ import {
 } from '../../domain/usecases/SubscriptionUsecases';
 import { Public } from '@common/decorators/public.decorator';
 import { StripeSubscriptionProvider } from '../../infrastructure/stripe/StripeSubscriptionProvider';
+import { MailService } from '@infrastructure/resend/mail.service';
 
 export type StripeEventHandler = (event: Stripe.Event) => Promise<true | Error>;
 
@@ -16,8 +17,7 @@ export class StripeController {
   private stripe: Stripe;
 
   public constructor(
-    @Inject('MailerService')
-    private mailer: MailerService,
+    private mailService: MailService,
     @Inject('CustomerRepository')
     private customerRepository: CustomerRepository,
     @Inject(StripeSubscriptionProvider)
@@ -34,7 +34,14 @@ export class StripeController {
   ) {
     let response: true | Error = true;
     try {
-      const rawBody = (req as any).rawBody || req.body;
+      // Utiliser le rawBody capturé par le middleware
+      const rawBody = req.rawBody;
+
+      if (!rawBody) {
+        throw new Error(
+          'Raw body is required for webhook signature verification',
+        );
+      }
 
       console.log('Secret :' + [process.env.STRIPE_WEBHOOK_SECRET]);
 
@@ -54,6 +61,12 @@ export class StripeController {
         case 'customer.subscription.deleted':
           response = await this.handleInvoicePaymentFailedOrDelete(event);
           break;
+        case 'customer.subscription.updated':
+          // Gérer les mises à jour d'abonnement si nécessaire
+          console.log('Subscription updated:', event.data.object);
+          break;
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
       }
 
       return { received: true };
@@ -73,7 +86,7 @@ export class StripeController {
     const invoice = event.data.object as Stripe.Invoice;
 
     const useCase = ActiveSubscriptionUseCaseFactory(
-      this.mailer,
+      this.mailService,
       this.customerRepository,
     );
 
@@ -107,7 +120,7 @@ export class StripeController {
     const customerId = invoice.customer as string;
 
     const useCase = InactiveSubscriptionUseCaseFactory(
-      this.mailer,
+      this.mailService,
       this.customerRepository,
     );
 
