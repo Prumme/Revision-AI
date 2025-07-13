@@ -3,10 +3,10 @@ import TwitterIcon from "@/components/icons/TwitterIcon.vue";
 import { Instagram, Linkedin } from "lucide-vue-next";
 
 const links = [
-  { label: "À propos", href: "#" },
-  { label: "Contact", href: "#" },
-  { label: "CGU", href: "#" },
-  { label: "Politique de confidentialité", href: "#" },
+  { label: "Contact", href: "/contact" },
+  { label: "Mentions légales", href: "/legal" },
+  { label: "CGU et CGV", href: "/terms" },
+  { label: "Politique de confidentialité", href: "/privacy" },
 ];
 
 const socials = [
