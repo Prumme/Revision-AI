@@ -8,7 +8,11 @@ export const SessionSchema = new Schema({
   duration: { type: Number, required: false },
   startedAt: { type: Date, default: Date.now, required: true },
   finishedAt: { type: Date, default: null },
-  status: { type: String, enum: ['pending', 'active', 'paused', 'finished'], default: 'pending' },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'paused', 'finished'],
+    default: 'pending',
+  },
   answers: [
     {
       c: { type: Boolean, required: true },
