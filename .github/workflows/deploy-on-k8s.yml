@@ -63,7 +63,7 @@ jobs:
         run: |
           cd frontend
           npm install
-          npm run build-build
+          npm run build-only
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
