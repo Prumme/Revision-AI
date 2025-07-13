@@ -67,7 +67,8 @@ export function useUserDocumentTable(userId: string | undefined) {
   ];
 
   function handleSeeDoc(doc: UploadedDocument) {
-    openDoc(doc.identifier);
+    if (!doc || !doc.url) return;
+    openDoc(doc?.url);
   }
   function handlePageChange(page: number) {
     console.log("Page change", page);

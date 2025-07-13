@@ -5,4 +5,5 @@ export interface UploadedDocument {
   name: string;
   size: number;
   createdAt: Date;
+  url?: string; // Optional URL for direct access
 }

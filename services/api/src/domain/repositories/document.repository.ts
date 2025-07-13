@@ -6,6 +6,7 @@ import { MongoDocumentRepository } from '@mongo/document/document.repository';
 import { UploadedDocument } from '@entities/document.entity';
 
 export interface IDocumentRepository {
+  findByIdentifier(string: string): Promise<UploadedDocument | null>;
   findByQuizId(
     quizId: string,
     pagination: PaginationOptions,

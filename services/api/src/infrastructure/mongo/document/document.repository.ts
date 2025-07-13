@@ -16,6 +16,18 @@ export class MongoDocumentRepository implements IDocumentRepository {
     private readonly quizModel: Model<QuizDocument>, // On créer des documents en utilisant le modèle Quiz
   ) {}
 
+  findByIdentifier(string: string): Promise<UploadedDocument | null> {
+    //alller chercher dans les quiz le premier document qui a l'identifiant
+    return this.quizModel
+      .findOne({ 'media.identifier': string }, { 'media.$': 1 })
+      .then((quiz) => {
+        if (!quiz || !quiz.media || quiz.media.length === 0) {
+          return null;
+        }
+        return quiz.media[0] as UploadedDocument; // On retourne le premier document trouvé
+      });
+  }
+
   private async getPaginatedDocuments(
     pipeline: any[],
     pagination: PaginationOptions,
