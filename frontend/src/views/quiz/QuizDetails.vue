@@ -5,7 +5,7 @@ import Input from "@/components/inputs/InputComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import { QuizService } from "@/services/quiz.service";
 import { computed, onMounted, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
 import { useQuizDetails } from "@/composables/useQuizDetails";
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
@@ -24,13 +24,13 @@ import caracterOrange from "@/assets/caracters/caracterOrange.png";
 import AutoFileIcon from "@/components/icons/AutoFileIcon.vue";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { humanizeBytes } from "@/utils/humanizeBytes.ts";
+import { openDoc } from "@/utils/openDoc.ts";
 
 const toast = useToastStore();
 const route = useRoute();
 const quizId = route.params.id as string;
 const quizDetails = useQuizDetails(quizId);
 const sessionStore = useSessionStore();
-const navigate = useRouter().push;
 
 const {
   quiz,
@@ -342,7 +342,8 @@ watch(quizFinished, (finished) => {
                 </div>
                 <ButtonComponent
                   :href="mediaQuiz.identifier"
-                  @click.prevent="() => navigate(mediaQuiz.identifier)"
+                  v-if="mediaQuiz.url"
+                  @click.prevent="() => openDoc(mediaQuiz?.url as string)"
                   target="_blank"
                   rel="noopener"
                   class="ml-4 text-xs"
