@@ -52,6 +52,23 @@ export class QuizService {
     { label: "Sciences", value: "sciences" },
     { label: "Mathématiques", value: "mathematics" },
     { label: "Littérature", value: "literature" },
+    { label: "Culture générale", value: "general_culture" },
+    { label: "Géopolitique", value: "geopolitics" },
+    { label: "Économie", value: "economy" },
+    { label: "Technologie", value: "technology" },
+    { label: "Art", value: "art" },
+    { label: "Sport", value: "sport" },
+    { label: "Musique", value: "music" },
+    { label: "Cinéma", value: "cinema" },
+    { label: "Télévision", value: "television" },
+    { label: "Internet", value: "internet" },
+    { label: "Politique", value: "politics" },
+    { label: "Société", value: "society" },
+    { label: "Philosophie", value: "philosophy" },
+    { label: "Religion", value: "religion" },
+    { label: "Informatique", value: "informatics" },
+    { label: "Vie quotidienne", value: "daily_life" },
+    { label: "Autres", value: "other" },
   ];
 
   static buildQueryParams(filters: Record<string, unknown>): string[] {
