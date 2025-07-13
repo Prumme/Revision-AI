@@ -36,7 +36,7 @@ const {
         :searchable="true"
         search-placeholder="Rechercher un document..."
         empty-message="Aucun document trouvé"
-        row-key="id"
+        row-key="identifier"
         :pagination="pagination"
         @update:page="handlePageChange"
         @update:items-per-page="handleItemsPerPageChange"
