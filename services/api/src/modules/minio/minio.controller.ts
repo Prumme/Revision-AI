@@ -5,13 +5,17 @@ import {
   Get,
   Inject,
   Param,
+  Req,
   Res,
   StreamableFile,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Cache } from 'cache-manager';
 import { Response } from 'express';
 import { MinioService } from './minio.service';
+import { ReqUser } from '@common/types/request';
+import { UserService } from '@modules/user/user.service';
 
 @ApiTags('Scaleway S3')
 @Controller('files')
@@ -19,6 +23,7 @@ export class MinioController {
   constructor(
     private readonly minioService: MinioService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly userService: UserService,
   ) {}
 
   @Public()
@@ -80,6 +85,27 @@ export class MinioController {
         'Last-Modified': metadata.lastModified.toUTCString(),
       });
     }
+
+    return new StreamableFile(file.stream);
+  }
+
+  @Get('documents/:userId/:filename')
+  @ApiOperation({ summary: 'Récupérer un fichier depuis Scaleway S3' })
+  @ApiParam({ name: 'filename', description: 'Chemin du fichier' })
+  async getFile(
+    @Param('userId') userId: string,
+    @Param('filename') filename: string,
+    @Req() { user: reqUser }: Request & { user: ReqUser },
+  ): Promise<StreamableFile> {
+    const user = await this.userService.findById(reqUser.sub);
+    if (user.role !== 'admin' && user.id !== userId) {
+      throw new UnauthorizedException(
+        "Vous n'avez pas les permissions pour accéder à ce fichier",
+      );
+    }
+    const file = await this.minioService.getFile(
+      `documents/${userId}/${filename}`,
+    );
 
     return new StreamableFile(file.stream);
   }
