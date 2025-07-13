@@ -138,6 +138,11 @@ jobs:
 
           # Apply updated deployments, services, and ingress
           kubectl apply -f k8s -R
+          
+          kubectl rollout restart deployment/api-deploy
+          kubectl rollout restart deployment/file-parser-deploy
+          kubectl rollout restart deployment/quiz-generator-deploy
+          kubectl rollout restart deployment/frontend-nginx-deploy
 
       - name: Wait for deployments to be ready
         run: |
