@@ -6,7 +6,7 @@ const links = [
   { label: "Contact", href: "/contact" },
   { label: "Mentions légales", href: "/legal" },
   { label: "CGU et CGV", href: "/terms" },
-  { label: "Politique de confidentialité", href: "#" },
+  { label: "Politique de confidentialité", href: "/privacy" },
 ];
 
 const socials = [

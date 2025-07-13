@@ -23,6 +23,7 @@ import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
 import ContactView from "@/views/landing/ContactView.vue";
 import LegalView from "@/views/landing/LegalView.vue";
 import TermsView from "@/views/landing/TermsView.vue";
+import PrivacyView from "@/views/landing/PrivacyView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,11 @@ const router = createRouter({
       path: "/terms",
       name: "terms",
       component: TermsView,
+    },
+    {
+      path: "/privacy",
+      name: "privacy",
+      component: PrivacyView,
     },
     {
       path: "/",
