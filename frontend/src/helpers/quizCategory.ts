@@ -1,13 +1,30 @@
 // Configuration des couleurs pour les catégories de quiz
 export const categoryColors = {
-  general_history: "#e5d5f7",
-  sciences: "#cce4f6",
-  geography: "#daf5e2",
-  literature: "#fdf4cc",
-  arts: "#f9d0d0",
-  sports: "#e5d5f7",
-  mathematics: "#ffe4e1",
-  default: "#e5e5e5",
+  general_history: "#E6B0AA", // Rouge pâle
+  sciences: "#AED6F1", // Bleu clair
+  geography: "#A2D9CE", // Turquoise
+  literature: "#F9E79F", // Jaune pâle
+  arts: "#D7BDE2", // Violet clair
+  sports: "#F5B7B1", // Corail
+  mathematics: "#A9CCE3", // Bleu gris
+  gastronomy: "#F5CBA7", // Pêche
+  informatics: "#A3E4D7", // Menthe
+  daily_life: "#FAD7A0", // Orange pâle
+  general_culture: "#D2B4DE", // Lavande
+  geopolitics: "#F1948A", // Rouge saumon
+  economy: "#85C1E9", // Bleu ciel
+  technology: "#82E0AA", // Vert clair
+  art: "#F8C471", // Orange doré
+  music: "#BB8FCE", // Violet moyen
+  cinema: "#F7DC6F", // Jaune doré
+  television: "#E8DAEF", // Mauve pâle
+  internet: "#73C6B6", // Turquoise moyen
+  politics: "#F0B27A", // Orange terre
+  society: "#B2BABB", // Gris bleuté
+  philosophy: "#C39BD3", // Violet pastel
+  religion: "#7FB3D5", // Bleu acier
+  other: "#BFC9CA", // Gris clair
+  default: "#E5E5E5", // Gris neutre
 };
 
 // Labels français pour les catégories
@@ -19,6 +36,23 @@ export const categoryLabels: Record<string, string> = {
   literature: "Littérature",
   arts: "Arts",
   sports: "Sports",
+  gastronomy: "Gastronomie",
+  informatics: "Informatique",
+  daily_life: "Vie quotidienne",
+  general_culture: "Culture générale",
+  geopolitics: "Géopolitique",
+  economy: "Économie",
+  technology: "Technologie",
+  art: "Art",
+  music: "Musique",
+  cinema: "Cinéma",
+  television: "Télévision",
+  internet: "Internet",
+  politics: "Politique",
+  society: "Société",
+  philosophy: "Philosophie",
+  religion: "Religion",
+  other: "Autres",
   "": "Non classé",
 };
 
