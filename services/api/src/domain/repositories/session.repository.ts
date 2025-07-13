@@ -1,47 +1,40 @@
-import {Session, SessionAnswer} from '../entities/session.entity';
-import {MongoSessionRepository} from '@mongo/session/session.repository';
+import { Session, SessionAnswer } from '../entities/session.entity';
+import { MongoSessionRepository } from '@mongo/session/session.repository';
 
 export interface PaginationOptions {
-    page: number;
-    limit: number;
+  page: number;
+  limit: number;
 }
 
 export interface PaginatedResult<T> {
-    data: T[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface SessionRepository {
-    findById(id: string): Promise<Session | null>;
+  findById(id: string): Promise<Session | null>;
 
-    findAllByUserId(
-        userId: string,
-        pagination: PaginationOptions,
-    ): Promise<PaginatedResult<Session>>;
+  findAllByUserId(
+    userId: string,
+    pagination: PaginationOptions,
+  ): Promise<PaginatedResult<Session>>;
 
-    create(user: Omit<Session, 'id'>): Promise<Session>;
+  findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
 
-    startSession(id: string): Promise<Session | null>;
+  create(user: Omit<Session, 'id'>): Promise<Session>;
 
-    endSession(id: string, finishedAt: Date, score: number, answers: SessionAnswer[]): Promise<Session | null>;
+  patch(id: string, update: Partial<Session>): Promise<Session | null>;
 
-    updateAnswers(sessionId: string, answers: SessionAnswer[]): Promise<Session | null>;
-
-    pauseSession(id: string): Promise<Session | null>;
-
-    resumeSession(id: string): Promise<Session | null>;
-
-    updateStatus(id: string, status: string): Promise<Session | null>;
-
-    findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
-
-    findAllByQuizIdAndUserId(quizId: string, userId: string): Promise<PaginatedResult<Session>>;
+  findAllByQuizIdAndUserId(
+    quizId: string,
+    userId: string,
+  ): Promise<PaginatedResult<Session>>;
 }
 
 export const SessionRepositoryProvider = {
-    provide: 'SessionRepository',
-    useClass: MongoSessionRepository,
+  provide: 'SessionRepository',
+  useClass: MongoSessionRepository,
 };
