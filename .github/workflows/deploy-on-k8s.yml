@@ -70,7 +70,6 @@ jobs:
         with:
           context: ./frontend
           push: true
-          target: production
           tags: rg.fr-par.scw.cloud/${{ secrets.SCW_PROJECT_ID }}/revision-ai/frontend:${{ github.ref_name }}
 
   deploy:
