@@ -130,10 +130,11 @@ jobs:
           sed -i "s|image: revision-ai/api:latest|image: ${IMAGE_TAG}/api:${REF_NAME}|g" k8s/apps/api.deployement.yaml
           sed -i "s|image: revision-ai/file-parser:latest|image: ${IMAGE_TAG}/file-parser:${REF_NAME}|g" k8s/apps/file-parser.deployement.yml
           sed -i "s|image: revision-ai/quiz-generator:latest|image: ${IMAGE_TAG}/quiz-generator:${REF_NAME}|g" k8s/apps/quiz-generator.deployement.yml
-          sed -i "s|image: revision-ai/frontend:latest|image: ${IMAGE_TAG}/frontend:${REF_NAME}|g" k8s/apps/frontend.deployement.yaml
+          sed -i "s|image: revision-ai/frontend:latest|image: ${IMAGE_TAG}/frontend:${REF_NAME}|g" k8s/apps/frontend-nginx.deployement.yaml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/api.deployement.yaml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/file-parser.deployement.yml
           sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/quiz-generator.deployement.yml
+          sed -i "s|imagePullPolicy: IfNotPresent|imagePullPolicy: Always|g" k8s/apps/frontend-nginx.deployement.yaml
 
           # Apply updated deployments, services, and ingress
           kubectl apply -f k8s -R
