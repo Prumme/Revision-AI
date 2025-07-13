@@ -25,6 +25,7 @@ import AutoFileIcon from "@/components/icons/AutoFileIcon.vue";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { humanizeBytes } from "@/utils/humanizeBytes.ts";
 import { openDoc } from "@/utils/openDoc.ts";
+import Select from "@/components/inputs/SelectComponent.vue";
 
 const toast = useToastStore();
 const route = useRoute();
@@ -71,6 +72,8 @@ const {
 const medias = computed(() => {
   return quiz.value?.media;
 });
+
+const categoryOptions = QuizService.categories;
 
 onMounted(async () => {
   try {
@@ -274,7 +277,7 @@ watch(quizFinished, (finished) => {
               />
             </section>
             <section class="grid grid-cols-2 gap-2 space-y-5">
-              <Input
+              <Select
                 id="categorySelect"
                 v-model="quiz.category"
                 label="Catégorie"

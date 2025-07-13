@@ -2,34 +2,31 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: matomo-deploy
-  name: matamo-deploy
+    app: frontend-nginx-deploy
+  name: frontend-nginx-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: matomo-deploy
+      app: frontend-nginx-deploy
   strategy: {}
   template:
     metadata:
       labels:
-        app: matomo-deploy
+        app: frontend-nginx-deploy
         debug: "true"
     spec:
       containers:
-        - image: matomo:latest
+        - image: revision-ai/frontend:latest
           imagePullPolicy: IfNotPresent
-          name: matomo
+          name: frontend
           resources:
             limits:
               cpu: 900m
-              memory: 2Gi
+              memory: 500Mi
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 100Mi
           ports:
             - containerPort: 80
               protocol: TCP
-          envFrom:
-            - secretRef:
-                name: env-secrets

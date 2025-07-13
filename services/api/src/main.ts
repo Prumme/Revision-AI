@@ -9,10 +9,15 @@ import { quizGenerationQueueConsumer } from '@infrastructure/queue/consumers/qui
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ limit: '10mb', extended: true }));
-
   app.use('/stripe/webhook', raw({ type: 'application/json' }));
+
+  app.use((req, res, next) => {
+    if (req.path === '/stripe/webhook') return next();
+    json({ limit: '10mb' })(req, res, () => {
+      urlencoded({ limit: '10mb', extended: true })(req, res, next);
+    });
+  });
+
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

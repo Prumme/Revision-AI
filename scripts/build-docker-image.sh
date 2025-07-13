@@ -35,4 +35,11 @@ for service in "${SERVICES_DIR}"/*; do
     fi
 done
 
+# build frontend
+
+echo -e "\n${GREEN}Building frontend...${NC}"
+docker build -t revision-ai/frontend:latest \
+            -f "./frontend/Dockerfile" \
+            "./frontend"
+
 echo -e "\n${GREEN}All images built successfully!${NC}"

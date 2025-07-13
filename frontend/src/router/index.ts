@@ -20,6 +20,10 @@ import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
+import ContactView from "@/views/landing/ContactView.vue";
+import LegalView from "@/views/landing/LegalView.vue";
+import TermsView from "@/views/landing/TermsView.vue";
+import PrivacyView from "@/views/landing/PrivacyView.vue";
 import DocumentsView from "@/views/DocumentsView.vue";
 
 const router = createRouter({
@@ -29,6 +33,26 @@ const router = createRouter({
       path: "/",
       name: "Revision AI",
       component: LandingPage,
+    },
+    {
+      path: "/contact",
+      name: "contact",
+      component: ContactView,
+    },
+    {
+      path: "/legal",
+      name: "legal",
+      component: LegalView,
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: TermsView,
+    },
+    {
+      path: "/privacy",
+      name: "privacy",
+      component: PrivacyView,
     },
     {
       path: "/",
