@@ -12,24 +12,21 @@ import { QuizSafetyCheckResultSchema } from "../schemas/QuizSafetyCheckResultSch
 import { PromptTemplate } from "@langchain/core/prompts";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 
-const maxOutputTokens = Number(process.env.SCALEWAY_MAX_TOKEN) || 1000;
-const maxInputTokens = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 30000;
-
+const maxOutputTokens = Number(process.env.SCALEWAY_MAX_TOKEN) || 10000;
+const maxInputTokens = Number(process.env.SCALEWAY_MAX_TOKEN_INPUT) || 100000;
 
 let defaultModel: BaseChatModel;
-if(!process.env.GOOGLE_API_KEY) {
+if (!process.env.GOOGLE_API_KEY) {
   console.warn(
     "Environment variable GOOGLE_API_KEY is not set, using default model",
   );
-}else {
+} else {
   defaultModel = new ChatGoogleGenerativeAI({
     model: process.env.GOOGLE_MODEL || "gemini-2.0-flash",
     temperature: 0.2,
     maxOutputTokens,
   });
 }
-
-
 
 const _quizGeneratePrompt = PromptTemplate.fromTemplate(`
 Generate a quiz from the \"contents\" key of a JSON files, you receive an array of multiple file content.  
@@ -62,11 +59,10 @@ Quiz to evaluate
 `);
 
 export class LangChainQuizIAAgent implements IQuizIAAgent {
-
   constructor(
-    private model: BaseChatModel = defaultModel, 
-    private quizGenerationPrompt: PromptTemplate = _quizGeneratePrompt, 
-    private quizEvaluatePrompt: PromptTemplate = _quizEvaluatePrompt
+    private model: BaseChatModel = defaultModel,
+    private quizGenerationPrompt: PromptTemplate = _quizGeneratePrompt,
+    private quizEvaluatePrompt: PromptTemplate = _quizEvaluatePrompt,
   ) {}
 
   async generateQuiz(
@@ -76,12 +72,15 @@ export class LangChainQuizIAAgent implements IQuizIAAgent {
     const json = JSON.stringify(filesContents);
     if (json.length > maxInputTokens)
       return new QuizGenerationError("Files contents is too long");
-    const quizStructuredllm = this.model.withStructuredOutput<typeof QuizSchema._type>(QuizSchema);
+    const quizStructuredllm =
+      this.model.withStructuredOutput<typeof QuizSchema._type>(QuizSchema);
     try {
-      const data = await this.quizGenerationPrompt.pipe(quizStructuredllm).invoke({
-        questionsCount: questionsNumbers,
-        content: filesContents,
-      });
+      const data = await this.quizGenerationPrompt
+        .pipe(quizStructuredllm)
+        .invoke({
+          questionsCount: questionsNumbers,
+          content: filesContents,
+        });
       console.log("[QUIZ] AI Output:", data);
       try {
         return QuizSchema.parse(data);
@@ -91,7 +90,7 @@ export class LangChainQuizIAAgent implements IQuizIAAgent {
         return new QuizGenerationError("Failed to parse AI response");
       }
     } catch (e) {
-      console.error("[Quiz] error generating result");
+      console.error("[Quiz] error generating result", e);
       return new QuizGenerationError("Failed to generate AI response");
     }
   }
@@ -104,7 +103,9 @@ export class LangChainQuizIAAgent implements IQuizIAAgent {
     quiz: Quiz,
   ): Promise<QuizGenerationError | QuizSafetyCheckResult> {
     try {
-      const quizSafetyCheckStructuredllm = this.model.withStructuredOutput<typeof QuizSafetyCheckResultSchema._type>(QuizSafetyCheckResultSchema);
+      const quizSafetyCheckStructuredllm = this.model.withStructuredOutput<
+        typeof QuizSafetyCheckResultSchema._type
+      >(QuizSafetyCheckResultSchema);
       const data = await this.quizEvaluatePrompt
         .pipe(quizSafetyCheckStructuredllm)
         .invoke({
