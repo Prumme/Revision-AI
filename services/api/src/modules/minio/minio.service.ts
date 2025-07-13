@@ -137,6 +137,7 @@ export class MinioService implements OnModuleInit, FileService {
         identifier: objectName,
         mimeType: file.mimetype,
         checksum: result.ETag.replace(/"/g, ''),
+        createdAt: new Date(),
       };
     } catch (error) {
       this.logger.error("Erreur lors de l'upload vers Scaleway S3:", error);

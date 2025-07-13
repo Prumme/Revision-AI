@@ -40,6 +40,11 @@ const router = createRouter({
           component: DashboardView,
         },
         {
+          path: "/documents",
+          name: "documents",
+          component: DashboardView,
+        },
+        {
           path: "/quiz/create",
           name: "quiz-create",
           component: QuizForm,

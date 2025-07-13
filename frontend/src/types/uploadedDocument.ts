@@ -1,8 +1,8 @@
 export interface UploadedDocument {
-  checksum: string;
   identifier: string;
+  checksum: string;
+  mimeType: string;
   name: string;
   size: number;
-  mimeType: string;
   createdAt: Date;
 }

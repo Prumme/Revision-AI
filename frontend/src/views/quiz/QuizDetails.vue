@@ -21,9 +21,9 @@ import caracterRed from "@/assets/caracters/caracterRed.png";
 import caracterBlue from "@/assets/caracters/caracterBlue.png";
 import caracterYellow from "@/assets/caracters/caracterYellow.png";
 import caracterOrange from "@/assets/caracters/caracterOrange.png";
-import { arrayQuizMediaToContentMedia } from "@/utils/quizMediaToContentMedia";
 import AutoFileIcon from "@/components/icons/AutoFileIcon.vue";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
+import { humanizeBytes } from "@/utils/humanizeBytes.ts";
 
 const toast = useToastStore();
 const route = useRoute();
@@ -69,7 +69,7 @@ const {
 } = quizDetails;
 
 const medias = computed(() => {
-  return arrayQuizMediaToContentMedia(quiz.value?.media || []);
+  return quiz.value?.media;
 });
 
 onMounted(async () => {
@@ -104,7 +104,6 @@ function handlePauseSession() {
   activeTab.value = "sessions";
   toast.showToast("warning", "Session mise en pause. Vous pouvez reprendre plus tard.");
 }
-
 
 function getResultMessage(score: number, total: number) {
   const ratio = score / total;
@@ -165,7 +164,6 @@ watch(quizFinished, (finished) => {
       v-if="quiz && activeTab === 'quiz' && !isStarted"
       class="max-w-2xl mx-auto w-full text-center py-10"
     >
-    
       <div>
         <h2 class="text-3xl font-extrabold mb-4">Prêt à commencer le quiz ?</h2>
         <p class="text-lg text-black-transparent mb-8">
@@ -177,14 +175,14 @@ watch(quizFinished, (finished) => {
         </Button>
       </div>
 
-       <!-- Context Dialog -->
+      <!-- Context Dialog -->
       <div class="mt-8 relative">
-        <div class="bg-white p-6 rounded-xl  border border-gray-200">
-          
-
+        <div class="bg-white p-6 rounded-xl border border-gray-200">
           <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
             <img :src="caracterYellow" alt="Caractère jaune" class="w-20 h-20 object-contain" />
-            <h3 class="font-encode text-xl font-semibold text-primary">Quelques infos avant de commencer</h3>
+            <h3 class="font-encode text-xl font-semibold text-primary">
+              Quelques infos avant de commencer
+            </h3>
           </div>
 
           <div class="text-left space-y-2 font-outfit">
@@ -198,15 +196,24 @@ watch(quizFinished, (finished) => {
             </p>
             <p class="flex items-start gap-2">
               <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
-              <span>Pas de stress ! Le quiz peut être mis en pause et repris quand tu le souhaites.</span>
-            </p>
-            <p class="flex items-start gap-2">
-              <span class="inline-block w-2 h-2  mt-2 rounded-full bg-primary flex-shrink-0"></span>
-              <span>Certaines questions peuvent avoir plusieurs bonnes réponses, sois attentif !</span>
+              <span
+                >Pas de stress ! Le quiz peut être mis en pause et repris quand tu le
+                souhaites.</span
+              >
             </p>
             <p class="flex items-start gap-2">
               <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
-              <span>Si tu trouves que le de ce quiz contenu est inapproprié, n'hésite pas à le signaler. Chez Revision AI, nous nous efforçons de maintenir un environnement calme et propice à l'apprentissage.</span>
+              <span
+                >Certaines questions peuvent avoir plusieurs bonnes réponses, sois attentif !</span
+              >
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span
+                >Si tu trouves que le de ce quiz contenu est inapproprié, n'hésite pas à le
+                signaler. Chez Revision AI, nous nous efforçons de maintenir un environnement calme
+                et propice à l'apprentissage.</span
+              >
             </p>
           </div>
         </div>
@@ -323,16 +330,19 @@ watch(quizFinished, (finished) => {
             <ul class="divide-y divide-gray-200">
               <li
                 v-for="mediaQuiz in medias"
-                :key="mediaQuiz.media"
+                :key="mediaQuiz.identifier"
                 class="flex items-center gap-4 py-3"
               >
                 <AutoFileIcon :mime-type="mediaQuiz.mimeType" class="w-7 h-7 text-primary" />
                 <div class="flex-1 min-w-0">
-                  <div class="text-xs text-gray-500 break-all">{{ mediaQuiz.media }}</div>
+                  <div class="text-xs text-gray-500 break-all">{{ mediaQuiz.name }}</div>
+                  <div class="text-xs text-gray-400">
+                    {{ mediaQuiz.size > 0 ? humanizeBytes(mediaQuiz.size) : "Taille inconnue" }}
+                  </div>
                 </div>
                 <ButtonComponent
-                  :href="mediaQuiz.media"
-                  @click.prevent="() => navigate(mediaQuiz.media)"
+                  :href="mediaQuiz.identifier"
+                  @click.prevent="() => navigate(mediaQuiz.identifier)"
                   target="_blank"
                   rel="noopener"
                   class="ml-4 text-xs"
