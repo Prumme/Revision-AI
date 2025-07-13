@@ -1,30 +1,34 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useToastStore } from "@/stores/toast";
 import { useDialogStore } from "@/stores/dialog";
+import { useUserStore } from "@/stores/user";
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
 import FormCard from "@/components/forms/cards/FormCard.vue";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import DropdownInput from "@/components/dropdowns/DropdownInput.vue";
 import AvatarComponent from "@/components/profile/avatar/AvatarComponent.vue";
 import QuizCard from "@/components/cards/QuizCard.vue";
-import { CalendarIcon, BookOpen, MoreVertical } from "lucide-vue-next";
+import { CalendarIcon, BookOpen, MoreVertical, Home } from "lucide-vue-next";
 import { ApiService } from "@/services/api.service";
 import type { PublicProfileData, User } from "@/types/user";
 import type { Quiz } from "@/types/quiz";
 import { formatDateLong } from "@/helpers/dateFormat";
+import caracterBlueImage from "@/assets/caracters/caracterBlue.webp";
 
 const route = useRoute();
 const router = useRouter();
 const { showToast } = useToastStore();
 const dialogStore = useDialogStore();
+const userStore = useUserStore();
 
 const isLoading = ref(true);
 const error = ref("");
 const profileData = ref<PublicProfileData | null>(null);
 
 const username = computed(() => route.params.username as string);
+const currentUser = computed(() => userStore.user);
 
 const fetchPublicProfile = async () => {
   try {
@@ -52,6 +56,23 @@ const handleQuizClick = (quiz: Quiz) => {
   router.push(`/quiz/${quiz.id}`);
 };
 
+const goToMyProfile = () => {
+  if (currentUser.value) {
+    router.push(`/profil/${currentUser.value.username}`);
+  }
+};
+
+// Watcher pour refetcher les données quand le nom d'utilisateur change
+watch(
+  () => route.params.username,
+  (newUsername, oldUsername) => {
+    if (newUsername && newUsername !== oldUsername) {
+      fetchPublicProfile();
+    }
+  },
+  { immediate: false },
+);
+
 onMounted(() => {
   fetchPublicProfile();
 });
@@ -67,8 +88,36 @@ onMounted(() => {
 
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
-        <div class="text-red-500 text-lg mb-4">{{ error }}</div>
-        <ButtonComponent @click="fetchPublicProfile" variant="primary"> Réessayer </ButtonComponent>
+        <div class="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+          <!-- Image du caractère bleu -->
+          <div class="w-32 h-32 flex items-center justify-center">
+            <img
+              :src="caracterBlueImage"
+              alt="Caractère bleu"
+              class="w-full h-full object-contain"
+            />
+          </div>
+
+          <!-- Titre d'erreur -->
+          <div class="text-center">
+            <h2 class="font-outfit text-3xl font-bold text-gray-900 mb-4">
+              Utilisateur non trouvé
+            </h2>
+            <p class="text-lg text-gray-600 mb-8">Cet utilisateur n'existe pas ou a été supprimé</p>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex gap-4">
+            <ButtonComponent @click="router.push('/dashboard')" variant="primary">
+              <Home class="w-4 h-4 mr-2" />
+              Retour à l'accueil
+            </ButtonComponent>
+
+            <ButtonComponent v-if="currentUser" @click="goToMyProfile" variant="secondary">
+              Voir mon profil
+            </ButtonComponent>
+          </div>
+        </div>
       </div>
 
       <!-- Profile Content -->

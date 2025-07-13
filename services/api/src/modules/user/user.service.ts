@@ -204,6 +204,20 @@ export class UserService {
       await this.deleteAvatar(userId);
     }
 
+    // Anonymiser tous les quiz créés par l'utilisateur
+    const userQuizzes = await this.quizRepository.findAll(
+      { userId: { id: userId } },
+      { ignore: true },
+    );
+
+    // Mettre à jour le username de chaque quiz
+    for (const quiz of userQuizzes.data) {
+      await this.quizRepository.update(quiz.id, {
+        username: 'Utilisateur Supprimé',
+        updatedAt: new Date(),
+      });
+    }
+
     // Générer un email anonyme unique basé sur l'ID de l'utilisateur
     const anonymizedEmail = `deleted_${userId.slice(0, 8)}@deleted.com`;
     const anonymizedUsername = `deleted_${userId.slice(0, 8)}`;
@@ -257,7 +271,7 @@ export class UserService {
         : undefined;
 
     // Récupérer tous les quiz de l'utilisateur
-    const quizzes = await this.quizRepository.findAll({},{ignore: true});
+    const quizzes = await this.quizRepository.findAll({}, { ignore: true });
     const userQuizzes = quizzes.data.filter((quiz) => quiz.userId === userId);
 
     return {

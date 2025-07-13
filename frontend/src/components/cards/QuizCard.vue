@@ -6,6 +6,7 @@ import { MoreVertical, FileQuestion, Calendar, ArrowRight, User } from "lucide-v
 import { getCategoryColor, getCategoryLabel } from "@/helpers/quizCategory";
 import { formatDate } from "@/helpers/dateFormat";
 import type { Quiz } from "@/types/quiz";
+import { useDialogStore } from "@/stores/dialog";
 
 interface Props {
   quiz: Quiz;
@@ -24,12 +25,8 @@ const props = withDefaults(defineProps<Props>(), {
   maxDescriptionLength: 100,
 });
 
-const emit = defineEmits<{
-  click: [quiz: Quiz];
-  report: [quiz: Quiz];
-}>();
-
 const router = useRouter();
+const dialogStore = useDialogStore();
 
 const aspectRatioClass = computed(() => {
   return props.aspectRatio === "square" ? "aspect-square" : "";
@@ -44,11 +41,14 @@ const truncatedDescription = computed(() => {
 });
 
 const handleCardClick = () => {
-  emit("click", props.quiz);
+  router.push(`/quiz/${props.quiz.id}`);
 };
 
 const handleReport = () => {
-  emit("report", props.quiz);
+  dialogStore.showReport({
+    quizId: props.quiz.id,
+    quizName: props.quiz.title,
+  });
 };
 
 const handleUserClick = (username: string, event: Event) => {
