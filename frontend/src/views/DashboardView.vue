@@ -86,16 +86,20 @@ function animateNumber(stat, target) {
   step();
 }
 
-const stats = [
+const stats = ref([
   { label: "Quiz générés", value: quizCount, color: "pale-yellow" },
-  { label: "Cours importés", value: 16, color: "pale-red" },
+  { label: "Cours importés", value: 0, color: "pale-red" },
   { label: "Score moyen", value: averageScore, color: "pale-purple" },
   { label: "Temps de révision", value: totalRevisionTime, color: "pale-green" },
-];
+]);
 
 const router = useRouter();
 function goToQuizDetail(id: string) {
   router.push(`/quiz/${id}`);
+}
+
+function setMediaCount(count: number) {
+  stats.value[1].value = count; // Update the "Cours importés" stat with the media count
 }
 </script>
 
@@ -147,7 +151,7 @@ function goToQuizDetail(id: string) {
       <!-- Documents & QCM -->
       <section class="grid grid-cols-2 gap-15">
         <div class="col-span-2 md:col-span-1">
-          <MediaList />
+          <MediaList @onLoad="setMediaCount" />
         </div>
         <div class="col-span-2 md:col-span-1">
           <h2 class="text-3xl font-bold mb-5">Mes Quiz</h2>

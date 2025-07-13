@@ -1,4 +1,5 @@
 import { ApiService } from "./api.service";
+import type { UploadedDocument } from "@/types/uploadedDocument.ts";
 
 export interface QuizQuestion {
   question: string;
@@ -38,7 +39,7 @@ export interface Quiz {
   questionsNumbers?: number;
   description?: string;
   isPublic?: boolean;
-  media?: string[];
+  media?: UploadedDocument[];
   status?: "pending" | "processing" | "completed" | "failed" | "published" | "draft";
   createdAt?: Date;
   updatedAt?: Date;

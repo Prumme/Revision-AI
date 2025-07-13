@@ -8,6 +8,7 @@ import type {
   PaginatedResponse,
   PaginatedUsersResponse,
 } from "@/types/pagination";
+import type { UploadedDocument } from "@/types/uploadedDocument.ts";
 
 export class AdminService {
   static async getUsers(
@@ -50,13 +51,24 @@ export class AdminService {
     }
   }
 
-  static async getUserDocuments(userId: string): Promise<Document[]> {
+  static async getUserDocuments(
+    userId: string,
+    query: { page: number; limit: number } = { page: 1, limit: 10 },
+  ): Promise<PaginatedResponse<UploadedDocument>> {
     try {
-      const response = await ApiService.get<Document[]>(`/users/${userId}/documents`);
-      return response.data || [];
+      const response = await ApiService.get<PaginatedResponse<UploadedDocument>>(
+        `/documents/users/${userId}?page=${query.page}&limit=${query.limit}`,
+      );
+      return response.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des documents:", error);
-      return [];
+      return {
+        data: [],
+        total: 0,
+        totalPages: 0,
+        page: query.page,
+        limit: query.limit,
+      };
     }
   }
 

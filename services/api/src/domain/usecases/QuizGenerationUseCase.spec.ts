@@ -18,6 +18,7 @@ import { QuizGenerationJobStatus } from '../entities/quiz-generation-job.entity'
 import { QuizGeneratedDTO } from '../../types/QuizGeneratedDTO';
 import { SubscriptionPolicyService } from '../policies/SubscriptionPolicyService';
 import { SubscriptionTier } from '../policies/SubscriptionPolicy';
+import { createFakeUploadedDocument } from '../../../test/createFakeUploadedDocument';
 
 // On utilise jest.Mocked pour que TypeScript connaisse les méthodes de nos mocks
 type Mocked<T> = { [P in keyof T]: jest.Mock };
@@ -40,7 +41,7 @@ describe('CreateQuizUseCase', () => {
     mockFileService = {
       getFile: jest.fn(),
       getBucketName: jest.fn().mockResolvedValue('bucket-name'),
-    };
+    } as unknown as Mocked<FileService>;
     mockFileToParseQueue = { send: jest.fn() };
     mockQuizGenerationQueue = { send: jest.fn() };
 
@@ -75,7 +76,10 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       username: '',
-      medias: ['file1.pdf', 'file2.txt'],
+      medias: [
+        createFakeUploadedDocument('file1.pdf', 'file1.pdf', 'checksum-pdf'),
+        createFakeUploadedDocument('file2.txt', 'file2.txt', 'checksum-txt'),
+      ],
       isPublic: true,
     };
 
@@ -110,7 +114,6 @@ describe('CreateQuizUseCase', () => {
     await useCase(createQuizDto);
 
     // --- Assert (Vérification) ---
-    expect(mockFileService.getFile).toHaveBeenCalledTimes(2);
     expect(
       mockCachedFileRepository.getParsedFileByChecksum,
     ).toHaveBeenCalledTimes(2);
@@ -136,7 +139,9 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       username: '',
-      medias: ['file1.pdf'],
+      medias: [
+        createFakeUploadedDocument('file1.pdf', 'file1.pdf', 'checksum-pdf'),
+      ],
       isPublic: true,
     };
 
@@ -260,7 +265,11 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       username: '',
-      medias: ['a', 'b', 'c'],
+      medias: [
+        createFakeUploadedDocument('a'),
+        createFakeUploadedDocument('b'),
+        createFakeUploadedDocument('c'),
+      ],
       isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
@@ -296,7 +305,7 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       username: '',
-      medias: ['a'],
+      medias: [createFakeUploadedDocument('a')],
       isPublic: true,
     });
     expect(result).toBeInstanceOf(Error);
@@ -327,7 +336,7 @@ describe('CreateQuizUseCase', () => {
       title: '',
       userId: '',
       username: '',
-      medias: ['a'],
+      medias: [createFakeUploadedDocument('a')],
       isPublic: true,
     });
     expect(result).not.toBeInstanceOf(Error);
@@ -347,7 +356,6 @@ describe('HandleParsedFileUseCase', () => {
   let mockCachedFileRepository: Mocked<CachedFileParsedRepository>;
   let mockQuizGenerationQueue: Mocked<QueueProvider<any>>;
   let mockPolicy: jest.Mocked<SubscriptionPolicyService>;
-  const userTier: SubscriptionTier = 'free';
 
   beforeEach(() => {
     // Initialisation des mocks

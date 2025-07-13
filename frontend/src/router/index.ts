@@ -24,6 +24,7 @@ import ContactView from "@/views/landing/ContactView.vue";
 import LegalView from "@/views/landing/LegalView.vue";
 import TermsView from "@/views/landing/TermsView.vue";
 import PrivacyView from "@/views/landing/PrivacyView.vue";
+import DocumentsView from "@/views/DocumentsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,11 @@ const router = createRouter({
           path: "/dashboard",
           name: "Dashboard",
           component: DashboardView,
+        },
+        {
+          path: "/documents",
+          name: "documents",
+          component: DocumentsView,
         },
         {
           path: "/quiz/create",

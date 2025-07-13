@@ -1,5 +1,6 @@
 import { Question } from '@common/types/question';
 import { ApiProperty } from '@nestjs/swagger';
+import { UploadedDocument } from '@entities/document.entity';
 
 export class Quiz {
   id: string;
@@ -28,8 +29,11 @@ export class Quiz {
   @ApiProperty({ description: 'Visibilité publique' })
   isPublic: boolean;
 
-  @ApiProperty({ description: 'Médias associés au quiz', type: [String] })
-  media: string[];
+  @ApiProperty({
+    description: 'Médias associés au quiz',
+    type: Array<UploadedDocument>,
+  })
+  media: UploadedDocument[];
 
   // @ApiProperty({
   //   description: 'Statut du quiz',
@@ -52,7 +56,7 @@ export function createQuiz(
   isPublic: boolean,
   userId: string,
   username: string,
-  media: string[] = [],
+  media: UploadedDocument[] = [],
 ): Quiz {
   return {
     id: '',
