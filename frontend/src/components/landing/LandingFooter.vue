@@ -5,7 +5,7 @@ import { Instagram, Linkedin } from "lucide-vue-next";
 const links = [
   { label: "Contact", href: "/contact" },
   { label: "Mentions légales", href: "/legal" },
-  { label: "CGU et CGV", href: "#" },
+  { label: "CGU et CGV", href: "/terms" },
   { label: "Politique de confidentialité", href: "#" },
 ];
 

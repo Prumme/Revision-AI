@@ -22,6 +22,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
 import ContactView from "@/views/landing/ContactView.vue";
 import LegalView from "@/views/landing/LegalView.vue";
+import TermsView from "@/views/landing/TermsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,6 +41,11 @@ const router = createRouter({
       path: "/legal",
       name: "legal",
       component: LegalView,
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: TermsView,
     },
     {
       path: "/",
