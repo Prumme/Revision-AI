@@ -2,7 +2,7 @@
   <div class="flex border-b border-gray-200 mb-6">
     <button
       v-for="tab in tabs"
-      :key="tab.key"
+      :key="tab.key.toString()"
       @click="() => {
         if (!tab.disabled) emitTab(tab.key)
       }"
@@ -33,25 +33,16 @@
 
 defineProps({
   tabs: {
-    type: Array as () => { key: string; label: string; badge?: number; disabled?: boolean }[],
+    type: Array as () => { key: symbol; label: string; badge?: number; disabled?: boolean }[],
     required: true,
   },
   activeTab: {
-    type: String,
+    type: Symbol,
     required: true,
   },
 });
 const emit = defineEmits(['update:activeTab']);
-function emitTab(key: string) {
+function emitTab(key: symbol) {
   emit('update:activeTab', key);
 }
 </script>
-
-<style scoped>
-.border-primary {
-  border-color: var(--color-primary);
-}
-.text-primary {
-  color: var(--color-primary);
-}
-</style>

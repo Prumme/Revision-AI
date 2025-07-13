@@ -1,11 +1,9 @@
 import { Question } from '@common/types/question';
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
-  IsEnum,
-  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -38,14 +36,10 @@ export class UpdateQuizDto {
   @IsOptional()
   questions?: Question[];
 
-  @ApiProperty({ description: 'Nombre de questions', required: false })
-  @IsNumber()
-  @IsOptional()
-  questionsNumbers?: number;
-
   @ApiProperty({ description: 'Visibilité publique du quiz', required: false })
   @IsBoolean()
   @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
   isPublic?: boolean;
 
   @ApiProperty({ description: 'Médias associés au quiz', required: false })
@@ -53,13 +47,4 @@ export class UpdateQuizDto {
   @IsString({ each: true })
   @IsOptional()
   media?: string[];
-
-  @ApiProperty({
-    description: 'Statut du quiz',
-    enum: ['pending', 'processing', 'completed', 'failed'],
-    required: false,
-  })
-  @IsEnum(['pending', 'processing', 'completed', 'failed'])
-  @IsOptional()
-  status?: 'pending' | 'processing' | 'completed' | 'failed';
 }

@@ -5,9 +5,14 @@ export const SessionSchema = new Schema({
   quizId: { type: Types.ObjectId, ref: 'Quiz', required: true },
   userId: { type: Types.ObjectId, ref: 'User', required: true },
   score: { type: Number, required: true },
+  duration: { type: Number, required: false },
   startedAt: { type: Date, default: Date.now, required: true },
   finishedAt: { type: Date, default: null },
-  status: { type: String, enum: ['pending', 'active', 'paused', 'finished'], default: 'pending' },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'paused', 'finished'],
+    default: 'pending',
+  },
   answers: [
     {
       c: { type: Boolean, required: true },
@@ -22,6 +27,7 @@ export interface SessionDocument extends Document {
   quizId: Types.ObjectId;
   userId: Types.ObjectId;
   score: number;
+  duration?: number;
   startedAt: Date;
   finishedAt?: Date | null;
   status: 'pending' | 'active' | 'paused' | 'finished';

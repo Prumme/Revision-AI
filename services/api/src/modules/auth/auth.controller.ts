@@ -20,6 +20,7 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import * as qrcode from 'qrcode';
 
 @ApiTags('Authentification')
 @Controller('auth')
@@ -35,7 +36,7 @@ export class AuthController {
     description: 'Retourne le token JWT',
   })
   signIn(@Body() loginDto: LoginDto) {
-    return this.authService.signIn(loginDto.email, loginDto.password);
+    return this.authService.signIn(loginDto.email, loginDto.password,loginDto?.totpCode);
   }
 
   @Public()
@@ -88,5 +89,37 @@ export class AuthController {
   })
   logout() {
     return this.authService.logout();
+  }
+
+
+  @Post('totp/enable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Activer le TOTP' })
+  @ApiResponse({
+    status: 200,
+    description: 'TOTP activé avec succès',
+    schema: {
+      type: 'object',
+      properties: {
+        qrCode: { type: 'string' },
+      },
+    },
+  })
+  async enableTOTP(@Req() req: Request & { user: ReqUser }, @Body('totpCode') totpCode?: string): Promise<{ qrCode: string }> {
+    const user = await this.authService.toogleTOTP(req.user, true, totpCode) as { TOTPSecret: { otpauth_url: string } };
+    const qrCode = await qrcode.toDataURL(user.TOTPSecret.otpauth_url);
+    return { qrCode };
+  }
+
+  @Post('totp/disable')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Désactiver le TOTP' })
+  @ApiResponse({
+    status: 200,
+    description: 'TOTP désactivé avec succès',
+  })
+  async disableTOTP(@Req() req: Request & { user: ReqUser }) : Promise<{ message: string }> {
+    await this.authService.toogleTOTP(req.user, false);
+    return { message: 'TOTP désactivé avec succès' };
   }
 }

@@ -11,6 +11,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { SubscriptionModule } from '@modules/subscription/subscription.module';
 import { ReportModule } from '@modules/report/report.module';
 import { SessionModule } from './modules/session/session.module';
+import { KpiModule } from './modules/kpi/kpi.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SessionModule } from './modules/session/session.module';
     SubscriptionModule,
     ReportModule,
     SessionModule,
+    KpiModule,
   ],
   providers: [
     {

@@ -15,6 +15,7 @@ import { QuizGenerationJobRepositoryProvider } from '@repositories/quiz-generati
 import { QuizGenerationDTO } from 'types/QuizGenerationDTO';
 import { FileToParseDTO } from 'types/FileToParseDTO';
 import { RabbitMQProvider } from '@infrastructure/queue/RabbitMQProvider';
+import { SubscriptionPolicyService } from '@domain/policies/SubscriptionPolicyService';
 
 @Module({
   imports: [
@@ -30,11 +31,12 @@ import { RabbitMQProvider } from '@infrastructure/queue/RabbitMQProvider';
   ],
   controllers: [QuizController],
   providers: [
-      UserRepositoryProvider,
+    UserRepositoryProvider,
     QuizService,
     QuizRepositoryProvider,
     CachedFileParsedRepositoryProvider,
     QuizGenerationJobRepositoryProvider,
+    SubscriptionPolicyService,
     {
       provide: 'QuizGenerationQueueProvider',
       useFactory: () => {
@@ -53,6 +55,7 @@ import { RabbitMQProvider } from '@infrastructure/queue/RabbitMQProvider';
     QuizRepositoryProvider,
     CachedFileParsedRepositoryProvider,
     QuizGenerationJobRepositoryProvider,
+    SubscriptionPolicyService,
     'QuizGenerationQueueProvider',
     'FileUploadedQueueProvider',
   ],

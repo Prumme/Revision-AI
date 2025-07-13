@@ -16,18 +16,22 @@ export interface PaginatedResult<T> {
 
 export interface SessionRepository {
   findById(id: string): Promise<Session | null>;
+
   findAllByUserId(
-      userId: string,
-      pagination: PaginationOptions,
+    userId: string,
+    pagination: PaginationOptions,
   ): Promise<PaginatedResult<Session>>;
-  create(user: Omit<Session, 'id'>): Promise<Session>;
-  startSession(id: string): Promise<Session | null>;
-  endSession(id: string, finishedAt: Date, score: number, answers: SessionAnswer[]): Promise<Session | null>;
-  updateAnswers(sessionId: string, answers: SessionAnswer[]): Promise<Session | null>;
-  pauseSession(id: string): Promise<Session | null>;
-  resumeSession(id: string): Promise<Session | null>;
-  updateStatus(id: string, status: string): Promise<Session | null>;
+
   findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
+
+  create(user: Omit<Session, 'id'>): Promise<Session>;
+
+  patch(id: string, update: Partial<Session>): Promise<Session | null>;
+
+  findAllByQuizIdAndUserId(
+    quizId: string,
+    userId: string,
+  ): Promise<PaginatedResult<Session>>;
 }
 
 export const SessionRepositoryProvider = {

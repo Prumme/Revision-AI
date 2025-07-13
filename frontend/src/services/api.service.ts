@@ -67,7 +67,7 @@ export class ApiService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Une erreur est survenue");
+        throw data; // data contient tout l'objet d'erreur
       }
 
       return {
@@ -76,9 +76,6 @@ export class ApiService {
         statusText: response.statusText,
       };
     } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Erreur API: ${error.message}`);
-      }
       throw error;
     }
   }
@@ -117,5 +114,28 @@ export class ApiService {
 
   static async delete<T>(endpoint: string, requiresAuth = true, headers?: Record<string, string>) {
     return this.request<T>({ method: "DELETE", endpoint, requiresAuth, headers });
+  }
+
+  static async getFile(endpoint: string, requiresAuth = true, headers?: Record<string, string>) {
+    const url = `${API_CONFIG.BASE_URL}${endpoint}`;
+    const requestHeaders = {
+      ...API_CONFIG.DEFAULT_HEADERS,
+      ...headers,
+    };
+
+    if (requiresAuth) {
+      const token = this.getAuthToken();
+      if (!token) {
+        throw new Error("Token d'authentification manquant");
+      }
+      requestHeaders["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: requestHeaders,
+    });
+
+    return response;
   }
 }

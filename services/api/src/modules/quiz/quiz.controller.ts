@@ -33,6 +33,7 @@ import { Response } from 'express';
 import { GetJobProgressUseCaseFactory } from '@domain/usecases/QuizGenerationUseCase';
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { Public } from '@common/decorators/public.decorator';
+import { PaginatedResult } from '@repositories/user.repository';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
@@ -51,9 +52,19 @@ export class QuizController {
     description: 'Liste des quiz récupérée avec succès',
     type: [Quiz],
   })
-  async findAll(@Query() filters: QuizFiltersDto, @Req() req: Request & { user?: ReqUser }): Promise<Quiz[]> {
+  async findAll(@Query() filters: QuizFiltersDto, @Req() req: Request & { user?: ReqUser }): Promise<PaginatedResult<Quiz>> {
     const userId = req.user?.sub;
-    return this.quizService.findAll(filters, userId);
+    return this.quizService.findAll({
+      ...filters,
+      isPublic: true,
+      userId: {
+        id: userId,
+        exclude: true // Exclude quizzes created by the user
+      }
+    }, {
+      page: filters.page || 1,
+      limit: filters.limit || 4,
+    });
   }
 
   @Get(':id')
@@ -127,10 +138,15 @@ export class QuizController {
   async findAllByUserId(
     @Param('id') id: string,
     @Query() filters: QuizFiltersDto,
-  ): Promise<Quiz[]> {
-    return this.quizService.findAllByUserId(id, {
+  ): Promise<PaginatedResult<Quiz>> {
+    // @TODO check permissions
+    return this.quizService.findAll({
       ...filters,
+      userId: {id, exclude: false}, 
       ready: true,
+    },{
+      page: filters.page || 1,
+      limit: filters.limit || 10,
     });
   }
 

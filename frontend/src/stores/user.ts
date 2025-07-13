@@ -1,19 +1,35 @@
-import { API_URL } from "@/config/api";
+import {API_URL} from "@/config/api";
 import type {
   AuthResponse,
   LoginCredentials,
   LoginResponse,
   RegisterCredentials,
 } from "@/types/auth";
-import type { User } from "@/types/user";
-import { defineStore } from "pinia";
-import { computed, ref } from "vue";
-import { useRouter } from "vue-router";
+import type {User} from "@/types/user";
+import {defineStore} from "pinia";
+import {computed, ref} from "vue";
+import {useRouter} from "vue-router";
+import {QuizService} from '@/services/quiz.service';
+import { KpiService } from '@/services/kpi.service';
+
+interface LoginFunctionResponse{
+  totpRequired: boolean;
+}
+
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
 
 export const useUserStore = defineStore("user", () => {
   const router = useRouter();
   const user = ref<User | null>(null);
   const token = ref<string | null>(localStorage.getItem("token"));
+  const quizCount = ref<number>(localStorage.getItem("quizCount") ? parseInt(localStorage.getItem("quizCount")!) : 0);
+  const averageScore = ref<string>(localStorage.getItem("averageScore") || "0%");
+  const totalRevisionTimeFormatted = ref<string>(localStorage.getItem("totalRevisionTimeFormatted") || "0m");
 
   const getFullName = () => {
     return user?.value?.username;
@@ -143,18 +159,24 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
+        const { message } = await response.json();
+        if (message && message === "Un utilisateur avec cet email existe déjà") {
+          throw new Error("Un utilisateur avec cet email existe déjà");
+        }
+        if (message && message === "Un utilisateur avec ce nom d'utilisateur existe déjà") {
+          throw new Error("Un utilisateur avec ce nom d'utilisateur existe déjà");
+        }
         throw new Error("Erreur lors de l'inscription");
       }
 
       const data: AuthResponse = await response.json();
       return data;
     } catch (error) {
-      console.error("Erreur lors de l'inscription:", error);
       throw error;
     }
   }
 
-  async function login(credentials: LoginCredentials) {
+  async function login(credentials: LoginCredentials) : Promise<LoginFunctionResponse> {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -165,17 +187,24 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
-        const { message } = await response.json();
+        const {message} = await response.json();
         if (message && message === "Email not verified") {
-          throw new Error("Email not verified, please verify your email");
+          throw new AuthError("Email not verified");
         }
-        throw new Error("Erreur lors de la connexion");
+        if(message && message === "Invalid TOTP code") {
+          throw new AuthError("Code de vérification invalide");
+        }
+        throw new AuthError("Erreur lors de la connexion, veuillez vérifier vos identifiants");
       }
 
-      const data: LoginResponse = await response.json();
+      const data : LoginResponse = await response.json();
+      
+      if("needTOTP" in data) {
+        return { totpRequired: true };
+      }
       setUser(data.user);
       setToken(data.access_token);
-      return data;
+      return { totpRequired: false };
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       throw error;
@@ -185,6 +214,38 @@ export const useUserStore = defineStore("user", () => {
   function logout() {
     clearUser();
     router.push("/login");
+  }
+
+  async function fetchQuizCount() {
+    if (!user.value) {
+      quizCount.value = 0;
+      return 0;
+    }
+    const response = await QuizService.getUserQuizzes(user.value.id || user.value._id);
+    const count = response.length;
+    quizCount.value = count;
+    return count;
+  }
+
+  async function fetchKpis() {
+    if (!user.value) {
+      averageScore.value = "0%";
+      totalRevisionTimeFormatted.value = "0m";
+      return;
+    }
+    try {
+      const [score, time] = await Promise.all([
+        KpiService.getUserAverageScore(user.value.id || user.value._id),
+        KpiService.getUserTotalRevisionTime(user.value.id || user.value._id),
+      ]);
+      averageScore.value = (score || 0) + "%";
+      totalRevisionTimeFormatted.value = time || "0m";
+      localStorage.setItem('averageScore', averageScore.value);
+      localStorage.setItem('totalRevisionTimeFormatted', totalRevisionTimeFormatted.value);
+    } catch {
+      averageScore.value = "0%";
+      totalRevisionTimeFormatted.value = "0m";
+    }
   }
 
   return {
@@ -201,10 +262,11 @@ export const useUserStore = defineStore("user", () => {
     fetchCustomerInfo,
     updateUser,
     setAvatar,
-    quizCount: 0,
-    setQuizCount(count: number) {
-      this.quizCount = count;
-    },
+    quizCount,
+    fetchQuizCount,
     setSubscriptionTier,
+    averageScore,
+    totalRevisionTimeFormatted,
+    fetchKpis,
   };
 });

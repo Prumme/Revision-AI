@@ -4,30 +4,38 @@ import FormCard from "@/components/forms/cards/FormCard.vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import Switch from "@/components/inputs/SwitchComponent.vue";
 import { QuizService } from "@/services/quiz.service";
-import { onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/buttons/ButtonComponent.vue";
-import { useQuizDetails } from '@/composables/useQuizDetails';
+import { useQuizDetails } from "@/composables/useQuizDetails";
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
-import { useSessionStore } from '@/stores/session';
-import SessionDatatable from '@/components/tables/SessionDatatable.vue';
-import {PauseIcon} from "lucide-vue-next";
-import {useToastStore} from "@/stores/toast.ts";
+import { useSessionStore } from "@/stores/session";
+import SessionDatatable from "@/components/tables/SessionDatatable.vue";
+import { PauseIcon } from "lucide-vue-next";
+import { useToastStore } from "@/stores/toast.ts";
 import { ArrowLeftIcon } from "lucide-vue-next";
-import TabNavigation from '@/components/common/TabNavigation.vue';
+import TabNavigation from "@/components/common/TabNavigation.vue";
 import MotionLayout from "@/components/layouts/MotionLayout.vue";
+import { launchConfetti } from "@/utils/confetti";
+import caracterRed from "@/assets/caracters/caracterRed.png";
+import caracterBlue from "@/assets/caracters/caracterBlue.png";
+import caracterYellow from "@/assets/caracters/caracterYellow.png";
+import caracterOrange from "@/assets/caracters/caracterOrange.png";
+import { arrayQuizMediaToContentMedia } from "@/utils/quizMediaToContentMedia";
+import AutoFileIcon from "@/components/icons/AutoFileIcon.vue";
+import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 
 const toast = useToastStore();
 const route = useRoute();
 const quizId = route.params.id as string;
 const quizDetails = useQuizDetails(quizId);
 const sessionStore = useSessionStore();
+const navigate = useRouter().push;
 
 const {
   quiz,
   loading,
   error,
-  orderChanged,
   showAllAnswers,
   activeTab,
   currentStep,
@@ -43,7 +51,7 @@ const {
   actions,
   onQuestionsOrderChange,
   toggleAllAnswers,
-  saveOrder,
+  saveQuiz,
   startQuizSession,
   nextStep,
   endSession,
@@ -60,6 +68,10 @@ const {
   totalUniqueParticipants,
 } = quizDetails;
 
+const medias = computed(() => {
+  return arrayQuizMediaToContentMedia(quiz.value?.media || []);
+});
+
 onMounted(async () => {
   try {
     loading.value = true;
@@ -72,7 +84,7 @@ onMounted(async () => {
 });
 
 watch([activeTab, quiz], async ([tab]) => {
-  if (tab === 'sessions') {
+  if (tab === "sessions") {
     await fetchSessionsForTable;
   }
 });
@@ -89,15 +101,44 @@ watch(showAllSessions, async (val) => {
 
 function handlePauseSession() {
   sessionStore.pauseSession();
-  activeTab.value = 'sessions';
+  activeTab.value = "sessions";
   toast.showToast("warning", "Session mise en pause. Vous pouvez reprendre plus tard.");
 }
+
+
+function getResultMessage(score: number, total: number) {
+  const ratio = score / total;
+  if (ratio === 1) return "Incroyable ! Score parfait 🎉 Tu es un(e) champion(ne) !";
+  if (ratio > 0.8) return "Bravo ! Excellente performance !";
+  if (ratio > 0.5) return "Bien joué ! Tu progresses, continue comme ça.";
+  if (ratio > 0.2) return "Courage ! Tu peux t'améliorer, persévère.";
+  return "Ne te décourage pas, chaque erreur est une leçon !";
+}
+
+function getCharacter(score: number, total: number) {
+  const ratio = score / total;
+
+  if (ratio === 1) return caracterBlue;
+  if (ratio > 0.8) return caracterYellow;
+  if (ratio > 0.5) return caracterOrange;
+  if (ratio > 0.2) return caracterRed;
+  return caracterRed;
+}
+
+function goToSessions() {
+  activeTab.value = "sessions";
+}
+
+watch(quizFinished, (finished) => {
+  if (finished) {
+    launchConfetti(quizScore.value, quiz.value.questions.length);
+  }
+});
 </script>
 
 <template>
   <LoaderOverlay v-if="showLoader" message="Création de la session en cours..." />
-  <MotionLayout
-  >
+  <MotionLayout>
     <div class="flex items-center justify-between mb-8">
       <div class="flex flex-col gap-1.5">
         <p class="font-outfit text-lg text-black-transparent">Commence à réviser</p>
@@ -117,29 +158,66 @@ function handlePauseSession() {
     </div>
 
     <!-- Tabs -->
-    <TabNavigation
-      :tabs="quizTabs"
-      v-model:activeTab="activeTab"
-      class="mb-6"
-    />
+    <TabNavigation :tabs="quizTabs" v-model:activeTab="activeTab" class="mb-6" />
 
     <!-- Start Quiz  -->
-    <section v-if="quiz && activeTab === 'quiz' && !isStarted" class="max-w-2xl mx-auto w-full text-center py-10">
-      <h2 class="text-3xl font-extrabold mb-4">Prêt à commencer le quiz ?</h2>
-      <p class="text-lg text-black-transparent mb-8">
-        Teste tes connaissances sur <span class="text-primary font-semibold">{{ quiz.title }}</span>
-      </p>
-      <Button
-        class="btn btn-primary"
-        :disabled="loading"
-        @click="startQuizSession"
-      >
-        {{ loading ? 'Chargement...' : 'Commencer le quiz' }}
-      </Button>
+    <section
+      v-if="quiz && activeTab === 'quiz' && !isStarted"
+      class="max-w-2xl mx-auto w-full text-center py-10"
+    >
+    
+      <div>
+        <h2 class="text-3xl font-extrabold mb-4">Prêt à commencer le quiz ?</h2>
+        <p class="text-lg text-black-transparent mb-8">
+          Teste tes connaissances sur
+          <span class="text-primary font-semibold">{{ quiz.title }}</span>
+        </p>
+        <Button class="btn btn-primary" :disabled="loading" @click="startQuizSession">
+          {{ loading ? "Chargement..." : "Commencer le quiz" }}
+        </Button>
+      </div>
+
+       <!-- Context Dialog -->
+      <div class="mt-8 relative">
+        <div class="bg-white p-6 rounded-xl  border border-gray-200">
+          
+
+          <div class="flex flex-col sm:flex-row items-center gap-4 mb-4">
+            <img :src="caracterYellow" alt="Caractère jaune" class="w-20 h-20 object-contain" />
+            <h3 class="font-encode text-xl font-semibold text-primary">Quelques infos avant de commencer</h3>
+          </div>
+
+          <div class="text-left space-y-2 font-outfit">
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span>Tu t'apprêtes à faire un quiz pour tester tes connaissances !</span>
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span>À la fin, tu recevras une note qui t'aidera à évaluer ta progression.</span>
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span>Pas de stress ! Le quiz peut être mis en pause et repris quand tu le souhaites.</span>
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2  mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span>Certaines questions peuvent avoir plusieurs bonnes réponses, sois attentif !</span>
+            </p>
+            <p class="flex items-start gap-2">
+              <span class="inline-block w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0"></span>
+              <span>Si tu trouves que le de ce quiz contenu est inapproprié, n'hésite pas à le signaler. Chez Revision AI, nous nous efforçons de maintenir un environnement calme et propice à l'apprentissage.</span>
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Quiz Configuration -->
-    <section v-if="quiz && activeTab === 'config' && isQuizOwner" class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start">
+    <section
+      v-if="quiz && activeTab === 'config' && isQuizOwner"
+      class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start"
+    >
       <!-- Questions -->
       <div>
         <div class="flex gap-2 mb-4">
@@ -148,7 +226,7 @@ function handlePauseSession() {
             type="button"
             v-if="quiz.questions && quiz.questions.length"
           >
-            {{ showAllAnswers ? 'Masquer toutes les réponses' : 'Afficher toutes les réponses' }}
+            {{ showAllAnswers ? "Masquer toutes les réponses" : "Afficher toutes les réponses" }}
           </Button>
           <Button
             @click="shuffleQuestions"
@@ -179,7 +257,6 @@ function handlePauseSession() {
             <section class="grid grid-cols-1 gap-2 mb-5">
               <Input
                 id="title"
-                :disabled="true"
                 v-model="quiz.title"
                 label="Titre du quiz"
                 type="text"
@@ -196,7 +273,6 @@ function handlePauseSession() {
                 label="Catégorie"
                 :options="categoryOptions"
                 placeholder="Sélectionnez une catégorie"
-                :disabled="true"
               />
               <Input
                 id="questionsNumbers"
@@ -205,9 +281,9 @@ function handlePauseSession() {
                 type="number"
                 placeholder="Nombre de questions"
                 class="col-span-1"
+                disabled
                 :min="1"
                 :max="20"
-                :disabled="true"
               />
             </section>
             <Input
@@ -217,7 +293,6 @@ function handlePauseSession() {
               type="textarea"
               placeholder="Description du quiz"
               class="col-span-1"
-              :disabled="true"
             />
             <div class="flex items-center gap-2">
               <Switch
@@ -227,7 +302,6 @@ function handlePauseSession() {
                 description="Un quiz publique est accessible pour les autres quizzers"
                 v-model="quiz.isPublic"
                 class="mt-2"
-                :disabled="true"
               />
             </div>
           </template>
@@ -235,8 +309,8 @@ function handlePauseSession() {
         <FormCard class="w-full mt-4" v-if="quiz.media && quiz.media.length">
           <template #title>Fichiers du quiz</template>
           <template #content>
-            <ul class="space-y-2">
-              <li v-for="(mediaPath, idx) in quiz.media" :key="idx">
+            <!-- <ul class="space-y-2">
+              <li v-for="(mediaPath, idx) in medias" :key="idx">
                 <a
                   :href="`/api/public/${mediaPath}`"
                   target="_blank"
@@ -245,12 +319,33 @@ function handlePauseSession() {
                   {{ mediaPath.split('/').pop() }}
                 </a>
               </li>
+            </ul> -->
+            <ul class="divide-y divide-gray-200">
+              <li
+                v-for="mediaQuiz in medias"
+                :key="mediaQuiz.media"
+                class="flex items-center gap-4 py-3"
+              >
+                <AutoFileIcon :mime-type="mediaQuiz.mimeType" class="w-7 h-7 text-primary" />
+                <div class="flex-1 min-w-0">
+                  <div class="text-xs text-gray-500 break-all">{{ mediaQuiz.media }}</div>
+                </div>
+                <ButtonComponent
+                  :href="mediaQuiz.media"
+                  @click.prevent="() => navigate(mediaQuiz.media)"
+                  target="_blank"
+                  rel="noopener"
+                  class="ml-4 text-xs"
+                >
+                  Ouvrir
+                </ButtonComponent>
+              </li>
             </ul>
           </template>
         </FormCard>
         <Button
-          v-if="orderChanged && quiz.questions && quiz.questions.length"
-          @click="saveOrder"
+          v-if="quiz.questions && quiz.questions.length"
+          @click="saveQuiz"
           class="btn btn-primary mt-4"
         >
           Sauvegarder l'ordre des questions
@@ -265,8 +360,9 @@ function handlePauseSession() {
           <QuestionDraggable
             :questions="[quiz.questions[currentStep]]"
             :showAllAnswers="quizFinished || showCorrection"
-            :userSelection="{0: userAnswers[currentStep] || []}"
-            @update:selection="(selection) => userAnswers[currentStep] = selection[0] || []"
+            :userSelection="{ 0: userAnswers[currentStep] || [] }"
+            :total-questions="quiz.questions.length"
+            @update:selection="(selection) => (userAnswers[currentStep] = selection[0] || [])"
             mode="quiz"
           />
         </div>
@@ -280,16 +376,49 @@ function handlePauseSession() {
             :disabled="!userAnswers[currentStep] || userAnswers[currentStep].length === 0"
             @click="nextStep"
           >
-            {{ showCorrection ? (currentStep === quiz.questions.length - 1 ? 'Voir le résultat' : 'Question suivante') : 'Valider' }}
+            {{
+              showCorrection
+                ? currentStep === quiz.questions.length - 1
+                  ? "Voir le résultat"
+                  : "Question suivante"
+                : "Valider"
+            }}
           </Button>
         </div>
       </div>
       <div v-else class="text-center py-10">
         <div class="text-2xl font-bold mb-4">Résultat du quiz</div>
         <div class="text-lg mb-2">Score : {{ quizScore }} / {{ quiz.questions.length }}</div>
-        <Button class="mt-4" @click="() => { currentStep = 0; quizFinished = false; userAnswers = {}; quizScore = 0; showCorrection.value = false; isStarted = false; }">
-          Recommencer le quiz
-        </Button>
+        <div class="mb-4">
+          <img
+            :src="getCharacter(quizScore, quiz.questions.length)"
+            alt="Character based on performance"
+            class="mx-auto w-24 h-24 object-cover"
+          />
+        </div>
+        <div class="text-md text-black-transparent mb-6">
+          {{ getResultMessage(quizScore, quiz.questions.length) }}
+        </div>
+        <div class="flex justify-center gap-2 items-center">
+          <Button
+            class="mt-4"
+            @click="
+              () => {
+                currentStep = 0;
+                quizFinished = false;
+                userAnswers = {};
+                quizScore = 0;
+                showCorrection.value = false;
+                isStarted = false;
+              }
+            "
+          >
+            Recommencer le quiz
+          </Button>
+          <Button class="mt-4" @click="goToSessions" variant="outline">
+            Retourner aux sessions
+          </Button>
+        </div>
       </div>
     </section>
 
@@ -300,20 +429,25 @@ function handlePauseSession() {
         <template v-if="isQuizOwner">
           <label class="flex items-center gap-2 cursor-pointer select-none">
             <input
-                id="accept-terms"
-                v-model="showAllSessions"
-                type="checkbox"
-                class="w-4 h-4 rounded focus:ring-primary focus:ring-2"
-                style="accent-color: var(--color-primary)"
-                required
+              id="accept-terms"
+              v-model="showAllSessions"
+              type="checkbox"
+              class="w-4 h-4 rounded focus:ring-primary focus:ring-2"
+              style="accent-color: var(--color-primary)"
+              required
             />
             <span class="text-base">Afficher toutes les sessions du quiz</span>
           </label>
         </template>
       </div>
       <div v-if="isQuizOwner && showAllSessions" class="mb-4">
-        <span class="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white text-sm font-semibold">
-          Compteur total de participations : {{ totalUniqueParticipants }} personne{{ totalUniqueParticipants > 1 ? 's' : '' }} ont fait ce quiz
+        <span
+          class="inline-flex items-center px-3 py-1 rounded-full bg-primary text-white text-sm font-semibold"
+        >
+          Compteur total de participations : {{ totalUniqueParticipants }} personne{{
+            totalUniqueParticipants > 1 ? "s" : ""
+          }}
+          ont fait ce quiz
         </span>
       </div>
       <SessionDatatable
@@ -324,8 +458,13 @@ function handlePauseSession() {
         :rowKey="'id'"
         :filters="sessionFilters"
         :initial-filters="sessionTableFilters"
-        empty-message="Aucune session trouvée pour ce quiz."
+        :sort="sessionTableSort"
+        :pagination="sessionTablePagination"
         @update:filters="handleSessionTableFilters"
+        @update:sort="handleSessionTableSort"
+        @update:page="handleSessionTablePage"
+        @update:items-per-page="handleSessionTableItemsPerPage"
+        empty-message="Aucune session trouvée pour ce quiz."
       />
     </section>
   </MotionLayout>

@@ -1,12 +1,29 @@
-import {Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req} from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { SessionService } from './session.service';
 import { StartSessionDto } from './dto/start-session.dto';
 import { EndSessionDto } from './dto/end-session.dto';
 import { Session } from '@entities/session.entity';
-import { ReqUser } from "@common/types/request";
-import { CreateSessionDto } from "@modules/session/dto/create-session.dto";
-import {SessionFiltersDto} from "@modules/session/dto/filter-session.dto";
+import { ReqUser } from '@common/types/request';
+import { CreateSessionDto } from '@modules/session/dto/create-session.dto';
+import { SessionFiltersDto } from '@modules/session/dto/filter-session.dto';
 
 @ApiTags('Sessions')
 @Controller('sessions')
@@ -32,7 +49,7 @@ export class SessionController {
 
   @Get('user/:userId')
   @ApiOperation({ summary: "Récupérer toutes les sessions d'un utilisateur" })
-  @ApiParam({ name: 'userId', description: 'ID de l\'utilisateur' })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
   @ApiResponse({
     status: 200,
     description: 'Liste des sessions récupérée avec succès',
@@ -66,14 +83,18 @@ export class SessionController {
     name: 'limit',
     required: false,
     type: Number,
-    description: 'Nombre d\'éléments par page',
+    description: "Nombre d'éléments par page",
   })
   async findAllByUserId(
     @Param('userId') userId: string,
-    @Query() filters: SessionFiltersDto & { page?: number; limit?: number }
+    @Query() filters: SessionFiltersDto & { page?: number; limit?: number },
   ): Promise<any> {
     const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
-    return this.sessionService.findAllByUserId(userId, { scoreMin, scoreMax, status }, { page: Number(page), limit: Number(limit) });
+    return this.sessionService.findAllByUserId(
+      userId,
+      { scoreMin, scoreMax, status },
+      { page: Number(page), limit: Number(limit) },
+    );
   }
 
   @Post('create')
@@ -88,7 +109,11 @@ export class SessionController {
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
     const userId = user.sub;
-    if (!userId) throw new HttpException('Utilisateur non authentifié', HttpStatus.UNAUTHORIZED);
+    if (!userId)
+      throw new HttpException(
+        'Utilisateur non authentifié',
+        HttpStatus.UNAUTHORIZED,
+      );
     return this.sessionService.createSession({ ...createSessionDto, userId });
   }
 
@@ -101,6 +126,7 @@ export class SessionController {
   })
   async startSession(
     @Body() startSessionDto: StartSessionDto,
+    @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
     return this.sessionService.startSession(startSessionDto.sessionId);
   }
@@ -116,7 +142,11 @@ export class SessionController {
     @Body() endSessionDto: EndSessionDto,
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
-    return this.sessionService.endSession(endSessionDto.sessionId, endSessionDto, user.sub);
+    return this.sessionService.endSession(
+      endSessionDto.sessionId,
+      endSessionDto,
+      user.sub,
+    );
   }
 
   @Post(':id/answer')
@@ -132,7 +162,11 @@ export class SessionController {
 
   @Post(':id/pause')
   @ApiOperation({ summary: 'Mettre une session en pause' })
-  @ApiResponse({ status: 200, description: 'Session mise en pause', type: Session })
+  @ApiResponse({
+    status: 200,
+    description: 'Session mise en pause',
+    type: Session,
+  })
   async pauseSession(
     @Param('id') id: string,
     @Req() { user }: Request & { user: ReqUser },
@@ -151,7 +185,10 @@ export class SessionController {
   }
 
   @Get('quiz/:quizId')
-  @ApiOperation({ summary: "Récupérer toutes les sessions d'un quiz (tous utilisateurs sauf moi)" })
+  @ApiOperation({
+    summary:
+      "Récupérer toutes les sessions d'un quiz (tous utilisateurs sauf moi)",
+  })
   @ApiParam({ name: 'quizId', description: 'ID du quiz' })
   @ApiResponse({
     status: 200,
@@ -163,5 +200,55 @@ export class SessionController {
     @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session[]> {
     return this.sessionService.findAllByQuizId(quizId, user.sub);
+  }
+
+  @Get('quiz/:quizId/user/:userId')
+  @ApiOperation({
+    summary:
+      "Récupérer toutes les sessions d'un quiz pour un utilisateur spécifique avec filtres et pagination",
+  })
+  @ApiParam({ name: 'quizId', description: 'ID du quiz' })
+  @ApiParam({ name: 'userId', description: "ID de l'utilisateur" })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: ['pending', 'active', 'paused', 'finished'],
+    description: 'Filtrer par statut de session',
+  })
+  @ApiQuery({
+    name: 'scoreMin',
+    required: false,
+    type: Number,
+    description: 'Filtrer par score minimum',
+  })
+  @ApiQuery({
+    name: 'scoreMax',
+    required: false,
+    type: Number,
+    description: 'Filtrer par score maximum',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Numéro de page pour la pagination',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: "Nombre d'éléments par page",
+  })
+  async findAllByQuizIdAndUserId(
+    @Param('quizId') quizId: string,
+    @Param('userId') userId: string,
+    @Query() filters: SessionFiltersDto & { page?: number; limit?: number },
+  ): Promise<any> {
+    const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
+    return this.sessionService.findAllByQuizIdAndUserId(quizId, userId, {
+      scoreMin,
+      scoreMax,
+      status,
+    });
   }
 }

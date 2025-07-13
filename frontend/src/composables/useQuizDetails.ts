@@ -1,11 +1,18 @@
 import { ref, computed, onMounted, watch, h } from "vue";
-import { QuizService } from "@/services/quiz.service";
+import { QuizService, type Quiz } from "@/services/quiz.service";
 import { useToastStore } from "@/stores/toast";
 import { useSessionStore } from "@/stores/session";
 import { useUserStore } from "@/stores/user";
 import { sessionService } from "@/services/session.service";
 import StatusBadge from "@/components/badges/StatusBadge.vue";
-import type { TableAction, TableColumn, TableFilter, TableSort, PaginationData, TableFilters } from "@/types/datatable";
+import type {
+  TableAction,
+  TableColumn,
+  TableFilter,
+  TableSort,
+  TableFilters,
+} from "@/types/datatable";
+import type { PaginationData } from "@/components/ui/PaginatorComponent.vue";
 
 export function useQuizDetails(quizId: string) {
   const toast = useToastStore();
@@ -29,9 +36,14 @@ export function useQuizDetails(quizId: string) {
   const userSessions = ref<[]>([]);
 
   // Session table state for backend-driven filtering/sorting/pagination
-  const sessionTableFilters = ref<TableFilters>({ status: 'all' });
+  const sessionTableFilters = ref<TableFilters>({ status: "all" });
   const sessionTableSort = ref<TableSort | null>(null);
-  const sessionTablePagination = ref<PaginationData>({ currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: 10 });
+  const sessionTablePagination = ref<PaginationData>({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10,
+  });
   const sessionTableLoading = ref(false);
 
   const showAllSessions = ref(false);
@@ -39,7 +51,7 @@ export function useQuizDetails(quizId: string) {
   const totalUniqueParticipants = computed(() => {
     if (!showAllSessions.value) return 0;
     const sessions = allQuizSessions.value as Array<{ userId: string }>;
-    const uniqueUserIds = new Set(sessions.map(s => s.userId));
+    const uniqueUserIds = new Set(sessions.map((s) => s.userId));
     return uniqueUserIds.size;
   });
 
@@ -50,7 +62,12 @@ export function useQuizDetails(quizId: string) {
   const quizTabs = computed(() => {
     const tabs = [
       { key: "quiz", label: "Quiz" },
-      { key: "sessions", label: "Sessions", badge: filteredSessions.value.length > 0 ? filteredSessions.value.length.toString() : undefined },
+      {
+        key: "sessions",
+        label: "Sessions",
+        badge:
+          filteredSessions.value.length > 0 ? filteredSessions.value.length.toString() : undefined,
+      },
     ];
     if (quiz.value && quiz.value.userId === userId.value) {
       tabs.push({ key: "config", label: "Configuration" });
@@ -58,35 +75,43 @@ export function useQuizDetails(quizId: string) {
     return tabs;
   });
 
-  const sessionColumns: TableColumn[]= [
+  const sessionColumns: TableColumn[] = [
     {
       key: "startedAt",
       label: "Date de début",
-      sortable: true,
-      formatter: (value: string) => value ? new Date(value).toLocaleString("fr-FR") : "-",
+      formatter: (value: string) => (value ? new Date(value).toLocaleString("fr-FR") : "-"),
     },
     {
       key: "finishedAt",
       label: "Date de fin",
-      sortable: true,
-      formatter: (value: string) => value ? new Date(value).toLocaleString("fr-FR") : "-",
+      formatter: (value: string) => (value ? new Date(value).toLocaleString("fr-FR") : "-"),
     },
     {
       key: "status",
       label: "Statut",
       sortable: true,
       render: (value: string) => {
-        if (value === 'paused') return h(StatusBadge, { variant: 'warning' }, () => 'En pause');
-        if (value === 'active') return h(StatusBadge, { variant: 'secondary' }, () => 'En cours');
-        if (value === 'finished') return h(StatusBadge, { variant: 'success' }, () => 'Terminée');
-        if (value === 'pending') return h(StatusBadge, { variant: 'info' }, () => 'En attente');
-        return h(StatusBadge, { variant: 'secondary' }, () => '-');
+        if (value === "paused") return h(StatusBadge, { variant: "warning" }, () => "En pause");
+        if (value === "active") return h(StatusBadge, { variant: "secondary" }, () => "En cours");
+        if (value === "finished") return h(StatusBadge, { variant: "success" }, () => "Terminée");
+        if (value === "pending") return h(StatusBadge, { variant: "info" }, () => "En attente");
+      },
+    },
+    {
+      key: "duration",
+      label: "Durée",
+      formatter: (value: number) => {
+        if (value == null) return "-";
+        const minutes = Math.floor(value / 60);
+        const seconds = value % 60;
+        return `${minutes} min ${seconds} sec`;
       },
     },
     {
       key: "score",
       label: "Score",
-      sortable: true,
+      formatter: (value: number) =>
+        value != null ? `${value} / ${quiz.value?.questions.length || 0}` : "-",
     },
   ];
 
@@ -132,14 +157,21 @@ export function useQuizDetails(quizId: string) {
     }
   });
 
-  const saveOrder = async () => {
-    if (!quiz.value) return;
+  const saveQuiz = async () => {
+    if (quiz.value === null) return;
     try {
-      const questions = quiz.value.questions.map(q => ({
+      const questions = quiz.value.questions.map((q) => ({
         ...q,
-        answers: q.answers.map(a => ({ ...a }))
+        answers: q.answers.map((a) => ({ ...a })),
       }));
-      await QuizService.updateQuiz(quiz.value.id, { questions });
+      await QuizService.updateQuiz(quizId, {
+        questions,
+        title: quiz.value.title,
+        description: quiz.value.description,
+        category: quiz.value.category,
+        questionsNumbers: quiz.value.questionsNumbers,
+        isPublic: quiz.value.isPublic,
+      });
       orderChanged.value = false;
       toast.showToast("success", "Ordre des questions sauvegardé !");
     } catch {
@@ -152,9 +184,9 @@ export function useQuizDetails(quizId: string) {
     try {
       showLoader.value = true;
       loading.value = true;
-      await new Promise(resolve => setTimeout(resolve, 0));
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      const session = await sessionStore.startSession(quiz.value.id, userId.value);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      const session = await sessionStore.startSession(quizId, userId.value);
       if (!session || !session.id) {
         toast.showToast("error", "Erreur lors de la création de la session.");
         return;
@@ -174,10 +206,10 @@ export function useQuizDetails(quizId: string) {
     if (!quiz.value) return [];
     return quiz.value.questions.map((q, idx) => {
       const selected = userAnswers.value[idx] || [];
-      const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
+      const correctIndexes = q.answers.map((a, i) => (a.c ? i : -1)).filter((i) => i !== -1);
       const isCorrect =
         correctIndexes.length === selected.length &&
-        correctIndexes.every(i => selected.includes(i));
+        correctIndexes.every((i) => selected.includes(i));
       return {
         a: q.id || q._id || idx.toString(),
         c: isCorrect,
@@ -191,8 +223,10 @@ export function useQuizDetails(quizId: string) {
         try {
           const q = quiz.value?.questions[currentStep.value];
           const selected = userAnswers.value[currentStep.value] || [];
-          const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
-          const isCorrect = correctIndexes.length === selected.length && correctIndexes.every(i => selected.includes(i));
+          const correctIndexes = q.answers.map((a, i) => (a.c ? i : -1)).filter((i) => i !== -1);
+          const isCorrect =
+            correctIndexes.length === selected.length &&
+            correctIndexes.every((i) => selected.includes(i));
           await sessionService.addAnswer(sessionStore.sessionId, {
             a: q.id || q._id || currentStep.value.toString(),
             c: isCorrect,
@@ -216,11 +250,11 @@ export function useQuizDetails(quizId: string) {
     quizFinished.value = true;
     let score = 0;
     quiz.value?.questions.forEach((q, idx) => {
-      const correctIndexes = q.answers.map((a, i) => a.c ? i : -1).filter(i => i !== -1);
+      const correctIndexes = q.answers.map((a, i) => (a.c ? i : -1)).filter((i) => i !== -1);
       const selected = userAnswers.value[idx] || [];
       if (
         correctIndexes.length === selected.length &&
-        correctIndexes.every(i => selected.includes(i))
+        correctIndexes.every((i) => selected.includes(i))
       ) {
         score++;
       }
@@ -228,7 +262,7 @@ export function useQuizDetails(quizId: string) {
     quizScore.value = score;
     if (sessionStore.sessionId) {
       await sessionStore.endSession(score, buildSessionAnswers());
-      userSessions.value.find(s => s.id === sessionStore.sessionId);
+      userSessions.value.find((s) => s.id === sessionStore.sessionId);
     }
   };
 
@@ -236,7 +270,8 @@ export function useQuizDetails(quizId: string) {
     if (!sessionStore.sessionId) return;
     try {
       loading.value = true;
-      await sessionStore.endSession(quizScore.value, Object.values(userAnswers.value));
+      console.log("ici", userAnswers.value);
+      await sessionStore.endSession(quizScore.value, buildSessionAnswers());
       isStarted.value = false;
       quizFinished.value = false;
       currentStep.value = 0;
@@ -251,49 +286,44 @@ export function useQuizDetails(quizId: string) {
     }
   };
 
-  // Ajout pour la datatable sessions
-  const filteredSessions = ref<Session[]>([]);
-  const lastSessionsResponse = ref<{ data: Session[]; total: number; totalPages: number; page: number; limit: number } | null>(null);
-
+  // Define fetchAllUserSessions before usage
   async function fetchAllUserSessions() {
     sessionTableLoading.value = true;
     try {
-      // Reset page to 1 si un filtre change (hors pagination)
       if (fetchAllUserSessions._filterChanged) {
         sessionTablePagination.value.currentPage = 1;
         fetchAllUserSessions._filterChanged = false;
       }
-      const response = await sessionService.findAllByUserId(userId.value, {
+      const response = await sessionService.findAllByQuizIdAndUserId(quizId, userId.value, {
         page: sessionTablePagination.value.currentPage,
         limit: sessionTablePagination.value.itemsPerPage,
-        status: sessionTableFilters.value.status !== 'all' ? sessionTableFilters.value.status : undefined,
-        scoreMin: sessionTableFilters.value.scoreMin !== undefined ? sessionTableFilters.value.scoreMin : undefined,
-        scoreMax: sessionTableFilters.value.scoreMax !== undefined ? sessionTableFilters.value.scoreMax : undefined,
+        status:
+          sessionTableFilters.value.status !== "all" ? sessionTableFilters.value.status : undefined,
+        scoreMin:
+          sessionTableFilters.value.scoreMin !== undefined
+            ? sessionTableFilters.value.scoreMin
+            : undefined,
+        scoreMax:
+          sessionTableFilters.value.scoreMax !== undefined
+            ? sessionTableFilters.value.scoreMax
+            : undefined,
       });
-      filteredSessions.value = response.data;
-      lastSessionsResponse.value = response;
+
+      console.log(response);
+      userSessions.value = response.data;
       sessionTablePagination.value.totalItems = response.total;
       sessionTablePagination.value.totalPages = response.totalPages;
     } catch {
-      filteredSessions.value = [];
-      lastSessionsResponse.value = null;
+      userSessions.value = [];
     } finally {
       sessionTableLoading.value = false;
     }
   }
 
-  // Rafraîchir les sessions quand les filtres changent
-  watch(sessionTableFilters, () => {
-    fetchAllUserSessions._filterChanged = true;
-    fetchAllUserSessions();
-  }, { deep: true });
-  watch(() => sessionTablePagination.value.currentPage, fetchAllUserSessions);
-  watch(() => sessionTablePagination.value.itemsPerPage, fetchAllUserSessions);
-
   // Appel initial lors du montage ou changement d'onglet
   onMounted(fetchAllUserSessions);
   watch([activeTab, userId], ([tab]) => {
-    if (tab === 'sessions') fetchAllUserSessions();
+    if (tab === "sessions") fetchAllUserSessions();
   });
 
   // Fetch toutes les sessions du quiz (pour owner)
@@ -312,26 +342,26 @@ export function useQuizDetails(quizId: string) {
   }
 
   // Filtering logic (client-side)
-  // const filteredSessions = computed(() => {
-  //   if (showAllSessions.value && isQuizOwner.value) {
-  //     return getFilteredSessions(allQuizSessions.value);
-  //   }
-  //   return getFilteredSessions(userSessions.value);
-  // });
-  // function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
-  //   let result = sessions;
-  //   const { status, scoreMin, scoreMax } = sessionTableFilters.value;
-  //   if (status && status !== 'all') {
-  //     result = result.filter((s) => s.status === status);
-  //   }
-  //   if (scoreMin != null) {
-  //     result = result.filter((s) => typeof s.score === 'number' ? s.score >= scoreMin : true);
-  //   }
-  //   if (scoreMax != null && scoreMax > 0) {
-  //     result = result.filter((s) => typeof s.score === 'number' ? s.score <= scoreMax : true);
-  //   }
-  //   return result;
-  // }
+  const filteredSessions = computed(() => {
+    if (showAllSessions.value && isQuizOwner.value) {
+      return getFilteredSessions(allQuizSessions.value);
+    }
+    return getFilteredSessions(userSessions.value);
+  });
+  function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
+    let result = sessions;
+    const { status, scoreMin, scoreMax } = sessionTableFilters.value;
+    if (status && status !== "all") {
+      result = result.filter((s) => s.status === status);
+    }
+    if (scoreMin != null) {
+      result = result.filter((s) => (typeof s.score === "number" ? s.score >= scoreMin : true));
+    }
+    if (scoreMax != null && scoreMax > 0) {
+      result = result.filter((s) => (typeof s.score === "number" ? s.score <= scoreMax : true));
+    }
+    return result;
+  }
 
   // Handlers for SessionDatatable (client-side filtering)
   function handleSessionTableFilters(filters: TableFilters) {
@@ -424,7 +454,7 @@ export function useQuizDetails(quizId: string) {
     actions,
     onQuestionsOrderChange,
     toggleAllAnswers,
-    saveOrder,
+    saveQuiz,
     startQuizSession,
     nextStep,
     finishQuiz,

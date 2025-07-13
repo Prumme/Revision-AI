@@ -42,7 +42,7 @@ export class AdminService {
 
   static async getUserQuizzes(userId: string): Promise<Quiz[]> {
     try {
-      const response = await ApiService.get<Quiz[]>(`/users/${userId}/quizzes`);
+      const response = await ApiService.get<Quiz[]>(`/quizzes/user/${userId}`);
       return response.data || [];
     } catch (error) {
       console.error("Erreur lors de la récupération des quiz:", error);

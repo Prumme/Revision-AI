@@ -40,11 +40,6 @@
               :variant="dialogStore.options.type === 'error' ? 'primary' : 'outline'"
               @click="dialogStore.confirm"
               class="min-w-[180px]"
-              :style="
-                dialogStore.options.type === 'error'
-                  ? 'background-color:#F87171;color:#000;border-color:#000;'
-                  : ''
-              "
             >
               {{ dialogStore.options.confirmText }}
             </ButtonComponent>

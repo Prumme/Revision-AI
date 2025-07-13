@@ -30,12 +30,7 @@ export interface TableFilter {
   placeholder?: string;
 }
 
-export interface PaginationData {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-}
+
 
 export interface TableSort {
   column: string;

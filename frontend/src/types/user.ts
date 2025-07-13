@@ -1,5 +1,7 @@
+import type { Quiz } from "./quiz";
+
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   subscriptionTier: string;
@@ -22,4 +24,26 @@ export interface User {
     postal_code?: string;
     country?: string;
   };
+  TOTPSecret?: TOTPSecret;
+}
+
+export interface TOTPSecret {
+  secret: string;
+  otpauth_url: string;
+  userId: string;
+  active: boolean;
+}
+
+// Types pour le profil public
+export interface PublicUser extends Partial<User> {
+  id: string;
+  username: string;
+  bio?: string;
+  avatar?: string;
+  createdAt: string;
+}
+
+export interface PublicProfileData {
+  user: PublicUser;
+  quizzes: Quiz[];
 }
