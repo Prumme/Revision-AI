@@ -30,7 +30,7 @@ export class MongoCustomerRepository implements CustomerRepository {
 
   async findByUserId(userId: string): Promise<CustomerAndUser | User | null> {
     return this.userModel
-      .findOne({ _id: userId })
+      .findOne({ _id: userId }, { password: 0 })
       .exec()
       .then((document) => {
         if (!document) return null;
