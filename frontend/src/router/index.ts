@@ -20,6 +20,8 @@ import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
+import ContactView from "@/views/landing/ContactView.vue";
+import LegalView from "@/views/landing/LegalView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +30,16 @@ const router = createRouter({
       path: "/",
       name: "Revision AI",
       component: LandingPage,
+    },
+    {
+      path: "/contact",
+      name: "contact",
+      component: ContactView,
+    },
+    {
+      path: "/legal",
+      name: "legal",
+      component: LegalView,
     },
     {
       path: "/",
