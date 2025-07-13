@@ -53,7 +53,7 @@ export class AdminService {
 
   static async getUserDocuments(
     userId: string,
-    query = { page: number, limit: number },
+    query: { page: number; limit: number } = { page: 1, limit: 10 },
   ): Promise<PaginatedResponse<UploadedDocument>> {
     try {
       const response = await ApiService.get<PaginatedResponse<UploadedDocument>>(
@@ -62,7 +62,13 @@ export class AdminService {
       return response.data;
     } catch (error) {
       console.error("Erreur lors de la récupération des documents:", error);
-      return [];
+      return {
+        data: [],
+        total: 0,
+        totalPages: 0,
+        page: query.page,
+        limit: query.limit,
+      };
     }
   }
 
