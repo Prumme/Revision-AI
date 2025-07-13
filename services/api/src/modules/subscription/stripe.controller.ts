@@ -36,6 +36,8 @@ export class StripeController {
     try {
       const rawBody = (req as any).rawBody || req.body;
 
+      console.log('Secret :' + [process.env.STRIPE_WEBHOOK_SECRET]);
+
       const event = this.stripe.webhooks.constructEvent(
         rawBody,
         signature,
@@ -56,12 +58,12 @@ export class StripeController {
 
       return { received: true };
     } catch (err) {
-      console.error('Error verifying webhook signature:', err);
-      response = new Error('Failed to verify webhook signature');
+      console.error('Error while receiving stripe payload event:', err);
+      response = new Error('Failed to process Stripe webhook');
     }
 
     if (response instanceof Error) throw response;
-    console.log('Webhook received:', response);
+
     return response;
   }
 
