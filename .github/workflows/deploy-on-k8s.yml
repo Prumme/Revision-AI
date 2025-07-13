@@ -39,6 +39,7 @@ jobs:
 
   build_frontend_and_push:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
