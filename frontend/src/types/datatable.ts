@@ -1,3 +1,5 @@
+import type { PaginationData } from "@/components/ui/PaginatorComponent.vue";
+
 export interface TableColumn {
   key: string;
   label: string;

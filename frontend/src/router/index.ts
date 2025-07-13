@@ -20,6 +20,7 @@ import AdminUserDetailView from "@/views/admin/AdminUserDetailView.vue";
 import SubscriptionView from "@/views/SubscriptionView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import AdminReportDetailView from "@/views/admin/AdminReportDetailView.vue";
+import DocumentsView from "@/views/DocumentsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,7 +43,7 @@ const router = createRouter({
         {
           path: "/documents",
           name: "documents",
-          component: DashboardView,
+          component: DocumentsView,
         },
         {
           path: "/quiz/create",

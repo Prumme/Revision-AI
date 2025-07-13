@@ -7,6 +7,7 @@ import {
   PaginatedResult,
   PaginationOptions,
 } from '@repositories/user.repository';
+import { UploadedDocument } from '@entities/document.entity';
 
 @Injectable()
 export class MongoDocumentRepository implements IDocumentRepository {
@@ -18,7 +19,7 @@ export class MongoDocumentRepository implements IDocumentRepository {
   private async getPaginatedDocuments(
     pipeline: any[],
     pagination: PaginationOptions,
-  ): Promise<PaginatedResult<Document>> {
+  ): Promise<PaginatedResult<UploadedDocument>> {
     const { limit, page } = pagination;
 
     const paginationPipeline = [
@@ -28,7 +29,7 @@ export class MongoDocumentRepository implements IDocumentRepository {
 
     const documents = (await this.quizModel
       .aggregate([...pipeline, ...paginationPipeline])
-      .exec()) as Document[];
+      .exec()) as UploadedDocument[];
 
     const totalCountResult = await this.quizModel
       .aggregate([...pipeline, { $count: 'total' }])
@@ -49,12 +50,14 @@ export class MongoDocumentRepository implements IDocumentRepository {
   async findByQuizId(
     quizId: string,
     pagination: PaginationOptions,
-  ): Promise<PaginatedResult<Document>> {
+  ): Promise<PaginatedResult<UploadedDocument>> {
     const pipeline = [
       { $match: { _id: quizId } },
-      { $project: { medias: 1, _id: 0 } },
-      { $unwind: '$medias' },
-      { $replaceRoot: { newRoot: '$medias' } },
+      { $project: { media: 1, _id: 0 } },
+      { $unwind: '$media' },
+      { $replaceRoot: { newRoot: '$media' } },
+      { $group: { _id: '$checksum', doc: { $last: '$$ROOT' } } },
+      { $replaceRoot: { newRoot: '$doc' } },
     ];
 
     return this.getPaginatedDocuments(pipeline, pagination);
@@ -63,13 +66,15 @@ export class MongoDocumentRepository implements IDocumentRepository {
   async findByUserId(
     userId: string,
     pagination: PaginationOptions,
-  ): Promise<PaginatedResult<Document>> {
+  ): Promise<PaginatedResult<UploadedDocument>> {
     const pipeline = [
       { $match: { userId: userId } },
-      { $unwind: '$medias' },
-      { $replaceRoot: { newRoot: '$medias' } },
+      { $project: { media: 1, _id: 0 } },
+      { $unwind: '$media' },
+      { $replaceRoot: { newRoot: '$media' } },
+      { $group: { _id: '$checksum', doc: { $last: '$$ROOT' } } },
+      { $replaceRoot: { newRoot: '$doc' } },
     ];
-
     return this.getPaginatedDocuments(pipeline, pagination);
   }
 }
