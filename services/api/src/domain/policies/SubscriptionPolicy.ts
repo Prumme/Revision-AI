@@ -1,13 +1,16 @@
 export type SubscriptionTier = 'free' | 'basic' | 'pro';
 
 export interface SubscriptionPolicy {
-  maxTotalQuizzes: number | null;      
-  maxGenerationsPerDay: number | null; 
+  maxTotalQuizzes: number | null;
+  maxGenerationsPerDay: number | null;
   maxFilesPerGeneration: number;
   maxInputTokens: number;
 }
 
-export const SUBSCRIPTION_POLICIES: Record<SubscriptionTier, SubscriptionPolicy> = {
+export const SUBSCRIPTION_POLICIES: Record<
+  SubscriptionTier,
+  SubscriptionPolicy
+> = {
   free: {
     maxTotalQuizzes: 5,
     maxGenerationsPerDay: 1,
@@ -24,6 +27,6 @@ export const SUBSCRIPTION_POLICIES: Record<SubscriptionTier, SubscriptionPolicy>
     maxTotalQuizzes: null,
     maxGenerationsPerDay: 50,
     maxFilesPerGeneration: 10,
-    maxInputTokens: 30000,
+    maxInputTokens: 100000,
   },
 };

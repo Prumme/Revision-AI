@@ -23,7 +23,6 @@ const loadingUserQuizzes = ref(false);
 
 onMounted(async () => {
   loadingUserQuizzes.value = true;
-  quizCount.value = await userStore.fetchQuizCount();
   await userStore.fetchKpis();
   averageScore.value = userStore.averageScore;
   totalRevisionTime.value = userStore.totalRevisionTimeFormatted;
@@ -31,8 +30,11 @@ onMounted(async () => {
   // S'assurer que user existe avant d'essayer d'accéder à user.id
   if (user?.id) {
     try {
-      const res = await QuizService.getUserQuizzes(user.id);
-      userQuizzes.value = Array.isArray(res) ? res.slice(0, 5) : res?.data?.slice(0, 5) || [];
+      const res = await QuizService.getUserQuizzes(user.id, undefined, {
+        limit: 5,
+      });
+      userQuizzes.value = res.data;
+      quizCount.value = res.total;
     } catch {
       userQuizzes.value = [];
     }
@@ -85,7 +87,7 @@ function animateNumber(stat, target) {
 }
 
 const stats = [
-  { label: "Quiz disponibles", value: quizCount, color: "pale-yellow" },
+  { label: "Quiz générés", value: quizCount, color: "pale-yellow" },
   { label: "Cours importés", value: 16, color: "pale-red" },
   { label: "Score moyen", value: averageScore, color: "pale-purple" },
   { label: "Temps de révision", value: totalRevisionTime, color: "pale-green" },
