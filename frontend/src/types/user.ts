@@ -13,6 +13,8 @@ export interface User {
   deleted?: boolean;
   blocked?: boolean;
   emailVerified?: boolean;
+  lastModifiedUsernameAsked?: Date;
+  lastUpdatedPassword?: Date;
   createdAt?: string;
   updatedAt?: string;
   firstName?: string;

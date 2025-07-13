@@ -39,7 +39,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CustomerRepository } from '@repositories/customer.repository';
-import { MailerService } from '@services/MailerService';
+import { MailService } from '@infrastructure/resend/mail.service';
 import { Request } from 'express';
 import { UserData } from '../../common/types/user-data';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -56,8 +56,7 @@ export class UserController {
     private readonly quizService: QuizService,
     @Inject('CustomerRepository')
     private readonly customerRepository: CustomerRepository,
-    @Inject('MailerService')
-    private readonly mailer: MailerService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get()
@@ -512,7 +511,7 @@ export class UserController {
           ? ActiveSubscriptionUseCaseFactory
           : InactiveSubscriptionUseCaseFactory;
 
-      const useCase = factory(this.mailer, this.customerRepository);
+      const useCase = factory(this.mailService, this.customerRepository);
       const response = await useCase({
         customerId: user.customerId,
         tier: tier,
@@ -529,6 +528,56 @@ export class UserController {
         HttpStatus.NOT_FOUND,
       );
     }
+  }
+
+  @Patch(':id/block')
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'Bloquer un utilisateur (admin seulement)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "L'utilisateur a été bloqué",
+  })
+  async blockUser(@Param('id') id: string, @Body('reason') reason: string) {
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+    return await this.userService.block(id, reason);
+  }
+
+  @Patch(':id/unblock')
+  @UseGuards(AdminGuard)
+  @ApiOperation({ summary: 'Débloquer un utilisateur (admin seulement)' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "L'utilisateur a été débloqué",
+  })
+  async unblockUser(@Param('id') id: string) {
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+    return await this.userService.unblock(id);
+  }
+
+  @Post(':id/ask-new-username')
+  @UseGuards(AdminGuard)
+  @ApiOperation({
+    summary: "Demander un nouveau nom d'utilisateur (admin seulement)",
+  })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: "L'utilisateur a été débloqué",
+  })
+  async askNewUsername(@Param('id') id: string) {
+    const user = await this.userService.findById(id);
+    if (!user) {
+      throw new HttpException('Utilisateur non trouvé', HttpStatus.NOT_FOUND);
+    }
+    return await this.userService.askNewUsername(id);
   }
 
   @Get('me/data')

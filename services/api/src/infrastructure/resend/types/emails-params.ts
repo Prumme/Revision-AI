@@ -10,7 +10,7 @@ export interface BlockUserParams extends EmailParams {
   appealLink: string;
   reason?: string;
 }
-
+export interface UnblockUserParams extends EmailParams {}
 export interface SucceedBoughtParams extends EmailParams {
   articleName: string;
 }
@@ -22,3 +22,5 @@ export interface NewPasswordNeededParams extends EmailParams {
 }
 
 export interface DeleteAccountParams extends EmailParams {}
+
+export interface AskNewUsernameParams extends EmailParams {}

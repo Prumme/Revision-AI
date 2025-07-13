@@ -9,10 +9,21 @@ import { quizGenerationQueueConsumer } from '@infrastructure/queue/consumers/qui
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Middleware pour capturer le rawBody avant parsing JSON
+  app.use('/stripe/webhook', (req, res, next) => {
+    raw({ type: 'application/json' })(req, res, (err) => {
+      if (err) {
+        return next(err);
+      }
+      // Stocker le rawBody pour le webhook Stripe
+      req.rawBody = req.body;
+      next();
+    });
+  });
+
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ limit: '10mb', extended: true }));
 
-  app.use('/stripe/webhook', raw({ type: 'application/json' }));
   app.enableCors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

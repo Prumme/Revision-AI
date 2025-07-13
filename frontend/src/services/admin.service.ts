@@ -23,12 +23,12 @@ export class AdminService {
     return response.data;
   }
 
-  static async blockUser(userId: string): Promise<void> {
-    await ApiService.patch(`/users/${userId}`, { blocked: true });
+  static async blockUser(userId: string, reason: string): Promise<void> {
+    await ApiService.patch(`/users/${userId}/block`, { reason }, true);
   }
 
   static async unblockUser(userId: string): Promise<void> {
-    await ApiService.patch(`/users/${userId}`, { blocked: false });
+    await ApiService.patch(`/users/${userId}/unblock`, {}, true);
   }
 
   static async deleteUser(userId: string): Promise<void> {
@@ -60,8 +60,8 @@ export class AdminService {
     }
   }
 
-  static async requestPasswordReset(userId: string): Promise<void> {
-    await ApiService.post(`/users/${userId}/password-reset`, {});
+  static async askNewUsername(userId: string): Promise<void> {
+    await ApiService.post(`/users/${userId}/ask-new-username`, {});
   }
 
   static async updateUserSubscription(userId: string, tier: string): Promise<void> {

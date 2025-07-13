@@ -1,4 +1,4 @@
-import { TOTPSecret } from "@domain/value-objects/TOTPSecret";
+import { TOTPSecret } from '@domain/value-objects/TOTPSecret';
 
 export interface User {
   id: string;
@@ -6,6 +6,7 @@ export interface User {
   username: string;
   password: string;
   lastUpdatedPassword: Date;
+  lastModifiedUsernameAsked: Date;
   emailVerified: boolean;
   role: string;
   subscriptionTier: string; // Niveau d'abonnement de l'utilisateur
@@ -19,7 +20,6 @@ export interface User {
 
   TOTPSecret?: TOTPSecret; // Champ pour stocker des informations sensibles, comme un token de sécurité
 }
-
 
 export function hasTOTPEnabled(user: User): boolean {
   return !!user.TOTPSecret && user.TOTPSecret.active;
