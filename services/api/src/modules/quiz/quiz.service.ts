@@ -23,6 +23,7 @@ import { QuizGenerationDTO } from '../../types/QuizGenerationDTO';
 import * as crypto from 'node:crypto';
 import { SubscriptionPolicyService } from '../../domain/policies/SubscriptionPolicyService';
 import { SubscriptionTier } from '@domain/policies/SubscriptionPolicy';
+import { UploadedDocument } from '@entities/document.entity';
 
 @Injectable()
 export class QuizService {
@@ -76,7 +77,7 @@ export class QuizService {
       throw new Error('Utilisateur non trouvé');
     }
 
-    const medias = [];
+    const medias: UploadedDocument[] = [];
     /** Upload files to S3 */
     for (const file of files) {
       const fileExtension = file.originalname.split('.').pop();
@@ -86,8 +87,11 @@ export class QuizService {
         .digest('hex');
       const objectName = `${quiz.userId}/quiz-${hashedFileName}.${fileExtension}`;
       const fullPath = 'documents/' + objectName;
-      await this.fileService.uploadFile(file, fullPath);
-      medias.push(fullPath);
+      const uploadedDocument = await this.fileService.uploadFile(
+        file,
+        fullPath,
+      );
+      medias.push(uploadedDocument);
     }
 
     quiz.medias = medias;

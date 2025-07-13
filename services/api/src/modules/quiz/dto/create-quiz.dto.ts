@@ -1,13 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-
-
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { UploadedDocument } from '@entities/document.entity';
 
 export class CreateQuizDto {
   @ApiProperty({
@@ -83,15 +77,13 @@ export class CreateQuizDto {
   })
   isPublic: boolean = false;
 
-
   @ApiProperty({
     description: 'URL du média associé au quiz (image, vidéo, etc.)',
     example: 'https://monstockage.com/media/quiz-cover.jpg',
     required: false,
   })
   @IsOptional()
-  @IsString()
-  medias?: string[];
+  medias?: UploadedDocument[];
 
   @ApiProperty({
     description: 'Statut du quiz (par défaut "pending")',

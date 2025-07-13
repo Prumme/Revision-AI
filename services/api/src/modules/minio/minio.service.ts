@@ -9,6 +9,7 @@ import * as AWS from 'aws-sdk';
 import { Readable } from 'stream';
 import { ScalewayS3Options } from './interfaces/minio-options.interface';
 import { FileService } from '@services/FileService';
+import { UploadedDocument } from '@entities/document.entity';
 
 interface StorageFile {
   stream: Readable;
@@ -119,7 +120,7 @@ export class MinioService implements OnModuleInit, FileService {
   async uploadFile(
     file: Express.Multer.File,
     objectName: string,
-  ): Promise<string> {
+  ): Promise<UploadedDocument> {
     try {
       const params: AWS.S3.PutObjectRequest = {
         Bucket: this.bucketName,
@@ -130,7 +131,13 @@ export class MinioService implements OnModuleInit, FileService {
 
       const result = await this.s3Client.upload(params).promise();
       this.logger.log(`Fichier uploadé avec succès: ${result.Location}`);
-      return objectName;
+      return {
+        size: file.size,
+        name: file.originalname,
+        identifier: objectName,
+        mimeType: file.mimetype,
+        checksum: result.ETag.replace(/"/g, ''),
+      };
     } catch (error) {
       this.logger.error("Erreur lors de l'upload vers Scaleway S3:", error);
       throw error;

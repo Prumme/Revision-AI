@@ -59,7 +59,10 @@ export interface QuizIdentifier {
  *  It returns the created pending quiz or an error if something goes wrong
  */
 
-export type CreateQuizUseCase = UseCase<CreateQuizDto, Promise<Quiz | Error | ForbiddenException>>;
+export type CreateQuizUseCase = UseCase<
+  CreateQuizDto,
+  Promise<Quiz | Error | ForbiddenException>
+>;
 export const CreateQuizUseCaseFactory: UseCaseFactory<
   CreateQuizUseCase,
   [
@@ -71,7 +74,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     QueueProvider<QuizGenerationDTO>,
     SubscriptionPolicyService,
     SubscriptionTier,
-    typeof generateQuizGenerationDTO?
+    typeof generateQuizGenerationDTO?,
   ]
 > = (
   _quizRepository,
@@ -88,7 +91,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     // Vérification des quotas
     const [totalQuizzes, quizzesToday] = await Promise.all([
       _quizRepository.countByUserId(createQuizDto.userId),
-      _quizRepository.countCreatedToday(createQuizDto.userId)
+      _quizRepository.countCreatedToday(createQuizDto.userId),
     ]);
     const filesCount = createQuizDto.medias.length;
     let totalTokens = 0;
@@ -96,46 +99,35 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
     if (!checkTotal.allowed) return new ForbiddenException(checkTotal.reason);
     const checkToday = _policyService.canGenerateToday(_userTier, quizzesToday);
     if (!checkToday.allowed) return new ForbiddenException(checkToday.reason);
-    const checkFiles = _policyService.canUseFilesForGeneration(_userTier, filesCount);
+    const checkFiles = _policyService.canUseFilesForGeneration(
+      _userTier,
+      filesCount,
+    );
     if (!checkFiles.allowed) return new ForbiddenException(checkFiles.reason);
 
     type FileIdentifierWithChecksum = {
-      fileIdentifier: string;
+      name: string;
+      identifier: string;
       checksum: string;
     };
 
     /** Obtenir les checksum des fichiers */
-    const checksumsJobs = createQuizDto.medias.map(async (fileIdentifier) => {
-      try {
-        const file = await _fileService.getFile(fileIdentifier);
-        return {
-          fileIdentifier,
-          checksum: file.checksum,
-        };
-      } catch (e) {
-        console.error('Error fetching file:', e);
-        return null;
-      }
-    });
-
-    const files = (await Promise.all(checksumsJobs)).filter(
-      (checksum) => checksum !== null,
-    ) as FileIdentifierWithChecksum[];
+    const files = createQuizDto.medias as FileIdentifierWithChecksum[];
 
     /** Verifier que les fichiers non pas déjà été parsés */
     const parsedFiles = (
       await Promise.all(
-        files.map(async ({ checksum,fileIdentifier}) =>{
-          let foundFile = await _cachedFileParsedRepository.getParsedFileByChecksum(checksum);
-          if(foundFile && fileIdentifier == foundFile.identifier) {
+        files.map(async ({ checksum, identifier }) => {
+          const foundFile =
+            await _cachedFileParsedRepository.getParsedFileByChecksum(checksum);
+          if (foundFile && identifier == foundFile.identifier) {
             return foundFile;
           }
-          return null; // Si le fichier n'est pas trouvé, retourner null
-        }
-      ),
-    )
-  ).filter(Boolean);
-    
+          return null;
+        }),
+      )
+    ).filter(Boolean);
+
     const quiz = QuizEntity.createQuiz(
       createQuizDto.title,
       createQuizDto.description,
@@ -164,10 +156,10 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       const alreadyParsedChecksums = parsedFiles.map((file) => file.checksum);
       const filesToParse: FileToParseDTO[] = files
         .filter((file) => !alreadyParsedChecksums.includes(file.checksum))
-        .map(({ fileIdentifier, checksum }) => ({
+        .map(({ identifier, checksum, name }) => ({
           bucketName: _fileService.getBucketName(),
-          objectKey: fileIdentifier,
-          fileName: fileIdentifier,
+          objectKey: identifier,
+          fileName: name,
           checksum,
         }));
 
@@ -180,7 +172,7 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
 
     const inserted = await _quizGenerationJobRepository.putJob(job);
     if (!inserted) return new Error('Failed to create quiz generation job');
-      
+
     if (needGenerating) {
       const quizGenerationDTO = await _generateQuizGenerationDTO(
         createdQuiz.id,
@@ -190,10 +182,10 @@ export const CreateQuizUseCaseFactory: UseCaseFactory<
       );
       if (quizGenerationDTO instanceof Error) return quizGenerationDTO;
 
-      const allParsedFiles = quizGenerationDTO.filesContents
+      const allParsedFiles = quizGenerationDTO.filesContents;
       for (const file of allParsedFiles) {
-         let jsonString = JSON.stringify(file);
-         totalTokens += jsonString.length;
+        const jsonString = JSON.stringify(file);
+        totalTokens += jsonString.length;
       }
       const checkTokens = _policyService.canUseTokensForGeneration(
         _userTier,
@@ -308,13 +300,13 @@ export const HandleParsedFileUseCaseFactory: UseCaseFactory<
           continue;
         }
 
-        const allParsedFiles = quizGenerationDTO.filesContents
+        const allParsedFiles = quizGenerationDTO.filesContents;
         for (const file of allParsedFiles) {
-          let jsonString = JSON.stringify(file);
+          const jsonString = JSON.stringify(file);
           totalTokens += jsonString.length;
         }
         const checkTokens = _policyService.canUseTokensForGeneration(
-          user.subscriptionTier as SubscriptionTier || "free",
+          (user.subscriptionTier as SubscriptionTier) || 'free',
           totalTokens,
         );
         if (!checkTokens.allowed) {
