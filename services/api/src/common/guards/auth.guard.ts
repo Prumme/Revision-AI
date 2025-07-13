@@ -41,13 +41,13 @@ export class AuthGuard implements CanActivate {
           'Signature is required for signed routes',
         );
       }
-      const validSignauture = verifySignature(
+      const validSignature = verifySignature(
         request.path,
         signature,
         process.env.JWT_SECRET,
         request.query, // Assuming the query contains the parameters used for signing
       );
-      return validSignauture;
+      return validSignature;
     } else {
       const token = this.extractTokenFromHeader(request);
       if (!token) {
