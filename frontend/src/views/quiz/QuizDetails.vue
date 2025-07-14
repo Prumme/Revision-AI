@@ -463,7 +463,7 @@ watch(quizFinished, (finished) => {
     <section v-if="quiz && activeTab === 'sessions'">
       <div class="flex items-center gap-6 mb-4">
         <h2 class="text-2xl font-bold">Vos sessions sur ce quiz</h2>
-        <template v-if="isQuizOwner">
+        <template v-if="isQuizOwner || userStore.isAdmin">
           <label class="flex items-center gap-2 cursor-pointer select-none">
             <input
               id="accept-terms"

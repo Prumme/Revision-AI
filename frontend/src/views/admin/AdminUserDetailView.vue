@@ -163,7 +163,9 @@ onMounted(() => {
         <div class="flex items-center justify-between gap-4 mb-4">
           <h1 class="text-2xl text-gray-900 text-nowrap">
             Gestion de l'utilisateur
-            <span class="text-primary font-bold">{{ user?.username || "" }}</span>
+            <RouterLink :to="`/profil/${user?.username}`" class="text-primary font-bold">{{
+              user?.username || ""
+            }}</RouterLink>
           </h1>
 
           <div class="flex items-center gap-2">

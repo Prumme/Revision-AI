@@ -1,18 +1,18 @@
-import {API_URL} from "@/config/api";
+import { API_URL } from "@/config/api";
 import type {
   AuthResponse,
   LoginCredentials,
   LoginResponse,
   RegisterCredentials,
 } from "@/types/auth";
-import type {User} from "@/types/user";
-import {defineStore} from "pinia";
-import {computed, ref} from "vue";
-import {useRouter} from "vue-router";
-import {QuizService} from '@/services/quiz.service';
-import { KpiService } from '@/services/kpi.service';
+import type { User } from "@/types/user";
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { QuizService } from "@/services/quiz.service";
+import { KpiService } from "@/services/kpi.service";
 
-interface LoginFunctionResponse{
+interface LoginFunctionResponse {
   totpRequired: boolean;
 }
 
@@ -27,9 +27,13 @@ export const useUserStore = defineStore("user", () => {
   const router = useRouter();
   const user = ref<User | null>(null);
   const token = ref<string | null>(localStorage.getItem("token"));
-  const quizCount = ref<number>(localStorage.getItem("quizCount") ? parseInt(localStorage.getItem("quizCount")!) : 0);
+  const quizCount = ref<number>(
+    localStorage.getItem("quizCount") ? parseInt(localStorage.getItem("quizCount")!) : 0,
+  );
   const averageScore = ref<string>(localStorage.getItem("averageScore") || "0%");
-  const totalRevisionTimeFormatted = ref<string>(localStorage.getItem("totalRevisionTimeFormatted") || "0m");
+  const totalRevisionTimeFormatted = ref<string>(
+    localStorage.getItem("totalRevisionTimeFormatted") || "0m",
+  );
 
   const getFullName = () => {
     return user?.value?.username;
@@ -176,7 +180,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  async function login(credentials: LoginCredentials) : Promise<LoginFunctionResponse> {
+  async function login(credentials: LoginCredentials): Promise<LoginFunctionResponse> {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -187,19 +191,22 @@ export const useUserStore = defineStore("user", () => {
       });
 
       if (!response.ok) {
-        const {message} = await response.json();
+        const { message } = await response.json();
         if (message && message === "Email not verified") {
           throw new AuthError("Email not verified");
         }
-        if(message && message === "Invalid TOTP code") {
+        if (message && message === "Invalid TOTP code") {
           throw new AuthError("Code de vérification invalide");
+        }
+        if (message && message === "Account blocked") {
+          throw new AuthError("Votre compte est bloqué");
         }
         throw new AuthError("Erreur lors de la connexion, veuillez vérifier vos identifiants");
       }
 
-      const data : LoginResponse = await response.json();
-      
-      if("needTOTP" in data) {
+      const data: LoginResponse = await response.json();
+
+      if ("needTOTP" in data) {
         return { totpRequired: true };
       }
       setUser(data.user);
@@ -240,8 +247,8 @@ export const useUserStore = defineStore("user", () => {
       ]);
       averageScore.value = (score || 0) + "%";
       totalRevisionTimeFormatted.value = time || "0m";
-      localStorage.setItem('averageScore', averageScore.value);
-      localStorage.setItem('totalRevisionTimeFormatted', totalRevisionTimeFormatted.value);
+      localStorage.setItem("averageScore", averageScore.value);
+      localStorage.setItem("totalRevisionTimeFormatted", totalRevisionTimeFormatted.value);
     } catch {
       averageScore.value = "0%";
       totalRevisionTimeFormatted.value = "0m";
