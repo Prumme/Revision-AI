@@ -60,14 +60,15 @@ export const mqConsumer = async () => {
 
     console.log("[FILE-PARSER] File uploaded event processed successfully");
     await mqProvide({ ...fileUploaded, ...fileContent }).catch(console.error);
-
     try {
       fs.unlinkSync(payload.downloadPath);
       console.log(
         `[FILE-SERVICE] File ${payload.downloadPath} deleted successfully`,
       );
+      channel.ack(msg);
     } catch (error) {
       console.error("[FILE-PARSER][ERROR] Error deleting file:", error);
+      channel.nack(msg, false, false);
     }
   }
 
