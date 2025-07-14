@@ -23,6 +23,8 @@ export class MinioService implements OnModuleInit, FileService {
   private s3Client: AWS.S3;
   private readonly bucketName: string;
 
+  private fake: boolean = false;
+
   constructor(
     private configService: ConfigService,
     private readonly logger: Logger,
@@ -38,16 +40,23 @@ export class MinioService implements OnModuleInit, FileService {
     const bucketName = this.configService.get<string>('SCALEWAY_BUCKET_NAME');
 
     if (!accessKeyId) {
-      throw new Error('SCALEWAY_ACCESS_KEY_ID manquant dans le fichier .env');
+      this.fake = true;
     }
     if (!secretAccessKey) {
-      throw new Error('SCALEWAY_ACCESS_KEY manquant dans le fichier .env');
+      this.fake = true;
     }
     if (!bucketUrl) {
-      throw new Error('SCALEWAY_BUCKET_URL manquant dans le fichier .env');
+      this.fake = true;
     }
     if (!bucketName) {
-      throw new Error('SCALEWAY_BUCKET_NAME manquant dans le fichier .env');
+      this.fake = true;
+    }
+
+    if (this.fake) {
+      this.logger.warn(
+        'MinioService is running in fake mode. Please set SCALEWAY_ACCESS_KEY_ID, SCALEWAY_ACCESS_KEY, SCALEWAY_BUCKET_URL and SCALEWAY_BUCKET_NAME environment variables.',
+      );
+      return;
     }
 
     // Configuration pour Scaleway S3
@@ -61,11 +70,11 @@ export class MinioService implements OnModuleInit, FileService {
 
     this.bucketName = options.bucketName;
 
-    console.log(`Configuration Scaleway S3:`);
-    console.log(`- Endpoint: ${options.endpoint}`);
-    console.log(`- Region: ${options.region}`);
-    console.log(`- Bucket: ${options.bucketName}`);
-    console.log(`- Access Key ID: ${accessKeyId.substring(0, 8)}...`);
+    this.logger.log(`Configuration Scaleway S3:`);
+    this.logger.log(`- Endpoint: ${options.endpoint}`);
+    this.logger.log(`- Region: ${options.region}`);
+    this.logger.log(`- Bucket: ${options.bucketName}`);
+    this.logger.log(`- Access Key ID: ${accessKeyId.substring(0, 8)}...`);
 
     this.s3Client = new AWS.S3({
       accessKeyId: options.accessKeyId,
@@ -82,6 +91,10 @@ export class MinioService implements OnModuleInit, FileService {
   }
 
   async onModuleInit() {
+    if (this.fake)
+      return this.logger.warn(
+        'File Service is running in fake mode. Skipping bucket initialization. the file uploads will not work.',
+      );
     try {
       // Vérifier que le bucket existe
       await this.s3Client.headBucket({ Bucket: this.bucketName }).promise();
@@ -103,15 +116,21 @@ export class MinioService implements OnModuleInit, FileService {
               },
             })
             .promise();
-          console.log(
+          this.logger.log(
             `Bucket ${this.bucketName} créé avec succès sur Scaleway S3`,
           );
         } catch (createError) {
-          console.error('Erreur lors de la création du bucket:', createError);
+          this.logger.error(
+            'Erreur lors de la création du bucket:',
+            createError,
+          );
           throw createError;
         }
       } else {
-        console.error("Erreur lors de l'initialisation de Scaleway S3:", error);
+        this.logger.error(
+          "Erreur lors de l'initialisation de Scaleway S3:",
+          error,
+        );
         throw error;
       }
     }
