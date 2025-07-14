@@ -27,6 +27,7 @@ import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { humanizeBytes } from "@/utils/humanizeBytes.ts";
 import { openDoc } from "@/utils/openDoc.ts";
 import Select from "@/components/inputs/SelectComponent.vue";
+import { getCategoryColor, getCategoryLabel } from "@/helpers/quizCategory";
 
 const toast = useToastStore();
 const route = useRoute();
@@ -143,22 +144,41 @@ watch(quizFinished, (finished) => {
 <template>
   <LoaderOverlay v-if="showLoader" message="Création de la session en cours..." />
   <MotionLayout>
-    <div class="flex items-center justify-between mb-8">
-      <div class="flex flex-col gap-1.5">
-        <p class="font-outfit text-lg text-black-transparent">Commence à réviser</p>
-        <h1 class="font-outfit text-4xl font-extrabold text-black">
-          Détails du quiz : <span class="text-primary font-semibold">{{ quiz?.title }}</span>
-        </h1>
+    <!-- Header avec dégradé de couleur -->
+    <div
+      class="p-8 rounded-2xl mb-2 border border-gray-200"
+      :style="{
+        background: quiz
+          ? `linear-gradient(135deg, ${getCategoryColor(quiz.category)}, #fff 80%)`
+          : 'linear-gradient(135deg, #e5e7eb, #fff 80%)',
+      }"
+    >
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col gap-1.5">
+          <p class="font-outfit text-lg text-black-transparent">Commence à réviser</p>
+          <h1 class="font-outfit text-4xl font-extrabold text-black">
+            Détails du quiz : <span class="text-primary font-semibold">{{ quiz?.title }}</span>
+          </h1>
+          <div v-if="quiz" class="flex items-center gap-4 mt-2">
+            <span
+              class="px-3 py-1 rounded-full font-semibold text-sm shadow"
+              :style="{ backgroundColor: getCategoryColor(quiz.category), color: '#333' }"
+            >
+              {{ getCategoryLabel(quiz.category) }}
+            </span>
+            <span class="text-sm text-gray-600"> {{ quiz.questionsNumbers || 0 }} questions </span>
+          </div>
+        </div>
+        <router-link
+          to="/quiz"
+          class="text-primary font-semibold text-base group flex items-center transition-all"
+        >
+          <ArrowLeftIcon
+            class="w-5 h-5 inline-block mr-1 transform transition-all group-hover:-translate-x-1 group-hover:text-primary text-black"
+          />
+          <span class="transition-colors text-black group-hover:text-primary">Retour aux quiz</span>
+        </router-link>
       </div>
-      <router-link
-        to="/quiz"
-        class="text-primary font-semibold text-base group flex items-center transition-all"
-      >
-        <ArrowLeftIcon
-          class="transition-colors w-5 h-5 inline-block mr-1 transform transition-transform group-hover:-translate-x-1 group-hover:text-primary text-black transition-colors"
-        />
-        <span class="transition-colors text-black group-hover:text-primary">Retour aux quiz</span>
-      </router-link>
     </div>
 
     <!-- Tabs -->
@@ -375,6 +395,7 @@ watch(quizFinished, (finished) => {
         <div class="mb-6">
           <QuestionDraggable
             :questions="[quiz.questions[currentStep]]"
+            :questionIndex="currentStep"
             :showAllAnswers="quizFinished || showCorrection"
             :userSelection="{ 0: userAnswers[currentStep] || [] }"
             :total-questions="quiz.questions.length"
