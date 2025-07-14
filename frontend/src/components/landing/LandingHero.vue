@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { RouterLink } from "vue-router";
-import { Motion } from '@motionone/vue';
+import { Motion } from "@motionone/vue";
+import image from "../../assets/images/illuLanding.png";
 </script>
 
 <template>
@@ -38,7 +39,9 @@ import { Motion } from '@motionone/vue';
               :animate="{ opacity: 1, scale: 1 }"
               transition="{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }"
             >
-              <ButtonComponent variant="primary" tracking_event="start_free_trial"> Commencer gratuitement !</ButtonComponent>
+              <ButtonComponent variant="primary" tracking_event="start_free_trial">
+                Commencer gratuitement !</ButtonComponent
+              >
             </Motion>
           </RouterLink>
         </Motion>
@@ -50,14 +53,7 @@ import { Motion } from '@motionone/vue';
           transition="{ delay: 0.3, type: 'spring', stiffness: 200, damping: 20 }"
           class="flex-1 flex items-center justify-center"
         >
-          <div
-            class="w-[420px] h-[420px] bg-white rounded-2xl shadow-xl flex items-center justify-center border-2 border-gray-200 relative overflow-hidden"
-          >
-            <!-- Placeholder GIF/animation -->
-            <div class="flex flex-col items-center justify-center gap-4">
-              <span class="text-xs text-gray-400 mt-2">[Mockup de l'app]</span>
-            </div>
-          </div>
+          <img :src="image" />
         </Motion>
       </div>
     </section>
