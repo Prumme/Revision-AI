@@ -147,7 +147,12 @@ watch(quizCount, (newCount) => {
             placeholder="Catégorie"
             id="category"
           />
-          <Switch v-model="isPublic" label="Quiz publics uniquement" id="isPublic" />
+          <Switch
+            v-if="activeTab === quizKeys.my"
+            v-model="isPublic"
+            label="Quiz publics uniquement"
+            id="isPublic"
+          />
         </div>
       </Motion>
     </div>
