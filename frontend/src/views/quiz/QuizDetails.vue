@@ -397,9 +397,8 @@ watch(quizFinished, (finished) => {
             :questions="[quiz.questions[currentStep]]"
             :questionIndex="currentStep"
             :showAllAnswers="quizFinished || showCorrection"
-            :userSelection="{ 0: userAnswers[currentStep] || [] }"
+            v-model:selection="userAnswers[currentStep]"
             :total-questions="quiz.questions.length"
-            @update:selection="(selection) => (userAnswers[currentStep] = selection[0] || [])"
             mode="quiz"
           />
         </div>

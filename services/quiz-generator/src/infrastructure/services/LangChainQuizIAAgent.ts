@@ -32,11 +32,12 @@ const _quizGeneratePrompt = PromptTemplate.fromTemplate(`
 Generate a quiz from the \"contents\" key of a JSON files, you receive an array of multiple file content.  
 Detect the language of the content and write the quiz in that language.
 Generate exactly {questionsCount} questions.
+Try to generate a quiz that is educational, informative, and engaging.
+Each question must have between 2 and 4 answers (the more, the better), with at least one correct and one incorrect answer, it can be multiple choice question.
 Return **only** this JSON format (no text, no markdown):
 {{ "t": "Quiz title", 
   "questions": [{{ "q": "Question?", "answers": [{{ "a": "Answer 1", "c": true }}, {{ "a": "Answer 2", "c": false }}] }}]
 }}
-Each question must have 2–5 answers, at least one and max 2 marked "c": true,  Cover key ideas from the content.
 
 The content : 
 {content}
