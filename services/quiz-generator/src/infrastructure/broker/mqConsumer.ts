@@ -34,7 +34,7 @@ export const mqConsumer = async () => {
     }
     const quizGenerationMessagePayload = safeContentResult.data;
 
-    console.log("Message received:", quizGenerationMessagePayload);
+    console.log("[QUIZ-GENERATOR] Quiz generation message received");
 
     const fileContentResult = await generateQuizUseCase({
       filesContents: quizGenerationMessagePayload.filesContents,
@@ -43,7 +43,7 @@ export const mqConsumer = async () => {
 
     if (!fileContentResult.success) {
       console.error(
-        "Error generating the quiz:",
+        "[QUIZ-GENERATOR][ERROR] Error generating the quiz:",
         fileContentResult.error.message,
       );
       await mqProvide({
@@ -57,7 +57,7 @@ export const mqConsumer = async () => {
     }
 
     const quiz = fileContentResult.value;
-    console.log("Quiz generated successfully:", JSON.stringify(quiz, null, 2));
+    console.log("[QUIZ-GENERATOR] Quiz generated successfully");
     await mqProvide({
       success: true,
       identifier: quizGenerationMessagePayload.identifier,
@@ -70,6 +70,6 @@ export const mqConsumer = async () => {
   const channel = await connection.createChannel();
   await channel.assertQueue(QUEUE_NAME, { durable: true });
   await channel.prefetch(1);
-  console.log(`Waiting for messages in ${QUEUE_NAME}...`);
+  console.log(`[QUIZ-GENERATOR] Waiting for messages in ${QUEUE_NAME}...`);
   await channel.consume(QUEUE_NAME, onMessage, { noAck: false });
 };

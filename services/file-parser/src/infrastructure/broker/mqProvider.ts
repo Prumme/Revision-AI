@@ -16,13 +16,16 @@ export async function mqProvide(
     const msg = JSON.stringify(message);
     channel.sendToQueue(queueName, Buffer.from(msg), { persistent: true });
 
-    console.log("Message envoyé dans RabbitMQ:", msg);
+    console.log("[FILE-PARSER] Message sent back successfully");
 
     setTimeout(() => {
       channel.close();
       connection.close();
     }, 500);
   } catch (error) {
-    console.error("Erreur lors de l'envoi du message :", error);
+    console.error(
+      "[FILE-PARSER][ERROR] Erreur lors de l'envoi du message :",
+      error,
+    );
   }
 }

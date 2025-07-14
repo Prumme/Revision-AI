@@ -26,12 +26,19 @@ export const mqConsumer = async () => {
     const safeContentResult = fileUploadedEvent.safeParse(parsedContent);
 
     if (!safeContentResult.success) {
-      console.error("Invalid message format", safeContentResult.error);
+      console.error(
+        "[FILE-PARSER][ERROR] Invalid message format",
+        safeContentResult.error,
+      );
       channel.nack(msg, false, false);
       return;
     }
 
     const fileUploaded = safeContentResult.data;
+    console.log(
+      "[FILE-PARSER] New file to parse received",
+      fileUploaded.fileName,
+    );
     const payload: S3FileDownloaderArgs = {
       fileId: fileUploaded.objectKey, // Placeholder for actual ID
       objectKey: fileUploaded.objectKey,
@@ -41,21 +48,26 @@ export const mqConsumer = async () => {
     const fileContentResult = await handleFileUploadedUseCase(payload);
 
     if (!fileContentResult.success) {
-      console.error("Error processing file:", fileContentResult.error.message);
+      console.error(
+        "[FILE-PARSER][ERROR] Error processing file:",
+        fileContentResult.error.message,
+      );
       channel.nack(msg, false, false);
       return;
     }
 
     const fileContent = fileContentResult.value;
 
-    channel.ack(msg);
+    console.log("[FILE-PARSER] File uploaded event processed successfully");
     await mqProvide({ ...fileUploaded, ...fileContent }).catch(console.error);
 
     try {
       fs.unlinkSync(payload.downloadPath);
-      console.log(`File ${payload.downloadPath} deleted successfully`);
+      console.log(
+        `[FILE-SERVICE] File ${payload.downloadPath} deleted successfully`,
+      );
     } catch (error) {
-      console.error("Error deleting file:", error);
+      console.error("[FILE-PARSER][ERROR] Error deleting file:", error);
     }
   }
 
@@ -63,6 +75,6 @@ export const mqConsumer = async () => {
   const channel = await connection.createChannel();
   await channel.assertQueue(QUEUE_NAME, { durable: true });
   await channel.prefetch(1);
-  console.log(`Waiting for messages in ${QUEUE_NAME}...`);
+  console.log(`[FILE-PARSER] Waiting for messages in ${QUEUE_NAME}...`);
   await channel.consume(QUEUE_NAME, onMessage, { noAck: false });
 };
