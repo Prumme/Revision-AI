@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { SubscriptionTier } from '../../domain/value-objects/subscriptionTier';
 import { SubscriptionInfo } from 'domain/value-objects/subscriptionPrice';
 import { SubscriptionProvider } from '@services/SubscriptionProvider';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CustomerIdentifier } from '@entities/customer.entity';
 import { CustomerNotFoundError } from '../../domain/errors/SubscriptionError';
 import { CustomerDto } from '@modules/subscription/dto/customer.dto';
@@ -12,13 +12,22 @@ import { UserService } from '@modules/user/user.service';
 
 @Injectable()
 export class StripeSubscriptionProvider implements SubscriptionProvider {
-  private readonly stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  private readonly stripe: Stripe;
   private stripeProductIdToTier: Record<string, SubscriptionTier> = {};
   private tierToStripeProductId: Partial<Record<SubscriptionTier, string>> = {};
   private mappingInitialized = false;
-
+  private logger: Logger;
   constructor(private userService: UserService) {
-    this.initStripeMappings();
+    this.logger = new Logger(StripeSubscriptionProvider.name);
+    if (process.env.STRIPE_SECRET_KEY) {
+      this.logger.log('Initializing Stripe with secret key');
+      this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      this.initStripeMappings();
+    } else {
+      this.logger.warn(
+        'Stripe secret key is not set. StripeSubscriptionProvider will not work.',
+      );
+    }
   }
 
   private async initStripeMappings() {
@@ -74,6 +83,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
   }
 
   async getProductsPrices(): Promise<SubscriptionInfo[] | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     try {
       // Add conditions to filter only product and prices that are for RevisionAI
       const products = await this.stripe.products.list({
@@ -110,6 +120,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
   async upsertCustomer(
     customerPayload: CustomerDto & { customerId?: string; email: string },
   ): Promise<CustomerIdentifier | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     try {
       let customer: Stripe.Customer;
       //update a customer on stripe if customerId is provided create a new one otherwise
@@ -143,6 +154,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
   async getSubscriptionStatus(
     customerIdentifier: CustomerIdentifier,
   ): Promise<SubscriptionTier | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     try {
       await this.stripe.customers.retrieve(customerIdentifier.customerId);
     } catch (e) {
@@ -171,6 +183,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     tier: SubscriptionTier,
     paymentMethodId: string,
   ): Promise<true | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     try {
       const customer = await this.stripe.customers.retrieve(
         customerIdentifier.customerId,
@@ -247,6 +260,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     customerIdentifier: CustomerIdentifier,
     args?: any,
   ): Promise<true | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     try {
       await this.stripe.customers.retrieve(customerIdentifier.customerId);
     } catch (error) {
@@ -291,6 +305,7 @@ export class StripeSubscriptionProvider implements SubscriptionProvider {
     customerId: string,
     reqUser: ReqUser,
   ): Promise<Invoice[] | Error> {
+    if (!this.stripe) return new Error('Stripe is not initialized');
     const user = await this.userService.findById(reqUser.sub);
     if (!user) return new Error('User not found');
 

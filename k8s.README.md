@@ -1,4 +1,10 @@
-# Setup Kubernetes
+# Rendu Clusterization - Kubernetes
+
+> Ce document décrit les étapes que nous avons traverser pour mettre en place l'infrastrucuture distribué de l’application Revision AI sur un cluster Kubernetes local avec kind, ainsi que les configurations nécessaires pour RabbitMQ, MongoDB, et l’Ingress NGINX.
+
+# Contexte
+
+> cf. [README.md](README.md)
 
 ## 1. Lancer le cluster kind
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { verifyEmailTemplate } from './templates/verify-email';
 import { CreateEmailResponseSuccess, Resend } from 'resend';
 import {
@@ -19,11 +19,28 @@ import { deleteAccountTemplate } from './templates/delete-account';
 import { unblockUserTemplate } from './templates/unblock-user';
 import { askNewUsernameTemplate } from './templates/ask-new-username';
 
+class NullResend {
+  emails = {
+    send: async () => {
+      throw new Error('Resend API key is not set');
+    },
+  };
+}
+
 @Injectable()
 export class MailService {
-  private resend: Resend;
+  private resend: Resend | NullResend;
   constructor() {
-    this.resend = new Resend(process.env.RESEND_API_KEY);
+    const logger = new Logger(MailService.name);
+    if (!process.env.RESEND_API_KEY) {
+      logger.warn(
+        'Resend API key is not set. MailService will not send emails.',
+      );
+      this.resend = new NullResend();
+    } else {
+      logger.log('Using Resend service for sending emails');
+      this.resend = new Resend(process.env.RESEND_API_KEY);
+    }
   }
 
   private async send(

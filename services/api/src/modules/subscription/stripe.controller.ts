@@ -1,4 +1,4 @@
-import { Controller, Headers, Inject, Post, Req } from '@nestjs/common';
+import { Controller, Headers, Inject, Logger, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import Stripe from 'stripe';
 import { CustomerRepository } from '@repositories/customer.repository';
@@ -23,7 +23,14 @@ export class StripeController {
     @Inject(StripeSubscriptionProvider)
     private stripeSubscriptionProvider: StripeSubscriptionProvider,
   ) {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const logger = new Logger(StripeController.name);
+    if (process.env.STRIPE_SECRET_KEY) {
+      this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    } else {
+      logger.warn(
+        'Stripe secret key is not set. StripeSubscriptionProvider will not work.',
+      );
+    }
   }
 
   @Public()
@@ -35,13 +42,15 @@ export class StripeController {
     let response: true | Error = true;
     try {
       // Utiliser le rawBody capturé par le middleware
-      const rawBody = req.rawBody;
+      const rawBody = (req as any).rawBody || req.body;
 
       if (!rawBody) {
         throw new Error(
           'Raw body is required for webhook signature verification',
         );
       }
+
+      console.log('Secret :' + [process.env.STRIPE_WEBHOOK_SECRET]);
 
       const event = this.stripe.webhooks.constructEvent(
         rawBody,
@@ -69,12 +78,12 @@ export class StripeController {
 
       return { received: true };
     } catch (err) {
-      console.error('Error verifying webhook signature:', err);
-      response = new Error('Failed to verify webhook signature');
+      console.error('Error while receiving stripe payload event:', err);
+      response = new Error('Failed to process Stripe webhook');
     }
 
     if (response instanceof Error) throw response;
-    console.log('Webhook received:', response);
+
     return response;
   }
 
