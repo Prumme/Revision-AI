@@ -136,15 +136,4 @@ const sessionFilters: TableFilter[] = [
     @update:filters="handleFilterChange"
   />
 
-  <!--      search-placeholder="Rechercher un document..."
-    empty-message="Aucun document trouvé"
-    row-key="id"
-    :pagination="pagination"
-    @update:page="handlePageChange"
-    @update:items-per-page="handleItemsPerPageChange"
-    :data="sessions.data"
-    :rowKey="'id'"
-    :searchable="false"
-    :empty-message="props.emptyMessage || 'Aucune session trouvée pour ce quiz.'"
-    :pagination="pagination"-->
 </template>
