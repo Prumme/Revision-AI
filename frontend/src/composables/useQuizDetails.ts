@@ -1,18 +1,9 @@
-import { ref, computed, onMounted, watch, h } from "vue";
+import { ref, computed } from "vue";
 import { QuizService, type Quiz } from "@/services/quiz.service";
 import { useToastStore } from "@/stores/toast";
 import { useSessionStore } from "@/stores/session";
 import { useUserStore } from "@/stores/user";
 import { sessionService } from "@/services/session.service";
-import StatusBadge from "@/components/badges/StatusBadge.vue";
-import type {
-  TableAction,
-  TableColumn,
-  TableFilter,
-  TableSort,
-  TableFilters,
-} from "@/types/datatable";
-import type { PaginationData } from "@/components/ui/PaginatorComponent.vue";
 
 export function useQuizDetails(quizId: string) {
   const toast = useToastStore();
@@ -35,15 +26,10 @@ export function useQuizDetails(quizId: string) {
   const currentStep = ref(0);
   const userSessions = ref<[]>([]);
 
-  // Session table state for backend-driven filtering/sorting/pagination
-  const sessionTableFilters = ref<TableFilters>({ status: "all" });
-  const sessionTableSort = ref<TableSort | null>(null);
-  const sessionTablePagination = ref<PaginationData>({
-    currentPage: 1,
-    totalPages: 1,
-    totalItems: 0,
-    itemsPerPage: 10,
-  });
+  const sessionCount = ref(0);
+  function setSessionCount(count: number) {
+    sessionCount.value = count;
+  }
   const sessionTableLoading = ref(false);
 
   const showAllSessions = ref(false);
@@ -65,8 +51,7 @@ export function useQuizDetails(quizId: string) {
       {
         key: "sessions",
         label: "Sessions",
-        badge:
-          filteredSessions.value.length > 0 ? filteredSessions.value.length.toString() : undefined,
+        badge: sessionCount.value !== 0 ? sessionCount.value : undefined,
       },
     ];
     if ((quiz.value && quiz.value.userId === userId.value) || user.isAdmin) {
@@ -74,66 +59,6 @@ export function useQuizDetails(quizId: string) {
     }
     return tabs;
   });
-
-  const sessionColumns: TableColumn[] = [
-    {
-      key: "startedAt",
-      label: "Date de début",
-      formatter: (value: string) => (value ? new Date(value).toLocaleString("fr-FR") : "-"),
-    },
-    {
-      key: "finishedAt",
-      label: "Date de fin",
-      formatter: (value: string) => (value ? new Date(value).toLocaleString("fr-FR") : "-"),
-    },
-    {
-      key: "status",
-      label: "Statut",
-      sortable: true,
-      render: (value: string) => {
-        if (value === "paused") return h(StatusBadge, { variant: "warning" }, () => "En pause");
-        if (value === "active") return h(StatusBadge, { variant: "secondary" }, () => "En cours");
-        if (value === "finished") return h(StatusBadge, { variant: "success" }, () => "Terminée");
-        if (value === "pending") return h(StatusBadge, { variant: "info" }, () => "En attente");
-      },
-    },
-    {
-      key: "duration",
-      label: "Durée",
-      formatter: (value: number) => {
-        if (value == null) return "-";
-        const minutes = Math.floor(value / 60);
-        const seconds = value % 60;
-        return `${minutes} min ${seconds} sec`;
-      },
-    },
-    {
-      key: "score",
-      label: "Score",
-      formatter: (value: number) =>
-        value != null ? `${value} / ${quiz.value?.questions.length || 0}` : "-",
-    },
-  ];
-
-  const actions: TableAction[] = [
-    {
-      label: "Reprendre",
-      icon: "Play",
-      tooltip: "Reprendre cette session",
-      variant: "warning",
-      visible: (row) => row.status === "paused",
-      handler: async (row) => {
-        if (row && row.id) {
-          await sessionStore.resumeSession(row.id);
-          await fetchAllUserSessions();
-          toast.showToast("success", "Session reprise avec succès.");
-          activeTab.value = "quiz";
-          isStarted.value = true;
-          sessionStore.sessionId = row.id;
-        }
-      },
-    },
-  ];
 
   const onQuestionsOrderChange = (newQuestions: Quiz["questions"]) => {
     orderChanged.value = true;
@@ -143,19 +68,6 @@ export function useQuizDetails(quizId: string) {
   const toggleAllAnswers = () => {
     showAllAnswers.value = !showAllAnswers.value;
   };
-
-  onMounted(async () => {
-    try {
-      loading.value = true;
-      quiz.value = await QuizService.getQuizById(quizId);
-      // Fetch sessions dès le chargement de la page
-      await fetchAllUserSessions();
-    } catch {
-      error.value = "Erreur lors du chargement du quiz.";
-    } finally {
-      loading.value = false;
-    }
-  });
 
   const saveQuiz = async () => {
     if (quiz.value === null) return;
@@ -286,109 +198,6 @@ export function useQuizDetails(quizId: string) {
     }
   };
 
-  // Define fetchAllUserSessions before usage
-  async function fetchAllUserSessions() {
-    sessionTableLoading.value = true;
-    try {
-      if (fetchAllUserSessions._filterChanged) {
-        sessionTablePagination.value.currentPage = 1;
-        fetchAllUserSessions._filterChanged = false;
-      }
-      const response = await sessionService.findAllByQuizIdAndUserId(quizId, userId.value, {
-        page: sessionTablePagination.value.currentPage,
-        limit: sessionTablePagination.value.itemsPerPage,
-        status:
-          sessionTableFilters.value.status !== "all" ? sessionTableFilters.value.status : undefined,
-        scoreMin:
-          sessionTableFilters.value.scoreMin !== undefined
-            ? sessionTableFilters.value.scoreMin
-            : undefined,
-        scoreMax:
-          sessionTableFilters.value.scoreMax !== undefined
-            ? sessionTableFilters.value.scoreMax
-            : undefined,
-      });
-
-      console.log(response);
-      userSessions.value = response.data;
-      sessionTablePagination.value.totalItems = response.total;
-      sessionTablePagination.value.totalPages = response.totalPages;
-    } catch {
-      userSessions.value = [];
-    } finally {
-      sessionTableLoading.value = false;
-    }
-  }
-
-  // Appel initial lors du montage ou changement d'onglet
-  onMounted(fetchAllUserSessions);
-  watch([activeTab, userId], ([tab]) => {
-    if (tab === "sessions") fetchAllUserSessions();
-  });
-
-  // Fetch toutes les sessions du quiz (pour owner)
-  async function fetchAllQuizSessions() {
-    if (!quiz.value) return;
-    sessionTableLoading.value = true;
-    try {
-      // On suppose que sessionService.findAllByQuizId existe côté backend
-      const allSessions = await sessionService.findAllByQuizId(quiz.value.id);
-      allQuizSessions.value = allSessions;
-    } catch {
-      allQuizSessions.value = [];
-    } finally {
-      sessionTableLoading.value = false;
-    }
-  }
-
-  // Filtering logic (client-side)
-  const filteredSessions = computed(() => {
-    if (showAllSessions.value && isQuizOwner.value) {
-      return getFilteredSessions(allQuizSessions.value);
-    }
-    return getFilteredSessions(userSessions.value);
-  });
-  function getFilteredSessions(sessions: Array<{ status: string; score?: number }>) {
-    let result = sessions;
-    const { status, scoreMin, scoreMax } = sessionTableFilters.value;
-    if (status && status !== "all") {
-      result = result.filter((s) => s.status === status);
-    }
-    if (scoreMin != null) {
-      result = result.filter((s) => (typeof s.score === "number" ? s.score >= scoreMin : true));
-    }
-    if (scoreMax != null && scoreMax > 0) {
-      result = result.filter((s) => (typeof s.score === "number" ? s.score <= scoreMax : true));
-    }
-    return result;
-  }
-
-  // Handlers for SessionDatatable (client-side filtering)
-  function handleSessionTableFilters(filters: TableFilters) {
-    sessionTableFilters.value = { ...sessionTableFilters.value, ...filters };
-  }
-  function handleSessionTableSort(sort: TableSort | null) {
-    sessionTableSort.value = sort;
-  }
-  function handleSessionTablePage(page: number) {
-    sessionTablePagination.value.currentPage = page;
-  }
-  function handleSessionTableItemsPerPage(items: number) {
-    sessionTablePagination.value.itemsPerPage = items;
-    sessionTablePagination.value.currentPage = 1;
-  }
-
-  // Fetch all user sessions on tab change
-  watch([activeTab, quiz, showAllSessions], async ([tab]) => {
-    if (tab === "sessions") {
-      if (showAllSessions.value && isQuizOwner.value) {
-        await fetchAllQuizSessions();
-      } else {
-        await fetchAllUserSessions();
-      }
-    }
-  });
-
   function shuffleArray<T>(array: T[]): T[] {
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
@@ -405,35 +214,8 @@ export function useQuizDetails(quizId: string) {
     }
   }
 
-  const sessionFilters: TableFilter[] = [
-    {
-      key: "status",
-      label: "Statut",
-      type: "select",
-      options: [
-        { value: "all", label: "Tous" },
-        { value: "active", label: "En cours" },
-        { value: "paused", label: "En pause" },
-        { value: "finished", label: "Terminée" },
-        { value: "pending", label: "En attente" },
-      ],
-      defaultValue: "all",
-    },
-    {
-      key: "scoreMin",
-      label: "Score min.",
-      type: "number",
-      defaultValue: 0,
-    },
-    {
-      key: "scoreMax",
-      label: "Score max.",
-      type: "number",
-      defaultValue: 100,
-    },
-  ];
-
   return {
+    setSessionCount,
     quiz,
     loading,
     error,
@@ -450,8 +232,6 @@ export function useQuizDetails(quizId: string) {
     userSessions,
     isQuizOwner,
     quizTabs,
-    sessionColumns,
-    actions,
     onQuestionsOrderChange,
     toggleAllAnswers,
     saveQuiz,
@@ -460,18 +240,7 @@ export function useQuizDetails(quizId: string) {
     finishQuiz,
     endSession,
     shuffleQuestions,
-    sessionFilters,
-    sessionTableFilters,
-    sessionTableSort,
-    sessionTablePagination,
     sessionTableLoading,
-    fetchAllUserSessions,
-    fetchAllQuizSessions,
-    handleSessionTableFilters,
-    handleSessionTableSort,
-    handleSessionTablePage,
-    handleSessionTableItemsPerPage,
-    filteredSessions,
     showAllSessions,
     totalUniqueParticipants,
   };

@@ -97,7 +97,10 @@ describe('SessionService', () => {
 
       sessionRepository.findAllByUserId.mockResolvedValue(mockSessions as any);
 
-      const result = await service.findAllByUserId(userId, filters, pagination);
+      const result = await service.findAllByUserId(userId, {
+        ...filters,
+        ...pagination,
+      });
 
       expect(result).toEqual(mockSessions);
       expect(sessionRepository.findAllByUserId).toHaveBeenCalledWith(userId, {
@@ -116,11 +119,16 @@ describe('SessionService', () => {
 
       sessionRepository.findAllByQuizId.mockResolvedValue(mockSessions as any);
 
-      const result = await service.findAllByQuizId(quizId, excludeUserId);
+      const result = await service.findAllByQuizId(
+        quizId,
+        { limit: 10, page: 1 },
+        excludeUserId,
+      );
 
       expect(result).toEqual(mockSessions);
       expect(sessionRepository.findAllByQuizId).toHaveBeenCalledWith(
         quizId,
+        { limit: 10, page: 1 },
         excludeUserId,
       );
     });
@@ -131,11 +139,15 @@ describe('SessionService', () => {
 
       sessionRepository.findAllByQuizId.mockResolvedValue(mockSessions as any);
 
-      const result = await service.findAllByQuizId(quizId);
+      const result = await service.findAllByQuizId(quizId, {
+        limit: 10,
+        page: 1,
+      });
 
       expect(result).toEqual(mockSessions);
       expect(sessionRepository.findAllByQuizId).toHaveBeenCalledWith(
         quizId,
+        { limit: 10, page: 1 },
         undefined,
       );
     });

@@ -14,15 +14,27 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+export interface SessionOptions extends PaginationOptions {
+  page: number;
+  limit: number;
+  scoreMin?: number;
+  scoreMax?: number;
+  status?: string;
+}
+
 export interface SessionRepository {
   findById(id: string): Promise<Session | null>;
 
   findAllByUserId(
     userId: string,
-    pagination: PaginationOptions,
+    options: SessionOptions,
   ): Promise<PaginatedResult<Session>>;
 
-  findAllByQuizId(quizId: string, excludeUserId?: string): Promise<Session[]>;
+  findAllByQuizId(
+    quizId: string,
+    options: SessionOptions,
+    excludeUserId?: string,
+  ): Promise<PaginatedResult<Session>>;
 
   create(user: Omit<Session, 'id'>): Promise<Session>;
 
@@ -31,6 +43,7 @@ export interface SessionRepository {
   findAllByQuizIdAndUserId(
     quizId: string,
     userId: string,
+    options: SessionOptions,
   ): Promise<PaginatedResult<Session>>;
 }
 

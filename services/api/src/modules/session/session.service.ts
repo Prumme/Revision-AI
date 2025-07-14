@@ -3,7 +3,7 @@ import * as SessionEntity from '@entities/session.entity';
 import { Session } from '@entities/session.entity';
 import { CreateSessionDto } from '@modules/session/dto/create-session.dto';
 import { SessionRepository } from '@repositories/session.repository';
-import { UserRepository } from '@repositories/user.repository';
+import { PaginatedResult, UserRepository } from '@repositories/user.repository';
 import { QuizRepository } from '@repositories/quiz.repository';
 import { EndSessionDto } from '@modules/session/dto/end-session.dto';
 import { SessionAnswer, SessionStatus } from '@entities/session.entity';
@@ -39,31 +39,39 @@ export class SessionService {
   /**
    * Retrieves all sessions for a specific user.
    * @param userId - The ID of the user whose sessions are to be retrieved.
-   * @param filters
-   * @param pagination
+   * @param options - Pagination and filtering options.
    * @returns An array of sessions associated with the user.
    */
   async findAllByUserId(
     userId: string,
-    filters: { scoreMin?: number; scoreMax?: number; status?: string },
-    pagination: { page: number; limit: number },
+    options: { scoreMin?: number; scoreMax?: number; status?: string } & {
+      page: number;
+      limit: number;
+    },
   ): Promise<any> {
-    return this.sessionRepository.findAllByUserId(userId, {
-      ...pagination,
-      ...filters,
-    });
+    return this.sessionRepository.findAllByUserId(userId, options);
   }
 
   /**
    * Retrieves all sessions for a specific quiz.
    * @param quizId - The ID of the quiz whose sessions are to be retrieved.
+   * @param options - Pagination and filtering options.
+   * @param excludeUserId - Optional user ID to exclude from the results.
    * @returns An array of sessions associated with the quiz.
    */
   async findAllByQuizId(
     quizId: string,
+    options: { scoreMin?: number; scoreMax?: number; status?: string } & {
+      page: number;
+      limit: number;
+    },
     excludeUserId?: string,
-  ): Promise<Session[]> {
-    return this.sessionRepository.findAllByQuizId(quizId, excludeUserId);
+  ): Promise<PaginatedResult<Session>> {
+    return this.sessionRepository.findAllByQuizId(
+      quizId,
+      options,
+      excludeUserId,
+    );
   }
 
   /**
@@ -76,15 +84,16 @@ export class SessionService {
   async findAllByQuizIdAndUserId(
     quizId: string,
     userId: string,
-    options?: {
-      page?: number;
-      limit?: number;
-      scoreMin?: number;
-      scoreMax?: number;
-      status?: string;
+    options: { scoreMin?: number; scoreMax?: number; status?: string } & {
+      page: number;
+      limit: number;
     },
   ): Promise<any> {
-    return this.sessionRepository.findAllByQuizIdAndUserId(quizId, userId);
+    return this.sessionRepository.findAllByQuizIdAndUserId(
+      quizId,
+      userId,
+      options,
+    );
   }
 
   /**

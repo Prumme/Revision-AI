@@ -51,8 +51,6 @@ const {
   showLoader,
   isQuizOwner,
   quizTabs,
-  sessionColumns,
-  actions,
   onQuestionsOrderChange,
   toggleAllAnswers,
   saveQuiz,
@@ -60,16 +58,10 @@ const {
   nextStep,
   endSession,
   shuffleQuestions,
-  fetchSessionsForTable,
   sessionTableLoading,
-  filteredSessions,
-  sessionFilters,
-  sessionTableFilters,
-  handleSessionTableFilters,
   showAllSessions,
-  fetchAllQuizSessions,
-  fetchAllUserSessions,
   totalUniqueParticipants,
+  setSessionCount,
 } = quizDetails;
 
 const medias = computed(() => {
@@ -86,22 +78,6 @@ onMounted(async () => {
     error.value = "Erreur lors du chargement du quiz.";
   } finally {
     loading.value = false;
-  }
-});
-
-watch([activeTab, quiz], async ([tab]) => {
-  if (tab === "sessions") {
-    await fetchSessionsForTable;
-  }
-});
-
-watch(showAllSessions, async (val) => {
-  if (isQuizOwner.value) {
-    if (val) {
-      await fetchAllQuizSessions();
-    } else {
-      await fetchAllUserSessions();
-    }
   }
 });
 
@@ -488,20 +464,20 @@ watch(quizFinished, (finished) => {
         </span>
       </div>
       <SessionDatatable
-        :data="filteredSessions"
-        :actions="actions"
-        :columns="sessionColumns"
+        @load="setSessionCount"
+        v-if="quiz.id"
+        :quiz-and-author-identifier="{
+          id: quiz.id,
+          authorId: quiz.userId,
+        }"
         :loading="sessionTableLoading"
         :rowKey="'id'"
-        :filters="sessionFilters"
-        :initial-filters="sessionTableFilters"
-        :sort="sessionTableSort"
-        :pagination="sessionTablePagination"
-        @update:filters="handleSessionTableFilters"
-        @update:sort="handleSessionTableSort"
-        @update:page="handleSessionTablePage"
-        @update:items-per-page="handleSessionTableItemsPerPage"
         empty-message="Aucune session trouvée pour ce quiz."
+        @resume:session="
+          (rowId) => {
+            activeTab = 'quiz';
+          }
+        "
       />
     </section>
   </MotionLayout>
