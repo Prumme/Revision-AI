@@ -26,4 +26,14 @@ for image in $images; do
     fi
 done
 
+# Load frontend image
+
+echo -e "\n${GREEN}Loading frontend image...${NC}"
+if kind load docker-image "revision-ai/frontend:latest"; then
+    echo -e "${GREEN}Successfully loaded frontend image${NC}"
+else
+    echo -e "${RED}Failed to load frontend image${NC}"
+    exit 1
+fi
+
 echo -e "\n${GREEN}All images loaded successfully!${NC}"

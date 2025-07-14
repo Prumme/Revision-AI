@@ -18,7 +18,6 @@ import UserDocuments from "@/components/admin/UserDocuments.vue";
 
 import type { User as UserType } from "@/types/user";
 import type { Quiz } from "@/types/quiz";
-import type { Document } from "@/types/document";
 import type { Invoice } from "@/types/invoice";
 
 const route = useRoute();
@@ -29,7 +28,7 @@ const dialog = useDialogStore();
 const user = ref<UserType | null>(null);
 const loading = ref(false);
 const userQuizzes = ref<Quiz[]>([]);
-const userDocuments = ref<Document[]>([]);
+
 const userInvoices = ref<Invoice[]>([]);
 const actionLoading = ref(false);
 
@@ -74,7 +73,6 @@ const fetchUserDetails = async () => {
     }
 
     userQuizzes.value = quizzesData.status === "fulfilled" ? quizzesData.value.data : [];
-    userDocuments.value = quizzesData.value.data.map((quiz) => quiz.media).flat();
   } catch (error) {
     console.error("Erreur lors du chargement des détails utilisateur:", error);
     toast.showToast("error", "Impossible de charger les détails de l'utilisateur");
@@ -213,7 +211,7 @@ onMounted(() => {
           @refresh="handleSubscriptionUpdate"
         />
         <UserQuizzes class="col-span-2" :quizzes="userQuizzes" />
-        <UserDocuments :documents="userDocuments" />
+        <UserDocuments class="col-span-2" :user-id="userId" />
       </div>
 
       <!-- Error State -->

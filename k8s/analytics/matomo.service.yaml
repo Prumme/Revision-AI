@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: matomo-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: matomo-deploy
   ports:

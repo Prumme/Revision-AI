@@ -34,6 +34,7 @@ import { GetJobProgressUseCaseFactory } from '@domain/usecases/QuizGenerationUse
 import { QuizGenerationJobRepository } from '@repositories/quiz-generation-job.repository';
 import { Public } from '@common/decorators/public.decorator';
 import { PaginatedResult } from '@repositories/user.repository';
+import { generateSignature } from '@infrastructure/urlSignature';
 
 @ApiTags('Quizzes')
 @Controller('quizzes')
@@ -52,19 +53,25 @@ export class QuizController {
     description: 'Liste des quiz récupérée avec succès',
     type: [Quiz],
   })
-  async findAll(@Query() filters: QuizFiltersDto, @Req() req: Request & { user?: ReqUser }): Promise<PaginatedResult<Quiz>> {
+  async findAll(
+    @Query() filters: QuizFiltersDto,
+    @Req() req: Request & { user?: ReqUser },
+  ): Promise<PaginatedResult<Quiz>> {
     const userId = req.user?.sub;
-    return this.quizService.findAll({
-      ...filters,
-      isPublic: true,
-      userId: {
-        id: userId,
-        exclude: true // Exclude quizzes created by the user
-      }
-    }, {
-      page: filters.page || 1,
-      limit: filters.limit || 4,
-    });
+    return this.quizService.findAll(
+      {
+        ...filters,
+        isPublic: true,
+        userId: {
+          id: userId,
+          exclude: true, // Exclude quizzes created by the user
+        },
+      },
+      {
+        page: filters.page || 1,
+        limit: filters.limit || 4,
+      },
+    );
   }
 
   @Get(':id')
@@ -81,6 +88,22 @@ export class QuizController {
     if (!quiz) {
       throw new HttpException('Quiz non trouvé', HttpStatus.NOT_FOUND);
     }
+
+    quiz.media = quiz.media.map((document) => {
+      const pathSigned = generateSignature(
+        '/documents/view',
+        3600, // 1 hour expiration,
+        process.env.JWT_SECRET,
+        {
+          f: document.identifier,
+        },
+      );
+      return {
+        ...JSON.parse(JSON.stringify(document)),
+        url: pathSigned,
+      };
+    });
+
     return quiz;
   }
 
@@ -140,14 +163,17 @@ export class QuizController {
     @Query() filters: QuizFiltersDto,
   ): Promise<PaginatedResult<Quiz>> {
     // @TODO check permissions
-    return this.quizService.findAll({
-      ...filters,
-      userId: {id, exclude: false}, 
-      ready: true,
-    },{
-      page: filters.page || 1,
-      limit: filters.limit || 10,
-    });
+    return this.quizService.findAll(
+      {
+        ...filters,
+        userId: { id, exclude: false },
+        ready: true,
+      },
+      {
+        page: filters.page || 1,
+        limit: filters.limit || 10,
+      },
+    );
   }
 
   @Post()

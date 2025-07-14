@@ -9,11 +9,14 @@ import { quizGenerationQueueConsumer } from '@infrastructure/queue/consumers/qui
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Configure raw body parser for Stripe webhooks BEFORE JSON parser
   app.use('/stripe/webhook', raw({ type: 'application/json' }));
 
-  app.use(json({ limit: '10mb' }));
-  app.use(urlencoded({ limit: '10mb', extended: true }));
+  app.use((req, res, next) => {
+    if (req.path === '/stripe/webhook') return next();
+    json({ limit: '10mb' })(req, res, () => {
+      urlencoded({ limit: '10mb', extended: true })(req, res, next);
+    });
+  });
 
   app.enableCors({
     origin: '*',

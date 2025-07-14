@@ -41,10 +41,4 @@ export class UpdateQuizDto {
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
   isPublic?: boolean;
-
-  @ApiProperty({ description: 'Médias associés au quiz', required: false })
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  media?: string[];
 }

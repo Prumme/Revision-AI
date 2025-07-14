@@ -12,6 +12,7 @@ import { SubscriptionModule } from '@modules/subscription/subscription.module';
 import { ReportModule } from '@modules/report/report.module';
 import { SessionModule } from './modules/session/session.module';
 import { KpiModule } from './modules/kpi/kpi.module';
+import { DocumentModule } from '@modules/documents/document.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { KpiModule } from './modules/kpi/kpi.module';
     ReportModule,
     SessionModule,
     KpiModule,
+    DocumentModule,
   ],
   providers: [
     {

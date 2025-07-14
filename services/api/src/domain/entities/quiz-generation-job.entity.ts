@@ -1,10 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
 import * as crypto from 'node:crypto';
+import { UploadedDocument } from '@entities/document.entity';
 
 export enum QuizGenerationJobStatus {
   PENDING = 'pending',
-  PARSING_FILES = "parsing_files",
-  GENERATING = "generating",
+  PARSING_FILES = 'parsing_files',
+  GENERATING = 'generating',
   COMPLETED = 'completed',
   FAILED = 'failed',
 }
@@ -16,7 +16,7 @@ export interface QuizGenerationJobEvent {
 }
 
 export interface QuizGenerationFile {
-  identifier: string;
+  identifier: string; // Unique identifier for the file
   parsed: boolean;
 }
 
@@ -34,7 +34,7 @@ export interface QuizGenerationJob {
 export function createQuizGenerationJob(
   userId: string,
   quizId,
-  files: string[] = [],
+  files: UploadedDocument[] = [],
 ): QuizGenerationJob {
   const id = crypto.randomUUID();
   return {
@@ -44,7 +44,7 @@ export function createQuizGenerationJob(
     status: QuizGenerationJobStatus.PENDING,
     events: [],
     files: files.map((file) => ({
-      identifier: file,
+      identifier: file.identifier,
       parsed: false,
     })),
     createdAt: new Date(),
@@ -95,16 +95,16 @@ export function startParsing(job: QuizGenerationJob): QuizGenerationJob {
   return {
     ...job,
     status: QuizGenerationJobStatus.PARSING_FILES,
-    updatedAt : new Date()
-  }
+    updatedAt: new Date(),
+  };
 }
 
 export function startGenerating(job: QuizGenerationJob): QuizGenerationJob {
   return {
     ...job,
     status: QuizGenerationJobStatus.GENERATING,
-    updatedAt : new Date()
-  }
+    updatedAt: new Date(),
+  };
 }
 
 export function completeJob(job: QuizGenerationJob): QuizGenerationJob {

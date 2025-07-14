@@ -1,11 +1,25 @@
-import { createQuizGenerationJob, markFileAsParsed, isReadyForGeneration, addEventJob, completeJob, startParsing, failJob, QuizGenerationJobStatus, startGenerating } from './quiz-generation-job.entity';
+import {
+  createQuizGenerationJob,
+  markFileAsParsed,
+  isReadyForGeneration,
+  addEventJob,
+  completeJob,
+  startParsing,
+  failJob,
+  QuizGenerationJobStatus,
+  startGenerating,
+} from './quiz-generation-job.entity';
+import { createFakeUploadedDocument } from '../../../test/createFakeUploadedDocument';
 
 describe('QuizGenerationJob Entity', () => {
   describe('createQuizGenerationJob', () => {
     it('should create a job with the correct properties', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
 
       const job = createQuizGenerationJob(userId, quizId, files);
 
@@ -26,7 +40,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should mark a file as parsed and add an event', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const updatedJob = markFileAsParsed(job, 'file1');
@@ -36,7 +53,9 @@ describe('QuizGenerationJob Entity', () => {
         { identifier: 'file2', parsed: false },
       ]);
       expect(updatedJob.events.length).toBe(1);
-      expect(updatedJob.events[0].message).toBe('File file1 parsed successfully');
+      expect(updatedJob.events[0].message).toBe(
+        'File file1 parsed successfully',
+      );
       expect(updatedJob.updatedAt).toBeInstanceOf(Date);
     });
   });
@@ -45,7 +64,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should return true if all files are parsed', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const updatedJob = markFileAsParsed(job, 'file1');
@@ -57,7 +79,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should return false if not all files are parsed', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const updatedJob = markFileAsParsed(job, 'file1');
@@ -70,7 +95,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should add an event to the job', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const updatedJob = addEventJob(job, {
@@ -88,14 +116,19 @@ describe('QuizGenerationJob Entity', () => {
     it('should mark the job as completed and add an event', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const completedJob = completeJob(job);
 
       expect(completedJob.status).toBe(QuizGenerationJobStatus.COMPLETED);
       expect(completedJob.events.length).toBe(1);
-      expect(completedJob.events[0].message).toBe('Quiz generation completed successfully');
+      expect(completedJob.events[0].message).toBe(
+        'Quiz generation completed successfully',
+      );
       expect(completedJob.updatedAt).toBeInstanceOf(Date);
     });
   });
@@ -104,7 +137,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should mark the job as failed and add an event', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const failedJob = failJob(job, 'Error occurred');
@@ -121,7 +157,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should mark the job as parsing file', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const processingJob = startParsing(job);
@@ -135,7 +174,10 @@ describe('QuizGenerationJob Entity', () => {
     it('should mark the job as parsing file', () => {
       const userId = 'user123';
       const quizId = 'quiz123';
-      const files = ['file1', 'file2'];
+      const files = [
+        createFakeUploadedDocument('file1', 'file1', 'checksum-1'),
+        createFakeUploadedDocument('file2', 'file2', 'checksum-2'),
+      ];
       const job = createQuizGenerationJob(userId, quizId, files);
 
       const processingJob = startGenerating(job);

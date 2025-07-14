@@ -1,7 +1,7 @@
 import type { Quiz } from "./quiz";
 
 export interface User {
-  _id: string;
+  id: string;
   username: string;
   email: string;
   subscriptionTier: string;
