@@ -73,6 +73,14 @@ export class MongoQuizRepository implements QuizRepository {
         .skip((pagination.page - 1) * pagination.limit)
         .limit(pagination.limit);
     }
+
+    if (filters?.sortBy) {
+      const sortOrder = filters.sortOrder === 'desc' ? -1 : 1;
+      mongoQuery = mongoQuery.sort({ [filters.sortBy]: sortOrder });
+    } else {
+      mongoQuery = mongoQuery.sort({ createdAt: -1 }); // Default sort by createdAt desc
+    }
+
     const [documents, total] = await Promise.all([
       mongoQuery.exec(),
       this.quizModel.countDocuments(query).exec(),
