@@ -24,6 +24,7 @@ import { Session } from '@entities/session.entity';
 import { ReqUser } from '@common/types/request';
 import { CreateSessionDto } from '@modules/session/dto/create-session.dto';
 import { SessionFiltersDto } from '@modules/session/dto/filter-session.dto';
+import { PaginatedResult } from '@repositories/user.repository';
 
 @ApiTags('Sessions')
 @Controller('sessions')
@@ -87,14 +88,49 @@ export class SessionController {
   })
   async findAllByUserId(
     @Param('userId') userId: string,
-    @Query() filters: SessionFiltersDto & { page?: number; limit?: number },
+    @Query()
+    filters: SessionFiltersDto & { page: number; limit: number } = {
+      limit: 10,
+      page: 1,
+    },
   ): Promise<any> {
     const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
-    return this.sessionService.findAllByUserId(
-      userId,
-      { scoreMin, scoreMax, status },
-      { page: Number(page), limit: Number(limit) },
-    );
+    return this.sessionService.findAllByUserId(userId, {
+      scoreMin: Number(scoreMin) || undefined,
+      scoreMax: Number(scoreMax) || undefined,
+      status: String(status),
+      page: Number(page),
+      limit: Number(limit),
+    });
+  }
+
+  @Get('quiz/:quizId')
+  @ApiOperation({
+    summary:
+      "Récupérer toutes les sessions d'un quiz (tous utilisateurs sauf moi)",
+  })
+  @ApiParam({ name: 'quizId', description: 'ID du quiz' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des sessions du quiz récupérée avec succès (hors moi)',
+    type: [Session],
+  })
+  async findAllByQuizId(
+    @Param('quizId') quizId: string,
+    @Query()
+    filters: SessionFiltersDto & { page: number; limit: number } = {
+      limit: 10,
+      page: 1,
+    },
+  ): Promise<PaginatedResult<Session>> {
+    const { scoreMin, scoreMax, status, page = 1, limit = 10 } = filters;
+    return this.sessionService.findAllByQuizId(quizId, {
+      scoreMin: Number(scoreMin) || undefined,
+      scoreMax: Number(scoreMax) || undefined,
+      status: String(status),
+      page: Number(page),
+      limit: Number(limit),
+    });
   }
 
   @Post('create')
@@ -126,7 +162,6 @@ export class SessionController {
   })
   async startSession(
     @Body() startSessionDto: StartSessionDto,
-    @Req() { user }: Request & { user: ReqUser },
   ): Promise<Session> {
     return this.sessionService.startSession(startSessionDto.sessionId);
   }
@@ -184,24 +219,6 @@ export class SessionController {
     return this.sessionService.resumeSession(id, user.sub);
   }
 
-  @Get('quiz/:quizId')
-  @ApiOperation({
-    summary:
-      "Récupérer toutes les sessions d'un quiz (tous utilisateurs sauf moi)",
-  })
-  @ApiParam({ name: 'quizId', description: 'ID du quiz' })
-  @ApiResponse({
-    status: 200,
-    description: 'Liste des sessions du quiz récupérée avec succès (hors moi)',
-    type: [Session],
-  })
-  async findAllByQuizId(
-    @Param('quizId') quizId: string,
-    @Req() { user }: Request & { user: ReqUser },
-  ): Promise<Session[]> {
-    return this.sessionService.findAllByQuizId(quizId, user.sub);
-  }
-
   @Get('quiz/:quizId/user/:userId')
   @ApiOperation({
     summary:
@@ -249,6 +266,8 @@ export class SessionController {
       scoreMin,
       scoreMax,
       status,
+      page: Number(page),
+      limit: Number(limit),
     });
   }
 }

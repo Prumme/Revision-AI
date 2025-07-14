@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsEnum, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsEnum, IsNumber } from 'class-validator';
 import { SessionStatus } from '@entities/session.entity';
+import { Type } from 'class-transformer';
 
 export class SessionFiltersDto {
   @ApiPropertyOptional({
@@ -16,6 +17,8 @@ export class SessionFiltersDto {
     example: 10,
   })
   @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
   scoreMin?: number;
 
   @ApiPropertyOptional({
@@ -23,5 +26,7 @@ export class SessionFiltersDto {
     example: 100,
   })
   @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
   scoreMax?: number;
 }

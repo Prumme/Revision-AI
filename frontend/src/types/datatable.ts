@@ -13,7 +13,7 @@ export interface TableAction {
   label: string;
   icon?: string;
   tooltip?: string;
-  variant?: "primary" | "outline" | "danger";
+  variant?: "primary" | "outline" | "danger" | "warning";
   disabled?: (row: any) => boolean;
   visible?: (row: any) => boolean;
   handler: (row: any) => void;
@@ -31,8 +31,6 @@ export interface TableFilter {
   options?: FilterOption[];
   placeholder?: string;
 }
-
-
 
 export interface TableSort {
   column: string;

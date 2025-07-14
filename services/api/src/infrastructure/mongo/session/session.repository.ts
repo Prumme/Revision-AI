@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   PaginatedResult,
+  SessionOptions,
   SessionRepository,
 } from '@repositories/session.repository';
 import { InjectModel } from '@nestjs/mongoose';
@@ -31,38 +32,43 @@ export class MongoSessionRepository implements SessionRepository {
   }
 
   /**
-   * Finds all sessions for a specific user, paginated.
-   * @param userId - The ID of the user whose sessions are to be retrieved.
-   * @param pagination - Pagination options (page, limit).
-   * @returns PaginatedResult of sessions associated with the user.
+   * Constructs the query and handles pagination.
+   * @param queryCriteria - The base query object.
+   * @param options - Pagination and filtering options.
+   * @returns A paginated result of sessions.
    */
-  async findAllByUserId(
-    userId: string,
-    options: {
-      page: number;
-      limit: number;
-      scoreMin?: number;
-      scoreMax?: number;
-      status?: string;
-    },
+  private async findAndPaginateSessions(
+    queryCriteria: any,
+    options: SessionOptions,
   ): Promise<PaginatedResult<Session>> {
-    const query: any = { userId };
-    if (options.status) {
+    const query = { ...queryCriteria };
+
+    if (options.status && options.status !== 'all') {
       query.status = options.status;
     }
-    if (typeof options.scoreMin === 'number') {
-      query.score = { ...query.score, $gte: options.scoreMin };
+
+    if (
+      typeof options.scoreMin === 'number' ||
+      typeof options.scoreMax === 'number'
+    ) {
+      query.score = {};
+      if (typeof options.scoreMin === 'number') {
+        query.score.$gte = options.scoreMin;
+      }
+      if (typeof options.scoreMax === 'number') {
+        query.score.$lte = options.scoreMax;
+      }
     }
-    if (typeof options.scoreMax === 'number') {
-      query.score = { ...query.score, $lte: options.scoreMax };
-    }
+
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 10;
     const skip = (page - 1) * limit;
+
     const [total, documents] = await Promise.all([
       this.sessionModel.countDocuments(query),
       this.sessionModel.find(query).skip(skip).limit(limit).exec(),
     ]);
+
     return {
       data: documents.map(this.documentToSession),
       total,
@@ -73,68 +79,53 @@ export class MongoSessionRepository implements SessionRepository {
   }
 
   /**
+   * Finds all sessions for a specific user.
+   * @param userId - The ID of the user.
+   * @param options - Pagination and filtering options.
+   * @returns A paginated result of sessions.
+   */
+  async findAllByUserId(
+    userId: string,
+    options: SessionOptions,
+  ): Promise<PaginatedResult<Session>> {
+    return this.findAndPaginateSessions({ userId }, options);
+  }
+
+  /**
    * Finds all sessions for a specific quiz.
    * @param quizId - The ID of the quiz whose sessions are to be retrieved.
-   * @param excludeUserId
-   * @returns An array of sessions associated with the quiz.
+   * @param options - Pagination and filtering options.
+   * @param excludeUserId - Optional user ID to exclude.
+   * @returns A paginated result of sessions.
    */
   async findAllByQuizId(
     quizId: string,
+    options: SessionOptions,
     excludeUserId?: string,
-  ): Promise<Session[]> {
-    const query: any = { quizId };
+  ): Promise<PaginatedResult<Session>> {
+    const queryCriteria: any = { quizId };
     if (excludeUserId) {
-      query.userId = { $ne: excludeUserId };
+      queryCriteria.userId = { $ne: excludeUserId };
     }
-    const documents = await this.sessionModel.find(query).exec();
-    return documents.map(this.documentToSession);
+    return this.findAndPaginateSessions(queryCriteria, options);
   }
 
   /**
    * Finds all sessions for a specific quiz and user.
    * @param quizId - The ID of the quiz.
    * @param userId - The ID of the user.
-   * @param options
-   * @returns An array of sessions associated with the quiz and user.
+   * @param options - Pagination and filtering options.
+   * @returns A paginated result of sessions.
    */
   async findAllByQuizIdAndUserId(
     quizId: string,
     userId: string,
-    options?: {
-      page?: number;
-      limit?: number;
-      scoreMin?: number;
-      scoreMax?: number;
-      status?: string;
-    },
+    options: SessionOptions,
   ): Promise<PaginatedResult<Session>> {
     if (!quizId || !userId || userId === 'undefined') {
       return { data: [], total: 0, page: 1, limit: 10, totalPages: 1 };
     }
-    const query: any = { quizId, userId };
-    if (options?.status) {
-      query.status = options.status;
-    }
-    if (typeof options?.scoreMin === 'number') {
-      query.score = { ...query.score, $gte: options.scoreMin };
-    }
-    if (typeof options?.scoreMax === 'number') {
-      query.score = { ...query.score, $lte: options.scoreMax };
-    }
-    const page = options?.page ?? 1;
-    const limit = options?.limit ?? 10;
-    const skip = (page - 1) * limit;
-    const [total, documents] = await Promise.all([
-      this.sessionModel.countDocuments(query),
-      this.sessionModel.find(query).skip(skip).limit(limit).exec(),
-    ]);
-    return {
-      data: documents.map(this.documentToSession),
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+    return this.findAndPaginateSessions({ quizId, userId }, options);
   }
 
   /**
