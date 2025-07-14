@@ -9,11 +9,6 @@ import StatusBadge from "@/components/badges/StatusBadge.vue";
 import { useSessionStore } from "@/stores/session.ts";
 import { useToastStore } from "@/stores/toast.ts";
 
-// interface SessionDatatableFilter {
-//   status?: string;
-//   dateFrom?: string;
-//   dateTo?: string;
-// }
 
 const props = defineProps<{
   quizAndAuthorIdentifier: QuizAndAuthorIdentifier;
