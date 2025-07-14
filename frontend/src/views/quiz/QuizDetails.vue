@@ -10,6 +10,7 @@ import Button from "@/components/buttons/ButtonComponent.vue";
 import { useQuizDetails } from "@/composables/useQuizDetails";
 import LoaderOverlay from "@/components/common/LoaderOverlay.vue";
 import { useSessionStore } from "@/stores/session";
+import { useUserStore } from "@/stores/user";
 import SessionDatatable from "@/components/tables/SessionDatatable.vue";
 import { PauseIcon } from "lucide-vue-next";
 import { useToastStore } from "@/stores/toast.ts";
@@ -32,6 +33,7 @@ const route = useRoute();
 const quizId = route.params.id as string;
 const quizDetails = useQuizDetails(quizId);
 const sessionStore = useSessionStore();
+const userStore = useUserStore();
 
 const {
   quiz,
@@ -225,7 +227,7 @@ watch(quizFinished, (finished) => {
 
     <!-- Quiz Configuration -->
     <section
-      v-if="quiz && activeTab === 'config' && isQuizOwner"
+      v-if="quiz && activeTab === 'config' && (isQuizOwner || userStore.isAdmin)"
       class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-8 items-start"
     >
       <!-- Questions -->
@@ -362,7 +364,7 @@ watch(quizFinished, (finished) => {
           @click="saveQuiz"
           class="btn btn-primary mt-4"
         >
-          Sauvegarder l'ordre des questions
+          Sauvegarder
         </Button>
       </div>
     </section>
