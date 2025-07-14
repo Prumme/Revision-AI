@@ -34,16 +34,7 @@ export class StripeController {
   ) {
     let response: true | Error = true;
     try {
-      // Utiliser le rawBody capturé par le middleware
-      const rawBody = req.rawBody;
-
-      if (!rawBody) {
-        throw new Error(
-          'Raw body is required for webhook signature verification',
-        );
-      }
-
-      console.log('Secret :' + [process.env.STRIPE_WEBHOOK_SECRET]);
+      const rawBody = (req as any).rawBody || req.body;
 
       const event = this.stripe.webhooks.constructEvent(
         rawBody,
