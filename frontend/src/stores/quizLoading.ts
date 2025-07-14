@@ -16,6 +16,8 @@ export const useQuizLoadingStore = defineStore("quizLoading", () => {
   const fileParsingProgress = ref(0);
   const status = ref<QuizGenerationJobStatus | null>(QuizGenerationJobStatus.PENDING);
   function startPolling(quizId: string) {
+    fileParsingProgress.value = 0;
+    status.value = QuizGenerationJobStatus.PENDING;
     isLoading.value = true;
 
     QuizService.getQuizStatusJob(quizId, (data, close) => {
@@ -26,17 +28,18 @@ export const useQuizLoadingStore = defineStore("quizLoading", () => {
         ? (data.status as QuizGenerationJobStatus)
         : QuizGenerationJobStatus.PENDING;
       fileParsingProgress.value = data.parsingFileProgress;
-      isLoading.value =
-        !(data.status === QuizGenerationJobStatus.COMPLETED ||
-        data.status === QuizGenerationJobStatus.FAILED);
+      isLoading.value = !(
+        data.status === QuizGenerationJobStatus.COMPLETED ||
+        data.status === QuizGenerationJobStatus.FAILED
+      );
       if (!isLoading.value) {
-        useToastStore().showToast(data.status === QuizGenerationJobStatus.COMPLETED ?'success' : 'error',
-          data.status === QuizGenerationJobStatus.COMPLETED ?
-          "Votre quiz a été généré avec succès!" :
-          "La génération de votre quiz a échoué. Veuillez réessayer."
+        useToastStore().showToast(
+          data.status === QuizGenerationJobStatus.COMPLETED ? "success" : "error",
+          data.status === QuizGenerationJobStatus.COMPLETED
+            ? "Votre quiz a été généré avec succès!"
+            : "La génération de votre quiz a échoué. Veuillez réessayer.",
         );
         return close();
-        
       }
     }).then();
   }
