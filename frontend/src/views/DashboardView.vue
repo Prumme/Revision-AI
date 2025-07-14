@@ -157,7 +157,7 @@ function setMediaCount(count: number) {
           <h2 class="text-3xl font-bold mb-5">Mes Quiz</h2>
           <p class="text-lg" v-if="userQuizzes.length === 0">Aucun QCM créé pour le moment.</p>
           <div v-else>
-            <div class="flex gap-6 overflow-x-auto pb-2 custom-scrollbar">
+            <div class="flex gap-6 overflow-x-auto pb-4 custom-scrollbar">
               <div
                 v-for="quiz in userQuizzes"
                 :key="quiz.id"

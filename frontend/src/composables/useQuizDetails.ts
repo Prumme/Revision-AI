@@ -69,7 +69,7 @@ export function useQuizDetails(quizId: string) {
           filteredSessions.value.length > 0 ? filteredSessions.value.length.toString() : undefined,
       },
     ];
-    if (quiz.value && quiz.value.userId === userId.value) {
+    if ((quiz.value && quiz.value.userId === userId.value) || user.isAdmin) {
       tabs.push({ key: "config", label: "Configuration" });
     }
     return tabs;
