@@ -3,6 +3,8 @@ import { ref, computed, watch } from "vue";
 import Input from "@/components/inputs/InputComponent.vue";
 import { ApiService } from "@/services/api.service";
 import { useToastStore } from "@/stores/toast";
+import CardComponent from "@/components/cards/CardComponent.vue";
+import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 
 const props = defineProps({
   customer: {
@@ -84,58 +86,54 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <section
-    id="billing-form-card"
-    class="flex flex-col p-5 bg-white border-1 border-gray-extralight rounded-lg h-full"
-  >
-    <div class="flex items-center gap-3">
-      <h1 class="font-outfit text-lg text-black-transparent mb-4">
+  <CardComponent id="billing-form-card">
+    <template #header>
+      <h1 class="font-outfit text-lg text-black-transparent">
         Modifier votre adresse de facturation
       </h1>
-    </div>
-
-    <div class="flex flex-col gap-4 flex-grow">
-      <Input v-model="firstName" label="Prénom" placeholder="Entrez votre prénom" required />
-      <Input
-        v-model="lastName"
-        label="Nom de famille"
-        placeholder="Entrez votre nom de famille"
-        required
-      />
-      <Input
-        v-model="line1"
-        label="Adresse ligne 1"
-        placeholder="Entrez l'adresse ligne 1"
-        required
-      />
-      <Input
-        v-model="line2"
-        label="Adresse ligne 2 (optionnel)"
-        placeholder="Entrez l'adresse ligne 2 (optionnel)"
-      />
-      <Input v-model="city" label="Ville" placeholder="Entrez votre ville" required />
-      <Input
-        v-model="state"
-        label="État / Province / Région"
-        placeholder="Entrez votre état, province ou région"
-        required
-      />
-      <Input
-        v-model="postalCode"
-        label="Code postal"
-        placeholder="Entrez votre code postal"
-        required
-      />
-      <Input v-model="country" label="Pays" placeholder="Entrez votre pays" required />
-    </div>
-    <div class="mt-auto pt-4">
-      <button
-        @click="handleSubmit"
-        :disabled="!isFormValid"
-        class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        Confirmer la modification de l'adresse de facturation
-      </button>
-    </div>
-  </section>
+    </template>
+    <template #content>
+      <div class="flex flex-col gap-4 flex-grow">
+        <Input v-model="firstName" label="Prénom" placeholder="Entrez votre prénom" required />
+        <Input
+          v-model="lastName"
+          label="Nom de famille"
+          placeholder="Entrez votre nom de famille"
+          required
+        />
+        <Input
+          v-model="line1"
+          label="Adresse ligne 1"
+          placeholder="Entrez l'adresse ligne 1"
+          required
+        />
+        <Input
+          v-model="line2"
+          label="Adresse ligne 2 (optionnel)"
+          placeholder="Entrez l'adresse ligne 2 (optionnel)"
+        />
+        <Input v-model="city" label="Ville" placeholder="Entrez votre ville" required />
+        <Input
+          v-model="state"
+          label="État / Province / Région"
+          placeholder="Entrez votre état, province ou région"
+          required
+        />
+        <Input
+          v-model="postalCode"
+          label="Code postal"
+          placeholder="Entrez votre code postal"
+          required
+        />
+        <Input v-model="country" label="Pays" placeholder="Entrez votre pays" required />
+      </div>
+    </template>
+    <template #footer>
+      <div class="mt-auto pt-4">
+        <ButtonComponent @click="handleSubmit" :disabled="!isFormValid">
+          Confirmer la modification de l'adresse de facturation
+        </ButtonComponent>
+      </div>
+    </template>
+  </CardComponent>
 </template>

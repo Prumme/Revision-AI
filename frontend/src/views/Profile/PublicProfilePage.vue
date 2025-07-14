@@ -16,6 +16,7 @@ import type { PublicProfileData, User } from "@/types/user";
 import type { Quiz } from "@/types/quiz";
 import { formatDateLong } from "@/helpers/dateFormat";
 import caracterBlueImage from "@/assets/caracters/caracterBlue.webp";
+import CardComponent from "@/components/cards/CardComponent.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -173,22 +174,30 @@ onMounted(() => {
 
         <!-- Stats Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 text-center">
-            <BookOpen class="w-8 h-8 text-primary mx-auto mb-2" />
-            <div class="text-2xl font-bold text-black">{{ profileData.quizzes.length }}</div>
-            <div class="text-sm text-gray-600">
-              Quiz{{ profileData.quizzes.length > 1 ? "s" : "" }} créé{{
-                profileData.quizzes.length > 1 ? "s" : ""
-              }}
-            </div>
-          </div>
-          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100 text-center">
-            <CalendarIcon class="w-8 h-8 text-primary mx-auto mb-2" />
-            <div class="text-2xl font-bold text-black">
-              {{ formatDateLong(profileData.user.createdAt) }}
-            </div>
-            <div class="text-sm text-gray-600">Date d'inscription</div>
-          </div>
+          <CardComponent>
+            <template #content-no-padding>
+              <div class="bg-white text-center pb-5">
+                <BookOpen class="w-8 h-8 text-primary mx-auto mb-2" />
+                <div class="text-2xl font-bold text-black">{{ profileData.quizzes.length }}</div>
+                <div class="text-sm text-gray-600">
+                  Quiz{{ profileData.quizzes.length > 1 ? "s" : "" }} créé{{
+                    profileData.quizzes.length > 1 ? "s" : ""
+                  }}
+                </div>
+              </div>
+            </template>
+          </CardComponent>
+          <CardComponent
+            ><template #content-no-padding>
+              <div class="bg-white text-center pb-5">
+                <CalendarIcon class="w-8 h-8 text-primary mx-auto mb-2" />
+                <div class="text-2xl font-bold text-black">
+                  {{ formatDateLong(profileData.user.createdAt) }}
+                </div>
+                <div class="text-sm text-gray-600">Date d'inscription</div>
+              </div>
+            </template>
+          </CardComponent>
         </div>
 
         <!-- Quiz Section -->
