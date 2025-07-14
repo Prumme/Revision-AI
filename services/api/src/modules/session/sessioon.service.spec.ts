@@ -176,6 +176,11 @@ describe('SessionService', () => {
       expect(sessionRepository.findAllByQuizIdAndUserId).toHaveBeenCalledWith(
         quizId,
         userId,
+        expect.objectContaining({
+          page: options.page,
+          limit: options.limit,
+          scoreMin: options.scoreMin,
+        }),
       );
     });
   });
