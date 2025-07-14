@@ -14,6 +14,11 @@ import type {
 } from "@/types/datatable";
 import type { PaginationData } from "@/components/ui/PaginatorComponent.vue";
 
+export type SelectedAnswerIndexForQuestion = number[];
+export interface UserAnswers {
+  [questionIndex: number]: SelectedAnswerIndexForQuestion; // questionIndex -> array of selected answer indexes
+}
+
 export function useQuizDetails(quizId: string) {
   const toast = useToastStore();
   const sessionStore = useSessionStore();
@@ -26,7 +31,7 @@ export function useQuizDetails(quizId: string) {
   const orderChanged = ref(false);
   const showAllAnswers = ref(false);
   const activeTab = ref<string>("quiz");
-  const userAnswers = ref<Record<number, number[]>>({});
+  const userAnswers = ref<UserAnswers>({}); // user answers indexed by question index
   const quizFinished = ref(false);
   const quizScore = ref(0);
   const showCorrection = ref(false);
@@ -192,6 +197,9 @@ export function useQuizDetails(quizId: string) {
         return;
       }
       sessionStore.sessionId = session.id;
+      userAnswers.value = {
+        0: [],
+      };
       isStarted.value = true;
       activeTab.value = "quiz";
     } catch {
@@ -231,6 +239,10 @@ export function useQuizDetails(quizId: string) {
             a: q.id || q._id || currentStep.value.toString(),
             c: isCorrect,
           });
+          userAnswers.value = {
+            ...userAnswers.value,
+            [currentStep.value + 1]: [],
+          };
         } catch {
           toast.showToast("error", "Erreur lors de l'enregistrement de la réponse.");
         }

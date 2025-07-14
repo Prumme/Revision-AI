@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { GripVertical, CheckCircle2, XCircle } from "lucide-vue-next";
-import { ref, watch, computed } from "vue";
+import { ref, computed } from "vue";
 import draggable from "vuedraggable";
+import type { SelectedAnswerIndexForQuestion } from "@/composables/useQuizDetails.ts";
 
 const props = defineProps({
   questions: {
@@ -16,10 +17,6 @@ const props = defineProps({
   showCorrection: {
     type: Boolean,
     default: false,
-  },
-  userSelection: {
-    type: Object,
-    default: undefined,
   },
   mode: {
     type: String,
@@ -41,30 +38,13 @@ const props = defineProps({
 const emit = defineEmits(["update:questions", "update:selection"]);
 
 const drag = ref(false);
-const selectedAnswers = ref<Record<number, number[]>>({});
 const showResult = ref(false);
+
+const userSelectedAnswersIndexes = defineModel<SelectedAnswerIndexForQuestion>("selection");
 
 const updateQuestions = () => {
   emit("update:questions", props.questions);
 };
-
-watch(
-  () => props.questions,
-  () => {
-    selectedAnswers.value = {};
-  },
-  { deep: true },
-);
-
-watch(
-  () => props.userSelection,
-  (newVal) => {
-    if (newVal) {
-      selectedAnswers.value = { ...newVal };
-    }
-  },
-  { deep: true, immediate: true },
-);
 
 const isCorrectionActive = computed(
   () => props.showAllAnswers || (props.mode === "quiz" && props.showCorrection),
@@ -73,33 +53,29 @@ const isCorrectionActive = computed(
 const selectAnswer = (questionIdx: number, answerIdx: number) => {
   if (props.mode === "config") return;
   if (isCorrectionActive.value) return;
+  if (!userSelectedAnswersIndexes.value) return;
 
-  const question = props.questions[questionIdx];
-  if (!question) return;
-
-  if (!selectedAnswers.value[questionIdx]) selectedAnswers.value[questionIdx] = [];
-
-  if (isMultipleChoice(question)) {
-    const idx = selectedAnswers.value[questionIdx].indexOf(answerIdx);
-    console.log("SELECTED ANSWERS", selectedAnswers.value);
-    if (idx === -1) {
-      selectedAnswers.value[questionIdx].push(answerIdx);
+  if (isMultipleChoice(props.questions[questionIdx])) {
+    if (isSelected(questionIdx, answerIdx)) {
+      // Si la réponse est déjà sélectionnée, on la désélectionne
+      userSelectedAnswersIndexes.value = [
+        ...userSelectedAnswersIndexes.value.filter((idx) => idx !== answerIdx),
+      ];
     } else {
-      selectedAnswers.value[questionIdx].splice(idx, 1);
+      // Sinon, on l'ajoute à la sélection
+      userSelectedAnswersIndexes.value = [...userSelectedAnswersIndexes.value, answerIdx];
     }
   } else {
-    // Question à choix unique
-    selectedAnswers.value[questionIdx] = [answerIdx];
+    // Si ce n'est pas un QCM, on ne garde qu'une seule réponse sélectionnée
+    userSelectedAnswersIndexes.value = [answerIdx];
   }
-
-  emit("update:selection", { ...selectedAnswers.value });
 };
 
 const isSelected = (questionIdx: number, answerIdx: number) => {
-  if (props.userSelection && props.userSelection[questionIdx]) {
-    return props.userSelection[questionIdx].includes(answerIdx);
-  }
-  return selectedAnswers.value[questionIdx]?.includes(answerIdx);
+  const question = props.questions[questionIdx];
+  if (!question) return false;
+  if (!userSelectedAnswersIndexes.value) return false;
+  return userSelectedAnswersIndexes.value.includes(answerIdx);
 };
 
 const isMultipleChoice = (question) => {
