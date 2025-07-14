@@ -20,6 +20,8 @@ export class KpiService {
 
   async getUserTotalRevisionTime(userId: string): Promise<string> {
     const seconds = await this.kpiRepository.getUserTotalRevisionTime(userId);
+    if (seconds === null || seconds === undefined || seconds == 0)
+      return '0 minutes';
     if (seconds < 60) return `1 minute`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes`;
     const hours = Math.floor(seconds / 3600);
