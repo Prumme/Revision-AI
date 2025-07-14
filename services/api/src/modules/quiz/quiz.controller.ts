@@ -60,6 +60,8 @@ export class QuizController {
     const userId = req.user?.sub;
     return this.quizService.findAll(
       {
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
         ...filters,
         isPublic: true,
         userId: {
@@ -165,6 +167,8 @@ export class QuizController {
     // @TODO check permissions
     return this.quizService.findAll(
       {
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
         ...filters,
         userId: { id, exclude: false },
         ready: true,
