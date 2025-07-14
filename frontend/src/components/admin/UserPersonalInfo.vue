@@ -51,9 +51,29 @@ defineProps<{
             {{ user.updatedAt ? new Date(user.updatedAt).toLocaleDateString("fr-FR") : "-" }}
           </p>
         </div>
-        <div v-if="user.bio" class="md:col-span-2 lg:col-span-3">
-          <label class="block text-sm font-medium text-gray-500 mb-1">Biographie</label>
-          <p class="text-gray-900">{{ user.bio }}</p>
+        <div>
+          <label class="block text-sm font-medium text-gray-500 mb-1"
+            >Dernière demande de changement de nom d'utilisateur</label
+          >
+          <p class="text-gray-900">
+            {{
+              user.lastModifiedUsernameAsked
+                ? new Date(user.lastModifiedUsernameAsked).toLocaleDateString("fr-FR")
+                : "Jamais"
+            }}
+          </p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-500 mb-1"
+            >Dernière modification du mot de passe</label
+          >
+          <p class="text-gray-900">
+            {{
+              user.lastUpdatedPassword
+                ? new Date(user.lastUpdatedPassword).toLocaleDateString("fr-FR")
+                : "Jamais"
+            }}
+          </p>
         </div>
       </div>
     </template>

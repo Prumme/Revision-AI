@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { verifyEmailTemplate } from './templates/verify-email';
 import { CreateEmailResponseSuccess, Resend } from 'resend';
 import {
+  AskNewUsernameParams,
   BlockUserParams,
   CancelSubscriptionParams,
   DeleteAccountParams,
   NewPasswordNeededParams,
   SucceedBoughtParams,
+  UnblockUserParams,
   VerifyEmailParams,
 } from './types/emails-params';
 import { blockUserTemplate } from './templates/block-user';
@@ -14,7 +16,8 @@ import { succeedBoughtTemplate } from './templates/succeed-bought';
 import { cancelSubscriptionTemplate } from './templates/cancel-subscription';
 import { newPasswordNeededTemplate } from './templates/new-password-needed';
 import { deleteAccountTemplate } from './templates/delete-account';
-
+import { unblockUserTemplate } from './templates/unblock-user';
+import { askNewUsernameTemplate } from './templates/ask-new-username';
 
 @Injectable()
 export class MailService {
@@ -65,6 +68,16 @@ export class MailService {
     return await this.send(to, subject, template);
   }
 
+  public async sendUnblockUserEmail(
+    to: string,
+    params: UnblockUserParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Ton compte a été débloqué';
+    const loginUrl = `${process.env.FRONTEND_URL}/login`;
+    const template = unblockUserTemplate(params.username, loginUrl);
+    return await this.send(to, subject, template);
+  }
+
   public async sendSucceedBoughtEmail(
     to: string,
     params: SucceedBoughtParams,
@@ -83,6 +96,24 @@ export class MailService {
     return await this.send(to, subject, template);
   }
 
+  public async sendSubscriptionDeactivationEmail(
+    to: string,
+    params: CancelSubscriptionParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Ton abonnement a été annulé';
+    const template = cancelSubscriptionTemplate(params.username);
+    return await this.send(to, subject, template);
+  }
+
+  public async sendSubscriptionActivationEmail(
+    to: string,
+    params: SucceedBoughtParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Ton abonnement a été activé';
+    const template = succeedBoughtTemplate(params.username, params.articleName);
+    return await this.send(to, subject, template);
+  }
+
   public async sendNewPasswordNeededEmail(
     to: string,
     params: NewPasswordNeededParams,
@@ -92,6 +123,16 @@ export class MailService {
       params.username,
       params.loginUrl,
     );
+    return await this.send(to, subject, template);
+  }
+
+  public async sendAskNewUsernameEmail(
+    to: string,
+    params: AskNewUsernameParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Action requise : modifie ton nom d’utilisateur';
+    const changeUsernameUrl = `${process.env.FRONTEND_URL}/profile`;
+    const template = askNewUsernameTemplate(params.username, changeUsernameUrl);
     return await this.send(to, subject, template);
   }
 

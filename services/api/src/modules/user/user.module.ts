@@ -8,7 +8,6 @@ import { MinioModule } from '@modules/minio/minio.module';
 import { MailModule } from '@infrastructure/resend/mail.module';
 import { CustomerRepositoryProvider } from '@repositories/customer.repository';
 import { MongoCustomerRepository } from '@mongo/user/customer.repository';
-import { MailerServiceProvider } from '@services/MailerService';
 import { QuizModule } from '@modules/quiz/quiz.module';
 
 @Module({
@@ -24,7 +23,6 @@ import { QuizModule } from '@modules/quiz/quiz.module';
     UserRepositoryProvider,
     CustomerRepositoryProvider,
     MongoCustomerRepository,
-    MailerServiceProvider,
   ],
   exports: [UserService, UserRepositoryProvider],
 })

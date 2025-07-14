@@ -47,6 +47,10 @@ export class AuthService {
       throw new UnauthorizedException('Email not verified');
     }
 
+    if (user.blocked) {
+      throw new UnauthorizedException('Account blocked');
+    }
+
     if (UserEntity.hasTOTPEnabled(user)) {
       if (totpCode === undefined) {
         return { needTOTP: true };

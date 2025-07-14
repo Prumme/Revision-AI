@@ -5,9 +5,10 @@ import Input from "@/components/inputs/InputComponent.vue";
 import AppLayout from "@/components/layouts/AppLayout.vue";
 import { AuthError, useUserStore } from "@/stores/user";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 
 // Form props
@@ -21,19 +22,24 @@ const totpForm = ref(false);
 
 const handleLogin = async () => {
   try {
-    const loginResponse =  await userStore.login({
+    const loginResponse = await userStore.login({
       email: email.value,
       password: password.value,
       totpCode: totpForm.value ? totpCode.value : undefined,
     });
 
-    if(loginResponse.totpRequired) {
+    if (loginResponse.totpRequired) {
       totpForm.value = true;
       return;
     }
 
-    // Redirection vers la page d'accueil
-    router.push("/dashboard");
+    // Redirection vers l'URL d'origine ou vers le dashboard
+    const redirectUrl = route.query.redirect as string;
+    if (redirectUrl && redirectUrl !== "/login") {
+      router.push(redirectUrl);
+    } else {
+      router.push("/dashboard");
+    }
   } catch (e) {
     if (e instanceof AuthError) {
       error.value = e.message;
@@ -68,11 +74,10 @@ const handleLogin = async () => {
                 @submit.prevent="handleLogin"
                 class="flex flex-col justify-center w-full px-2 lg:px-12"
               >
-              <div v-if="error" class="mb-4 text-red-500 text-sm text-center">
-                    {{ error }}
-                  </div>
+                <div v-if="error" class="mb-4 text-red-500 text-sm text-center">
+                  {{ error }}
+                </div>
                 <template v-if="!totpForm">
-                  
                   <div class="mb-2">
                     <Input
                       v-model="email"
@@ -105,7 +110,9 @@ const handleLogin = async () => {
                   </div>
                 </template>
                 <template v-else>
-                  <p class="text-sm mb-3 opacity-60 text-center">Vous avez activé la vérification en deux étapes.</p>
+                  <p class="text-sm mb-3 opacity-60 text-center">
+                    Vous avez activé la vérification en deux étapes.
+                  </p>
                   <div class="mb-2">
                     <Input
                       v-model="totpCode"

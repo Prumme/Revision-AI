@@ -2,13 +2,14 @@
 import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useToastStore } from "@/stores/toast";
+import { useDialogStore } from "@/stores/dialog";
 import { AdminService } from "@/services/admin.service";
 import { getUserInvoices } from "@/services/user.service";
 
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import StatusBadge from "@/components/badges/StatusBadge.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
-import { UserX, Send } from "lucide-vue-next";
+import { UserX, AtSign } from "lucide-vue-next";
 
 import UserPersonalInfo from "@/components/admin/UserPersonalInfo.vue";
 import UserBillingInfo from "@/components/admin/UserBillingInfo.vue";
@@ -21,6 +22,7 @@ import type { Invoice } from "@/types/invoice";
 
 const route = useRoute();
 const toast = useToastStore();
+const dialog = useDialogStore();
 
 // État
 const user = ref<UserType | null>(null);
@@ -28,8 +30,6 @@ const loading = ref(false);
 const userQuizzes = ref<Quiz[]>([]);
 
 const userInvoices = ref<Invoice[]>([]);
-const showBlockDialog = ref(false);
-const showPasswordResetDialog = ref(false);
 const actionLoading = ref(false);
 
 // Computed
@@ -84,14 +84,22 @@ const fetchUserDetails = async () => {
 const handleBlockUser = async () => {
   if (!user.value) return;
 
+  const result = await dialog.showBlockUser({
+    user: user.value,
+    loading: actionLoading.value,
+  });
+
+  if (!result) return;
+
   try {
     actionLoading.value = true;
 
     if (user.value.blocked) {
-      await AdminService.unblockUser(user.value.id);
+      await AdminService.unblockUser(user.value._id);
       toast.showToast("success", "Utilisateur débloqué avec succès");
     } else {
-      await AdminService.blockUser(user.value.id);
+      const reason = typeof result === "string" ? result : "spam";
+      await AdminService.blockUser(user.value._id, reason);
       toast.showToast("success", "Utilisateur bloqué avec succès");
     }
 
@@ -101,25 +109,37 @@ const handleBlockUser = async () => {
     toast.showToast("error", "Impossible de modifier le statut de l'utilisateur");
   } finally {
     actionLoading.value = false;
-    showBlockDialog.value = false;
   }
 };
 
-const handlePasswordReset = async () => {
+const handleUsernameChange = async () => {
   if (!user.value) return;
+
+  const confirmed = await dialog.show({
+    title: "Demander un changement de nom d'utilisateur",
+    message:
+      "Êtes-vous sûr de vouloir demander à cet utilisateur de changer son nom d'utilisateur ?",
+    confirmText: "Envoyer",
+    cancelText: "Annuler",
+    type: "info",
+  });
+
+  if (!confirmed) return;
 
   try {
     actionLoading.value = true;
 
-    await AdminService.requestPasswordReset(user.value.id);
+    await AdminService.askNewUsername(user.value._id);
 
-    toast.showToast("success", "Demande de réinitialisation de mot de passe envoyée");
+    toast.showToast("success", "Demande de changement de nom d'utilisateur envoyée");
+
+    // Mettre à jour l'utilisateur
+    await fetchUserDetails();
   } catch (error) {
-    console.error("Erreur lors de la demande de réinitialisation:", error);
-    toast.showToast("error", "Impossible d'envoyer la demande de réinitialisation");
+    console.error("Erreur lors de la demande de changement de nom d'utilisateur:", error);
+    toast.showToast("error", "Impossible d'envoyer la demande de changement de nom d'utilisateur");
   } finally {
     actionLoading.value = false;
-    showPasswordResetDialog.value = false;
   }
 };
 
@@ -145,25 +165,26 @@ onMounted(() => {
             Gestion de l'utilisateur
             <span class="text-primary font-bold">{{ user?.username || "" }}</span>
           </h1>
-          <div class="flex items-center gap-2">
-            <ButtonComponent
-              :variant="user?.blocked ? 'danger' : 'danger'"
-              :disabled="actionLoading"
-              size="icon"
-              :tooltip="user?.blocked ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'"
-              @click="showBlockDialog = true"
-            >
-              <UserX class="w-4 h-4" />
-            </ButtonComponent>
 
+          <div class="flex items-center gap-2">
             <ButtonComponent
               variant="primary"
               :disabled="actionLoading"
-              size="icon"
-              tooltip="Envoyer une demande de réinitialisation de mot de passe"
-              @click="showPasswordResetDialog = true"
+              tooltip="Envoyer un email pour demander un changement de nom d'utilisateur"
+              @click="handleUsernameChange"
             >
-              <Send class="w-4 h-4" />
+              <AtSign class="w-4 h-4 mr-2" />
+              Nouveau pseudo
+            </ButtonComponent>
+
+            <ButtonComponent
+              :variant="user?.blocked ? 'danger' : 'danger'"
+              :disabled="actionLoading"
+              :tooltip="user?.blocked ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'"
+              @click="handleBlockUser"
+            >
+              <UserX class="w-4 h-4 mr-2" />
+              {{ user?.blocked ? "Débloquer" : "Bloquer" }}
             </ButtonComponent>
           </div>
         </div>
@@ -199,32 +220,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Dialog de confirmation pour le blocage -->
-    <ConfirmDialog
-      v-model="showBlockDialog"
-      :title="user?.blocked ? 'Débloquer l\'utilisateur' : 'Bloquer l\'utilisateur'"
-      :message="
-        user?.blocked
-          ? 'Êtes-vous sûr de vouloir débloquer cet utilisateur ? Il pourra à nouveau accéder à la plateforme.'
-          : 'Êtes-vous sûr de vouloir bloquer cet utilisateur ? Il ne pourra plus accéder à la plateforme.'
-      "
-      :confirm-text="user?.blocked ? 'Débloquer' : 'Bloquer'"
-      :confirm-variant="user?.blocked ? 'primary' : 'danger'"
-      :loading="actionLoading"
-      @confirm="handleBlockUser"
-      @cancel="showBlockDialog = false"
-    />
-
-    <!-- Dialog de confirmation pour la réinitialisation du mot de passe -->
-    <ConfirmDialog
-      v-model="showPasswordResetDialog"
-      title="Réinitialiser le mot de passe"
-      message="Êtes-vous sûr de vouloir envoyer une demande de réinitialisation de mot de passe à cet utilisateur ?"
-      confirm-text="Envoyer"
-      confirm-variant="primary"
-      :loading="actionLoading"
-      @confirm="handlePasswordReset"
-      @cancel="showPasswordResetDialog = false"
-    />
+    <!-- Dialog de confirmation global -->
+    <ConfirmDialog />
   </div>
 </template>

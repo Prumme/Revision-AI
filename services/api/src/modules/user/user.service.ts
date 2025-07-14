@@ -58,6 +58,7 @@ export class UserService {
       createdAt: new Date(),
       updatedAt: new Date(),
       deleted: false,
+      lastModifiedUsernameAsked: null,
     };
     return this.userRepository.create(user);
   }
@@ -279,5 +280,46 @@ export class UserService {
       customer,
       quizzes: userQuizzes,
     };
+  }
+
+  async block(id: string, reason: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    this.mailService.sendBlockUserEmail(user.email, {
+      username: user.username,
+      appealLink: 'https://www.google.com',
+      reason: reason,
+    });
+    return this.userRepository.update(id, { blocked: true });
+  }
+
+  async unblock(id: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    this.mailService.sendUnblockUserEmail(user.email, {
+      username: user.username,
+    });
+    return this.userRepository.update(id, { blocked: false });
+  }
+
+  async askNewUsername(id: string): Promise<User> {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    this.mailService.sendAskNewUsernameEmail(user.email, {
+      username: user.username,
+    });
+
+    return this.userRepository.update(id, {
+      lastModifiedUsernameAsked: new Date(),
+    });
   }
 }

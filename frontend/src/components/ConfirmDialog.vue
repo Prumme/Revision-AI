@@ -14,6 +14,7 @@
             :is="dialogStore.customComponent"
             v-bind="dialogStore.customComponentProps"
             @close="dialogStore.cancel"
+            @confirm="dialogStore.confirmWithData"
           />
         </template>
         <template v-else>

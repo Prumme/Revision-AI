@@ -6,6 +6,7 @@ export const UserSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   lastUpdatedPassword: { type: Date, default: Date.now },
+  lastModifiedUsernameAsked: { type: Date, default: null },
   emailVerified: { type: Boolean, default: false },
   role: { type: String, required: true, default: 'user' },
   createdAt: { type: Date, default: Date.now },
@@ -28,8 +29,8 @@ export const UserSchema = new Schema({
     secret: { type: String, required: false },
     otpauth_url: { type: String, required: false },
     userId: { type: String, required: false },
-    active: { type: Boolean, default: false }
-  }
+    active: { type: Boolean, default: false },
+  },
 });
 
 export interface UserDocument extends Document {
@@ -38,6 +39,7 @@ export interface UserDocument extends Document {
   username: string;
   password: string;
   lastUpdatedPassword: Date;
+  lastModifiedUsernameAsked: Date;
   emailVerified: boolean;
   role: string;
   createdAt: Date;
@@ -58,5 +60,5 @@ export interface UserDocument extends Document {
     postalCode: string;
     country: string;
   };
-  TOTPSecret?: TOTPSecret ;
+  TOTPSecret?: TOTPSecret;
 }
