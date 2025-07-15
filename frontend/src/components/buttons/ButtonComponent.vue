@@ -23,9 +23,9 @@ const emit = defineEmits<{
 
 const handleClick = (event: MouseEvent) => {
   if (!props.disabled) {
-    if( props.tracking_event) {
+    if (props.tracking_event && typeof window !== "undefined" && window._paq) {
       //@ts-expect-error  unknown global variable
-      window._paq.push(['trackEvent', 'Button', props.tracking_event]);
+      window._paq.push(["trackEvent", "Button", props.tracking_event]);
     }
     emit("click", event);
   }
@@ -50,21 +50,21 @@ const { type = "button" } = props;
         // Icon size
         'px-1.5 py-1.5 w-min': (props.size || 'default') === 'icon',
 
-      // Variants
-      'bg-primary text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base':
-        (props.variant || 'primary') === 'primary',
-      'bg-transparent text-black hover:bg-primary hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
-        (props.variant || 'primary') === 'outline',
-      'bg-primary/80 text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
-        variant === 'rounded-full',
-      'bg-white text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
-        variant === 'secondary',
-      'bg-primary text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
-        variant === 'secondary-inverted',
-      'bg-red-500 text-white shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base hover:bg-red-600':
-        (props.variant || 'primary') === 'danger',
-      'bg-transparent text-black hover:bg-gray-100 hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
-        (props.variant || 'primary') === 'ghost',
+        // Variants
+        'bg-primary text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base':
+          (props.variant || 'primary') === 'primary',
+        'bg-transparent text-black hover:bg-primary hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
+          (props.variant || 'primary') === 'outline',
+        'bg-primary/80 text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
+          variant === 'rounded-full',
+        'bg-white text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
+          variant === 'secondary',
+        'bg-primary text-black shadow-[0_4px_0_#000] hover:bg-primary hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] hover:cursor-pointer text-base rounded-full':
+          variant === 'secondary-inverted',
+        'bg-red-500 text-white shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer text-base hover:bg-red-600':
+          (props.variant || 'primary') === 'danger',
+        'bg-transparent text-black hover:bg-gray-100 hover:text-black shadow-[0_4px_0_#000] hover:translate-y-[2px] hover:shadow-[0_2px_0_#000] active:translate-y-[6px] active:shadow-[0_0px_0_#000] rounded-lg hover:cursor-pointer px-14 py-2.5 text-base':
+          (props.variant || 'primary') === 'ghost',
 
         // Icon position
         'flex items-center flex-row-reverse gap-2.5': props.positionIcon === 'right',

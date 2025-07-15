@@ -153,6 +153,7 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function register(credentials: RegisterCredentials) {
+    console.log(credentials);
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",

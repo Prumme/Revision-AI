@@ -41,8 +41,10 @@ const formattedPeriod = computed(() => {
 });
 
 const handleSelect = () => {
-  window._paq.push(['trackEvent', 'Button', "select_plan"]);
-  emit("select", props.plan);
+  if (typeof window !== "undefined" && window._paq) {
+    window._paq.push(["trackEvent", "Button", "select_plan"]);
+    emit("select", props.plan);
+  }
 };
 </script>
 
