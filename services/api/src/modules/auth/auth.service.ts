@@ -233,7 +233,6 @@ export class AuthService {
       const loginUrl = `${process.env.FRONTEND_URL}/login`;
       await this.mailService.sendResetPasswordConfirmationEmail(user.email, {
         username: user.username,
-        loginUrl: loginUrl,
       });
 
       return { message: 'Mot de passe réinitialisé avec succès' };
