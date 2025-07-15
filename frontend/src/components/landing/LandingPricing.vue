@@ -34,7 +34,9 @@ onMounted(() => {
             </li>
           </ul>
           <RouterLink to="/register" class="mt-auto">
-            <ButtonComponent variant="secondary"> S'inscrire </ButtonComponent>
+            <ButtonComponent tracking_event="landing_pricing_subscribe_cta" variant="secondary">
+              S'inscrire
+            </ButtonComponent>
           </RouterLink>
         </div>
 
