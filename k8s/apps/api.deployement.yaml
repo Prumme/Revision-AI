@@ -30,6 +30,13 @@ spec:
         - image: revision-ai/api:latest
           imagePullPolicy: IfNotPresent
           name: api
+          readinessProbe:
+            httpGet:
+              path: /subscription/subscription-products
+              port: 3000
+            initialDelaySeconds: 30   # Le plus important : donne 30s à l'API pour booter
+            periodSeconds: 10         # Répète la vérification toutes les 10s
+            failureThreshold: 3
           resources:
             limits:
               cpu: 900m
