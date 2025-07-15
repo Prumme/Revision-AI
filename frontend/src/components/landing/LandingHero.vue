@@ -39,7 +39,7 @@ import image from "../../assets/images/illuLanding.png";
               :animate="{ opacity: 1, scale: 1 }"
               transition="{ delay: 0.4, type: 'spring', stiffness: 300, damping: 20 }"
             >
-              <ButtonComponent variant="primary" tracking_event="start_free_trial">
+              <ButtonComponent variant="primary" tracking_event="landing_start_free_trial_cta">
                 Commencer gratuitement !</ButtonComponent
               >
             </Motion>

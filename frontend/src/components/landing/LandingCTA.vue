@@ -13,7 +13,9 @@ import { RouterLink } from "vue-router";
         Commence dès aujourd’hui gratuitement et découvre une nouvelle façon de réviser.
       </p>
       <RouterLink to="/register">
-        <ButtonComponent variant="primary"> Essayez gratuitement !</ButtonComponent>
+        <ButtonComponent variant="primary" tracking_event="landing_try_it_now_cta">
+          Essayez gratuitement !</ButtonComponent
+        >
       </RouterLink>
     </div>
   </section>
