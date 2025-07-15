@@ -1,18 +1,16 @@
 export const SUBSCRIPTION_FEATURES = {
-  free: ["1 quiz / jour", "Fichier max 10 Mo", "Pas de rappel intelligent", "Historique limité"],
+  free: ["1 quiz / jour", "10 000 tokens d'entrée par génération", "5 création de quiz maximum", "1 fichier par génération"],
   basic: [
-    "Quiz illimités",
-    "Taille fichier étendue (jusqu'à 50 Mo)",
-    "Rappels intelligents",
-    "Suivi de progression détaillé",
-    "Génération par thème / niveau",
+    "20 quiz / jour",
+    "20 000 tokens d'entrée par génération",
+    "Pas de limite sur le nombre total de quiz",
+    "5 fichiers par génération",
   ],
   pro: [
-    "Tout dans l'offre Basic",
-    "Analyse avancée des cours",
-    "Mode Révision Express",
-    "Création de sessions de révision intelligentes",
-    "Assistance prioritaire",
+    "50 quiz / jour",
+    "100 000 tokens d'entrée par génération",
+    "Pas de limite sur le nombre total de quiz",
+    "10 fichiers par génération",
   ],
 };
 

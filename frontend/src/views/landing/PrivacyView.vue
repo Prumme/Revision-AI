@@ -35,7 +35,6 @@ import {
   X,
   RotateCcw,
   Siren,
-  Clock
 } from "lucide-vue-next";
 import ButtonComponent from "@/components/buttons/ButtonComponent.vue";
 import { RouterLink } from "vue-router";
@@ -298,6 +297,23 @@ const privacySections = [
                   <li>Historique d'utilisation du service</li>
                 </ul>
               </div>
+              <div>
+                <h3 class="font-outfit font-semibold text-black mb-3 flex items-center gap-2">
+                  <Target class="w-5 h-5 text-primary" />
+                  Données d'analyse et de statistiques
+                </h3>
+                <ul class="font-outfit text-gray-700 space-y-1 list-disc list-inside ml-4">
+                  <li>Adresse IP (anonymisée)</li>
+                  <li>Pages visitées et temps de visite</li>
+                  <li>Navigateur et système d'exploitation</li>
+                  <li>Résolution d'écran et type d'appareil</li>
+                  <li>Référent (site depuis lequel vous venez)</li>
+                  <li>Pays et région (sans localisation précise)</li>
+                </ul>
+                <p class="font-outfit text-sm text-gray-600 mt-2 italic">
+                  Note : Ces données sont collectées via Matomo, hébergé sur nos serveurs français, dans le respect de votre vie privée.
+                </p>
+              </div>
             </div>
           </div>
         </Motion>
@@ -353,6 +369,13 @@ const privacySections = [
                   </h3>
                   <p class="font-outfit text-gray-700">Respect des obligations comptables, fiscales et réglementaires françaises.</p>
                 </div>
+                <div class="border-l-4 border-primary pl-4">
+                  <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
+                    <Target class="w-5 h-5 text-primary" />
+                    Amélioration de l'expérience utilisateur
+                  </h3>
+                  <p class="font-outfit text-gray-700">Analyse de l'utilisation du site, optimisation de l'interface, compréhension des besoins utilisateurs via Matomo (avec votre consentement).</p>
+                </div>
               </div>
             </div>
           </div>
@@ -389,6 +412,15 @@ const privacySections = [
                 </h3>
                 <p class="font-outfit text-gray-700">
                   Conservation des données comptables (10 ans), respect des obligations fiscales françaises, lutte contre la fraude.
+                </p>
+              </div>
+              <div>
+                <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
+                  <CheckCircle class="w-5 h-5 text-primary" />
+                  Consentement (Art. 6.1.a RGPD)
+                </h3>
+                <p class="font-outfit text-gray-700">
+                  Mesures d'audience et statistiques via Matomo pour améliorer notre service (avec votre consentement libre et révocable).
                 </p>
               </div>
             </div>
@@ -457,6 +489,15 @@ const privacySections = [
               </div>
               <div>
                 <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
+                  <Target class="w-5 h-5 text-primary" />
+                  Matomo (Analyse d'audience)
+                </h3>
+                <p class="font-outfit text-gray-700">
+                  Outil d'analyse web hébergé sur nos serveurs français pour mesurer l'audience et améliorer notre service (données anonymisées, avec votre consentement).
+                </p>
+              </div>
+              <div>
+                <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
                   <Scale class="w-5 h-5 text-primary" />
                   Autorités compétentes
                 </h3>
@@ -521,6 +562,13 @@ const privacySections = [
                 </div>
                 <div class="flex justify-between items-start p-4 bg-white rounded-lg">
                   <div>
+                    <h3 class="font-outfit font-semibold text-black mb-1">Données Matomo</h3>
+                    <p class="font-outfit text-gray-700">Statistiques d'audience anonymisées</p>
+                  </div>
+                  <span class="font-outfit font-bold text-primary">25 mois</span>
+                </div>
+                <div class="flex justify-between items-start p-4 bg-white rounded-lg">
+                  <div>
                     <h3 class="font-outfit font-semibold text-black mb-1">Données d'export</h3>
                     <p class="font-outfit text-gray-700">Fichiers de portabilité des données</p>
                   </div>
@@ -552,7 +600,7 @@ const privacySections = [
                   Hébergement en France
                 </h3>
                 <p class="font-outfit text-gray-700">
-                  Vos données sont principalement hébergées en France par Scaleway, garantissant le respect du droit européen.
+                  Vos données sont principalement hébergées en France par Scaleway, garantissant le respect du droit européen. Matomo est également hébergé sur nos serveurs français.
                 </p>
               </div>
               <div>
@@ -750,21 +798,51 @@ const privacySections = [
                   <CheckCircle class="w-5 h-5 text-primary" />
                   Cookies essentiels (sans consentement)
                 </h3>
-                <ul class="font-outfit text-gray-700 space-y-1 list-disc list-inside ml-4">
-                  <li><strong>Authentification :</strong> Maintien de votre session de connexion</li>
-                  <li><strong>Sécurité :</strong> Protection contre les attaques CSRF</li>
-                  <li><strong>Fonctionnement :</strong> Mémorisation de vos préférences de langue</li>
+                <p class="font-outfit text-gray-700">
+                  Ces cookies sont indispensables au fonctionnement du site et ne peuvent pas être désactivés :
+                </p>
+                <ul class="font-outfit text-gray-700 mt-2 space-y-1 list-disc list-inside ml-4">
+                  <li><strong>Authentification :</strong> Maintien de votre session de connexion (30 jours max)</li>
+                  <li><strong>Sécurité :</strong> Protection contre les attaques CSRF (session)</li>
+                  <li><strong>Fonctionnement :</strong> Mémorisation de vos préférences (session)</li>
                 </ul>
               </div>
               <div>
                 <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
-                  <Clock class="w-5 h-5 text-primary" />
-                  Durée de conservation
+                  <Target class="w-5 h-5 text-primary" />
+                  Cookies de mesure d'audience (avec consentement)
                 </h3>
-                <ul class="font-outfit text-gray-700 space-y-1 list-disc list-inside ml-4">
-                  <li><strong>Cookies de session :</strong> Supprimés à la fermeture du navigateur</li>
-                  <li><strong>Cookies d'authentification :</strong> 30 jours maximum</li>
+                <p class="font-outfit text-gray-700">
+                  Nous utilisons Matomo pour analyser l'utilisation de notre site dans le respect de votre vie privée :
+                </p>
+                <ul class="font-outfit text-gray-700 mt-2 space-y-1 list-disc list-inside ml-4">
+                  <li>Identifiant visiteur anonyme (25 mois)</li>
+                  <li>Source de la visite (6 mois)</li>
+                  <li>Pages visitées, temps passé, interactions</li>
+                  <li>Résolution d'écran, type d'appareil</li>
+                  <li>Localisation géographique (IP, pays)</li>
                 </ul>
+                <div class="bg-green-50 border-l-4 border-green-400 p-3 mt-3">
+                  <p class="font-outfit text-sm text-green-800">
+                    <strong>Respect de la vie privée :</strong> Matomo est configuré pour anonymiser automatiquement votre adresse IP, ne pas suivre les utilisateurs avec "Do Not Track" activé, et supprimer automatiquement les anciennes données visiteurs.
+                  </p>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-outfit font-semibold text-black mb-2 flex items-center gap-2">
+                  <Settings class="w-5 h-5 text-primary" />
+                  Gestion de vos cookies
+                </h3>
+                <p class="font-outfit text-gray-700">
+                  Vous pouvez gérer vos préférences de cookies :
+                </p>
+                <ul class="font-outfit text-gray-700 mt-2 space-y-1 list-disc list-inside ml-4">
+                  <li><strong>Via notre bandeau :</strong> Accepter ou refuser les cookies non essentiels</li>
+                  <li><strong>Dans votre navigateur :</strong> Paramètres de confidentialité pour tous les sites</li>
+                </ul>
+                <p class="font-outfit text-sm text-gray-600 mt-3 italic">
+                  Note : Refuser les cookies d'analyse n'affecte pas le fonctionnement du site mais nous aide moins à l'améliorer.
+                </p>
               </div>
             </div>
           </div>
@@ -843,11 +921,6 @@ const privacySections = [
             <RouterLink to="/contact">
               <ButtonComponent variant="primary">
                 Nous contacter
-              </ButtonComponent>
-            </RouterLink>
-            <RouterLink to="/terms">
-              <ButtonComponent variant="outline">
-                CGU et CGV
               </ButtonComponent>
             </RouterLink>
           </div>
