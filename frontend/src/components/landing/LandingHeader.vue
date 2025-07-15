@@ -47,6 +47,10 @@ function scrollTo(id: string) {
   if (el) {
     smoothScrollTo(el, 1000);
     closeMenu();
+  } else {
+    // Si l'élément n'existe pas, rediriger vers la page d'accueil avec l'ancre
+    router.push({ path: "/", hash: `#${id}` });
+    closeMenu();
   }
 }
 
@@ -95,7 +99,7 @@ onUnmounted(() => {
       <ul class="hidden md:flex items-center gap-8 font-outfit text-base">
         <li>
           <a
-            href="#fonctionnalites"
+            href="/#fonctionnalites"
             @click.prevent="scrollTo('fonctionnalites')"
             class="hover:text-primary transition"
             >Fonctionnalités</a
@@ -103,7 +107,7 @@ onUnmounted(() => {
         </li>
         <li>
           <a
-            href="#tarifs"
+            href="/#tarifs"
             @click.prevent="scrollTo('tarifs')"
             class="hover:text-primary transition"
             >Tarifs</a
@@ -111,14 +115,14 @@ onUnmounted(() => {
         </li>
         <li>
           <a
-            href="#partenaires"
+            href="/#partenaires"
             @click.prevent="scrollTo('partenaires')"
             class="hover:text-primary transition"
             >Partenaires</a
           >
         </li>
         <li>
-          <a href="#faq" @click.prevent="scrollTo('faq')" class="hover:text-primary transition"
+          <a href="/#faq" @click.prevent="scrollTo('faq')" class="hover:text-primary transition"
             >FAQ</a
           >
         </li>
@@ -186,18 +190,18 @@ onUnmounted(() => {
           </div>
           <ul class="flex flex-col gap-4 font-outfit text-lg">
             <li>
-              <a href="#fonctionnalites" @click.prevent="scrollTo('fonctionnalites')"
+              <a href="/#fonctionnalites" @click.prevent="scrollTo('fonctionnalites')"
                 >Fonctionnalités</a
               >
             </li>
             <li>
-              <a href="#tarifs" @click.prevent="scrollTo('tarifs')">Tarifs</a>
+              <a href="/#tarifs" @click.prevent="scrollTo('tarifs')">Tarifs</a>
             </li>
             <li>
-              <a href="#partenaires" @click.prevent="scrollTo('partenaires')">Partenaires</a>
+              <a href="/#partenaires" @click.prevent="scrollTo('partenaires')">Partenaires</a>
             </li>
             <li>
-              <a href="#faq" @click.prevent="scrollTo('faq')">FAQ</a>
+              <a href="/#faq" @click.prevent="scrollTo('faq')">FAQ</a>
             </li>
           </ul>
           <div v-if="!user" class="flex flex-col gap-3 mt-4">
