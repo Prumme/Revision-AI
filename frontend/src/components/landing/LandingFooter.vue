@@ -51,7 +51,7 @@ const cookieConsent = useCookieConsent();
         >
           {{ link.label }}
         </a>
-        <button type="button" @click="cookieConsent.showPreferences()">
+        <button type="button" @click="cookieConsent && cookieConsent.showPreferences()">
           Manage cookie preferences
         </button>
       </nav>
