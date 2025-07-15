@@ -8,6 +8,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CustomerRepository } from '@repositories/customer.repository';
@@ -176,5 +177,73 @@ export class AuthService {
       user.TOTPSecret = null;
     }
     return this.usersService.update(user.id, user);
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      // Pour des raisons de sécurité, on renvoie toujours le même message
+      // même si l'utilisateur n'existe pas
+      return {
+        message:
+          'Si cet email existe, un lien de réinitialisation a été envoyé.',
+      };
+    }
+
+    // Génération du token de réinitialisation avec une durée de vie courte (1 heure)
+    const resetToken = await this.jwtService.signAsync(
+      { sub: user.id, purpose: 'password-reset' },
+      { expiresIn: '1h' },
+    );
+
+    const resetPasswordUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
+
+    // Envoi de l'email de réinitialisation
+    await this.mailService.sendForgotPasswordEmail(user.email, {
+      username: user.username,
+      resetPasswordUrl: resetPasswordUrl,
+    });
+
+    return {
+      message: 'Si cet email existe, un lien de réinitialisation a été envoyé.',
+    };
+  }
+
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    try {
+      const decoded = await this.jwtService.verifyAsync(token);
+
+      // Vérifier que le token est bien un token de réinitialisation
+      if (decoded.purpose !== 'password-reset') {
+        throw new UnauthorizedException('Token invalide');
+      }
+
+      const user = await this.usersService.findById(decoded.sub);
+      if (!user) {
+        throw new UnauthorizedException('Utilisateur non trouvé');
+      }
+
+      // Mettre à jour le mot de passe sans vérifier l'ancien
+      await this.usersService.resetPassword(user.id, newPassword);
+
+      // Envoyer un email de confirmation
+      const loginUrl = `${process.env.FRONTEND_URL}/login`;
+      await this.mailService.sendResetPasswordConfirmationEmail(user.email, {
+        username: user.username,
+      });
+
+      return { message: 'Mot de passe réinitialisé avec succès' };
+    } catch (error) {
+      if (error.name === 'TokenExpiredError') {
+        throw new BadRequestException('Le token de réinitialisation a expiré');
+      }
+      if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Token invalide');
+      }
+      throw error;
+    }
   }
 }

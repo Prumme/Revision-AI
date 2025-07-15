@@ -24,3 +24,9 @@ export interface NewPasswordNeededParams extends EmailParams {
 export interface DeleteAccountParams extends EmailParams {}
 
 export interface AskNewUsernameParams extends EmailParams {}
+
+export interface ForgotPasswordParams extends EmailParams {
+  resetPasswordUrl: string;
+}
+
+export interface ResetPasswordConfirmationParams extends EmailParams {}
