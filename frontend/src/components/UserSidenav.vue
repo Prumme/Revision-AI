@@ -159,10 +159,10 @@ const handleLogout = () => {
                 @click="closeDropdown"
                 >Mon profil</RouterLink
               >
-              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="#"
+              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="/coming-soon"
                 >Boutique</RouterLink
               >
-              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="#"
+              <RouterLink class="block px-4 py-2 text-gray-light hover:bg-gray-100" to="/coming-soon"
                 >Paramètres</RouterLink
               >
               <span
