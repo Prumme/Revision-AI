@@ -274,9 +274,9 @@ const legalSections = [
                 </p>
               </div>
               <div>
-                <h3 class="font-outfit font-semibold text-black mb-2">Cookies</h3>
+                <h3 class="font-outfit font-semibold text-black mb-2">Cookies et mesure d'audience</h3>
                 <p class="font-outfit text-gray-700">
-                  Notre site utilise des cookies uniquement utiles au bon fonctionnement du site internet afin d'améliorer votre expérience. Vous pouvez gérer vos préférences depuis notre politique de cookies.
+                  Notre site utilise des cookies essentiels au bon fonctionnement du site et des cookies de mesure d'audience via Matomo (avec votre consentement). Matomo est hébergé sur nos serveurs français et respecte votre vie privée. Consultez notre politique de cookies pour plus de détails.
                 </p>
               </div>
             </div>
