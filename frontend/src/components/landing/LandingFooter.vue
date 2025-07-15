@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import TwitterIcon from "@/components/icons/TwitterIcon.vue";
 import { Instagram, Linkedin } from "lucide-vue-next";
+import { useCookieConsent } from "@/plugins/CookieConsentVue.ts";
 
 const links = [
   { label: "Contact", href: "/contact" },
@@ -26,6 +27,8 @@ const socials = [
     icon: Linkedin,
   },
 ];
+
+const cookieConsent = useCookieConsent();
 </script>
 
 <template>
@@ -48,6 +51,9 @@ const socials = [
         >
           {{ link.label }}
         </a>
+        <button type="button" @click="cookieConsent.showPreferences()">
+          Manage cookie preferences
+        </button>
       </nav>
 
       <!-- Réseaux sociaux -->
