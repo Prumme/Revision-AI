@@ -26,7 +26,7 @@ const handleForgotPassword = () => {
         />
         <!-- Card -->
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <Card>
+          <Card class="shadow-[0_4px_0_#000] border-2 !border-black">
             <template #header>
               <h1
                 class="text-center text-black text-lg lg:text-3xl mb-2 font-encode font-extrabold whitespace-pre"

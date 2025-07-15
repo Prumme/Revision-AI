@@ -22,7 +22,7 @@ const handleGoToLogin = () => {
           class="w-full h-full object-cover"
         />
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <Card>
+          <Card class="shadow-[0_4px_0_#000] border-2 !border-black">
             <template #header>
               <div class="flex flex-col items-center gap-4">
                 <div class="bg-primary/10 p-4 rounded-full">

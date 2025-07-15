@@ -15,8 +15,8 @@ const emit = defineEmits<(event: "confirm-order") => void>();
 const handleConfirm = () => {
   if (typeof window !== "undefined" && window._paq) {
     window._paq.push(["trackEvent", "Button", "confirm_order"]);
-    emit("confirm-order");
   }
+  emit("confirm-order");
 };
 </script>
 
