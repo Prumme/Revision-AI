@@ -1,0 +1,87 @@
+#cc-main {
+  /* Use your app's fonts */
+  --cc-font-family: 'Outfit', 'Encode Sans Semi Expanded', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+
+  /* Modal background and text */
+  --cc-modal-bg: var(--color-background);
+  --cc-modal-text: var(--color-text);
+  --cc-modal-border-radius: 16px;
+  --cc-modal-shadow: 0 4px 24px rgba(40, 38, 44, 0.12);
+
+  /* Primary button styles */
+  --cc-btn-primary-bg: #fcba04;
+  --cc-btn-primary-color: #000;
+  --cc-btn-primary-border-color: #000;
+  --cc-btn-primary-hover-bg: #f2c236;
+  --cc-btn-primary-hover-border-color: #000;
+
+  --cc-btn-border-radius: 8px;
+  --cc-btn-font-size: 1rem;
+  --cc-btn-font-family: 'Outfit', sans-serif;
+  --cc-btn-shadow: 0 4px 0 #000;
+  --cc-btn-hover-shadow: 0 2px 0 #000;
+  --cc-btn-active-shadow: 0 0px 0 #000;
+  --cc-btn-padding-x: 1.5rem;
+  --cc-btn-padding-y: 0.625rem;
+
+  /* Secondary button styles */
+  --cc-btn-secondary-bg: var(--color-background-alt, #fff);
+  --cc-btn-secondary-color: var(--color-black, #000);
+  --cc-btn-secondary-border-color: var(--color-black, #000);
+  --cc-btn-secondary-hover-bg: var(--color-primary, #fcba04);
+  --cc-btn-secondary-hover-border-color: var(--color-black, #000);
+
+  /* Toggle styles */
+  --cc-toggle-on-bg: var(--color-primary, #fcba04);
+  --cc-toggle-border-radius: 12px;
+
+  /* Section styles */
+  --cc-section-title-color: var(--color-primary, #fcba04);
+  --cc-section-title-font-size: 1.125rem;
+  --cc-section-title-font-weight: 600;
+  --cc-section-bg: var(--color-background-alt, #fff);
+  --cc-section-border-radius: 12px;
+
+  /* Link colors */
+  --cc-link-color: var(--color-primary, #fcba04);
+  --cc-link-hover-color: var(--color-primary-dark, #e9d275);
+}
+
+/* Custom button style for Cookie Consent modal */
+#cc-main .cc-btn {
+  font-family: var(--cc-btn-font-family);
+  font-size: var(--cc-btn-font-size);
+  border-radius: var(--cc-btn-border-radius);
+  box-shadow: 0 4px 0 var(--color-black, #000);
+  padding: var(--cc-btn-padding-y) var(--cc-btn-padding-x);
+  border: 2px solid var(--cc-btn-primary-border-color);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s;
+}
+#cc-main .cc-btn--primary {
+  background: var(--cc-btn-primary-bg);
+  color: var(--cc-btn-primary-color);
+}
+#cc-main .cc-btn--primary:hover {
+  background: var(--cc-btn-primary-hover-bg);
+  box-shadow: 0 2px 0 var(--color-black, #000);
+  transform: translateY(2px);
+}
+#cc-main .cc-btn--primary:active {
+  box-shadow: 0 0px 0 var(--color-black, #000);
+  transform: translateY(6px);
+}
+#cc-main .cc-btn--secondary {
+  background: var(--cc-btn-secondary-bg);
+  color: var(--cc-btn-secondary-color);
+  border: 2px solid var(--cc-btn-secondary-border-color);
+}
+#cc-main .cc-btn--secondary:hover {
+  background: var(--cc-btn-secondary-hover-bg);
+  color: var(--cc-btn-secondary-color);
+  box-shadow: 0 2px 0 var(--color-black, #000);
+  transform: translateY(2px);
+}
+#cc-main .cc-btn--secondary:active {
+  box-shadow: 0 0px 0 var(--color-black, #000);
+  transform: translateY(6px);
+}

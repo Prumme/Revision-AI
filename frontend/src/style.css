@@ -1,40 +1,39 @@
-@import url("https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Expanded:wght@100;200;300;400;500;600;700;800;900");
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Encode+Sans+Semi+Expanded:wght@100;200;300;400;500;600;700;800;900");
+  @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 
-@import "tailwindcss";
+  @import "tailwindcss";
 
-@theme {
-  --color-background: #f5f5f5;
-  --color-foreground: #000000;
+  @theme {
+    --color-background: #f5f5f5;
+    --color-foreground: #000000;
 
-  --color-background-alt: #ffffff;
-  --color-foreground-alt: #00000099;
+    --color-background-alt: #ffffff;
+    --color-foreground-alt: #00000099;
 
-  --color-primary: #fcba04;
-  --color-primary-dark: #e9d275;
+    --color-primary: #fcba04;
+    --color-primary-dark: #e9d275;
 
-  --color-error: #ef2d56;
-  --color-error-dark: #c72a4d;
-  --color-success-light: #62ef9f;
-  --color-success: #0cce6b;
+    --color-error: #ef2d56;
+    --color-error-dark: #c72a4d;
+    --color-success-light: #62ef9f;
+    --color-success: #0cce6b;
 
-  --color-pale-green: #9effbb;
-  --color-pale-yellow: #ffec9e;
-  --color-pale-purple: #a89eff;
-  --color-pale-red: #ff9ea0;
+    --color-pale-green: #9effbb;
+    --color-pale-yellow: #ffec9e;
+    --color-pale-purple: #a89eff;
+    --color-pale-red: #ff9ea0;
 
-  --color-blue-light: #f0faff;
-  --color-blue: #9ee0ff;
+    --color-blue-light: #f0faff;
+    --color-blue: #9ee0ff;
 
-  --color-gray-extralight: #d9d9d9;
-  --color-gray-light: #5a5a5a;
+    --color-gray-extralight: #d9d9d9;
+    --color-gray-light: #5a5a5a;
 
-  --color-black-transparent: rgba(0, 0, 0, 0.58);
-  --color-black: #28262c;
+    --color-black-transparent: rgba(0, 0, 0, 0.58);
+    --color-black: #28262c;
 
-  --font-encode: "Encode Sans Semi Expanded", sans-serif;
-  --font-outfit: "Outfit", sans-serif;
+    --font-encode: "Encode Sans Semi Expanded", sans-serif;
+    --font-outfit: "Outfit", sans-serif;
 
-  --inset-shadow-md: inset 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
+    --inset-shadow-md: inset 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
