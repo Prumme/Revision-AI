@@ -172,7 +172,7 @@ watch(quizCount, (newCount) => {
       <!-- Loading Skeleton -->
       <div
         v-if="loading"
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5 animate-pulse"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-7 mt-5 animate-pulse"
       >
         <div
           v-for="n in 8"
@@ -216,7 +216,9 @@ watch(quizCount, (newCount) => {
 
       <!-- Quiz list -->
       <div v-else>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-7 mt-5">
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6 gap-7 mt-5"
+        >
           <QuizCard
             v-for="quiz in quizzes"
             :key="quiz.id"
