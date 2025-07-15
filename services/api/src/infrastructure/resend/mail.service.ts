@@ -6,7 +6,9 @@ import {
   BlockUserParams,
   CancelSubscriptionParams,
   DeleteAccountParams,
+  ForgotPasswordParams,
   NewPasswordNeededParams,
+  ResetPasswordConfirmationParams,
   SucceedBoughtParams,
   UnblockUserParams,
   VerifyEmailParams,
@@ -18,6 +20,8 @@ import { newPasswordNeededTemplate } from './templates/new-password-needed';
 import { deleteAccountTemplate } from './templates/delete-account';
 import { unblockUserTemplate } from './templates/unblock-user';
 import { askNewUsernameTemplate } from './templates/ask-new-username';
+import { forgotPasswordTemplate } from './templates/forgot-password';
+import { resetPasswordConfirmationTemplate } from './templates/reset-password-confirmation';
 
 class NullResend {
   emails = {
@@ -159,6 +163,27 @@ export class MailService {
   ): Promise<CreateEmailResponseSuccess> {
     const subject = 'Ton compte a été supprimé';
     const template = deleteAccountTemplate(params.username);
+    return await this.send(to, subject, template);
+  }
+
+  public async sendForgotPasswordEmail(
+    to: string,
+    params: ForgotPasswordParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Réinitialisation de ton mot de passe';
+    const template = forgotPasswordTemplate(
+      params.username,
+      params.resetPasswordUrl,
+    );
+    return await this.send(to, subject, template);
+  }
+
+  public async sendResetPasswordConfirmationEmail(
+    to: string,
+    params: ResetPasswordConfirmationParams,
+  ): Promise<CreateEmailResponseSuccess> {
+    const subject = 'Mot de passe réinitialisé avec succès';
+    const template = resetPasswordConfirmationTemplate(params.username);
     return await this.send(to, subject, template);
   }
 }

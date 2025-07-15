@@ -6,6 +6,7 @@ import EmailSend from "@/views/authentication/EmailSend.vue";
 import ForgotPassword from "@/views/authentication/ForgotPassword.vue";
 import LoginPage from "@/views/authentication/LoginPage.vue";
 import RegisterPage from "@/views/authentication/RegisterPage.vue";
+import ResetPassword from "@/views/authentication/ResetPassword.vue";
 import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import CheckoutView from "@/views/CheckoutView.vue";
 import DashboardView from "@/views/DashboardView.vue";
@@ -153,6 +154,12 @@ const router = createRouter({
       path: "/auth/verify-email",
       name: "verify-email",
       component: VerifyEmail,
+      meta: { requiresGuest: true },
+    },
+    {
+      path: "/auth/reset-password",
+      name: "reset-password",
+      component: ResetPassword,
       meta: { requiresGuest: true },
     },
     {

@@ -149,6 +149,20 @@ export class UserService {
     });
   }
 
+  async resetPassword(id: string, newPassword: string): Promise<User> {
+    const existingUser = await this.userRepository.findById(id);
+    if (!existingUser) {
+      throw new Error('Utilisateur non trouvé');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    return this.userRepository.update(id, {
+      password: hashedPassword,
+      lastUpdatedPassword: new Date(),
+    });
+  }
+
   async delete(id: string): Promise<boolean> {
     return this.userRepository.delete(id);
   }
