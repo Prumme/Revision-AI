@@ -11,6 +11,7 @@ import VerifyEmail from "@/views/authentication/VerifyEmail.vue";
 import CheckoutView from "@/views/CheckoutView.vue";
 import DashboardView from "@/views/DashboardView.vue";
 import NotFound from "@/views/errors/NotFound.vue";
+import ComingSoon from "@/views/ComingSoon.vue";
 import LandingPage from "@/views/LandingPage.vue";
 import ProfilePage from "@/views/Profile/ProfilePage.vue";
 import PublicProfilePage from "@/views/Profile/PublicProfilePage.vue";
@@ -128,6 +129,11 @@ const router = createRouter({
           name: "admin-report-detail",
           component: AdminReportDetailView,
           meta: { requiresAdmin: true },
+        },
+        {
+          path: "/coming-soon",
+          name: "coming-soon",
+          component: ComingSoon,
         },
       ],
     },

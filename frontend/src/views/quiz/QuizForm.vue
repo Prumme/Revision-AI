@@ -69,6 +69,11 @@ const generateQuiz = async () => {
     // Préparation des fichiers
     const files = !Array.isArray(media.value) ? [media.value] : media.value;
 
+    if (files.length <= 0 || !files[0]) {
+      toast.showToast("error", "Veuillez ajouter des médias");
+      return;
+    }
+
     try {
       // Appel au service pour créer le quiz
       console.log("Création du quiz avec les données:", quizData, "et les fichiers:", files);

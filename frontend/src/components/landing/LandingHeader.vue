@@ -138,7 +138,7 @@ onUnmounted(() => {
         </RouterLink>
       </div>
 
-      <div v-else class="hidden md:flex items-center gap-4">
+      <div v-else class="hidden md:flex items-center gap-4 font-outfit">
         <Dropdown position="top-right">
           <template #trigger>
             <ProfileComponent :isSidebarOpen="menuOpen" :icon="true" />
@@ -149,8 +149,8 @@ onUnmounted(() => {
             <a href="/profile" class="block px-4 py-2 text-gray-light hover:bg-gray-100"
               >Mon profil</a
             >
-            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
-            <a href="#" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
+            <a href="/coming-soon" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Boutique</a>
+            <a href="/coming-soon" class="block px-4 py-2 text-gray-light hover:bg-gray-100">Paramètres</a>
             <span
               class="block px-4 py-2 mb-2 text-gray-light hover:bg-gray-100"
               @click="handleLogout"

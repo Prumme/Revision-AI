@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Download } from "lucide-vue-next";
 import type { Invoice } from "@/types/invoice";
+import { Newspaper } from 'lucide-vue-next';
 
 const props = defineProps<{
   invoices: Invoice[];
@@ -43,5 +44,10 @@ const props = defineProps<{
         </a>
       </div>
     </div>
+  </div>
+
+  <div class="px-6 py-12 text-center text-gray-500" v-else>
+    <Newspaper class="w-12 h-12 mx-auto mb-4 text-gray-400" />
+    <p>Aucune facture disponible.</p>
   </div>
 </template>
