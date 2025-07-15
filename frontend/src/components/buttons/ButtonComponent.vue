@@ -31,7 +31,6 @@ const handleClick = (event: MouseEvent) => {
   }
 };
 
-// Ne pas destructurer les props pour conserver la réactivité
 const { type = "button" } = props;
 </script>
 
