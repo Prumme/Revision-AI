@@ -4,6 +4,9 @@ Revision AI est une solution SaaS innovante conçue pour aider les collégiens e
 
 Pour garantir une **haute disponibilité**, une **scalabilité** et une **résilience** optimales, Revision AI s'appuie sur une **architecture distribuée** robuste, orchestrée par **Kubernetes**. Cette infrastructure est composée de plusieurs microservices interconnectés, chacun ayant un rôle spécifique dans le processus de création et de gestion des quiz.
 
+> URL : https://revision-ai.com
+> Login admin si besoin : axel@axel.com - 123456789@ESGI
+
 -----
 
 ## Architecture des services
